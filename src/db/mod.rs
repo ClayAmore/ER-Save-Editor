@@ -1,0 +1,12 @@
+pub mod item_name;
+pub mod weapon_name;
+pub mod armor_name;
+pub mod aow_name;
+pub mod accessory_name;
+pub mod map_name;
+pub mod graces;
+pub mod whetblades;
+pub mod cookbooks;
+pub mod maps;
+pub mod bosses;
+pub mod event_flags;
