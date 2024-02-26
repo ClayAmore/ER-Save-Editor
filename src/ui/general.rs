@@ -15,7 +15,7 @@ pub mod general {
 
             // Character Name
             ui.label("Character Name:");
-            ui.add(egui::widgets::TextEdit::singleline(&mut vm.slots[vm.index].general_vm.character_name).char_limit(0x10));
+            ui.add(egui::widgets::TextEdit::singleline(&mut vm.slots[vm.index].general_vm.character_name).char_limit(0x20));
         });
     }
 }

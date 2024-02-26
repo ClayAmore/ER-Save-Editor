@@ -3,6 +3,7 @@
 mod vm;
 mod save;
 mod read;
+mod write;
 mod ui;
 mod db;
 
@@ -12,6 +13,7 @@ use eframe::{egui::{self, Id, LayerId, Order}, epaint::Color32};
 use save::save::save::{Save, SaveType};
 use ui::{events::events::events, general::general::general, inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
 use vm::vm::vm::ViewModel;
+ 
 
 
 fn main() -> Result<(), eframe::Error> {
@@ -70,7 +72,7 @@ impl eframe::App for App {
 
                 ui.columns(3,| uis| {
                     if self.vm.active {
-                        egui::Frame::none().show(&mut uis[2], |ui| {
+                        egui::Frame::none().show(&mut uis[1], |ui| {
                             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                                 ui.label(format!("Character: {}", self.vm.profile_summary[self.vm.index].character_name));
                                 ui.label(format!("Steam Id: {}", self.vm.steam_id));
@@ -169,7 +171,6 @@ impl eframe::App for App {
                         self.save = Save::from_path(&path).expect("Failed to read save");
                         self.vm = ViewModel::from_save(&self.save);
                         self.picked_path = path.clone();
-
                     }
                 });
             });

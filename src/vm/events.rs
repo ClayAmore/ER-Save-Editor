@@ -101,10 +101,6 @@ pub mod events_view_model {
                 events_vm.colosseums.insert(*key, on);
             }
 
-            // for (k,v) in events_vm.grace_groups.iter_mut() {
-            //     v.sort_by((a,b) )
-            // }
-
             events_vm
         }
 
