@@ -10,3 +10,5 @@ pub mod cookbooks;
 pub mod maps;
 pub mod bosses;
 pub mod event_flags;
+pub mod summoning_pools;
+pub mod colosseums;

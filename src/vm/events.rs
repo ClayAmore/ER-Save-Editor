@@ -1,7 +1,7 @@
 pub mod events_view_model {
     use std::collections::{BTreeMap, HashMap};
 
-    use crate::{db::{bosses::bosses::{Boss, BOSSES}, cookbooks::books::{Cookbook, COOKBOKS}, event_flags::event_flags::EVENT_FLAGS, graces::maps::{Grace, GRACES}, map_name::maps::{MapName, MAP_NAME}, maps::maps::{Map, MAPS}, whetblades::whetblades::{Whetblade, WHETBLADES}}, save::save_slot::SaveSlot};
+    use crate::{db::{bosses::bosses::{Boss, BOSSES}, colosseums::colosseums::{Colosseum, COLOSSEUMS}, cookbooks::books::{Cookbook, COOKBOKS}, event_flags::event_flags::EVENT_FLAGS, graces::maps::{Grace, GRACES}, map_name::maps::{MapName, MAP_NAME}, maps::maps::{Map, MAPS}, summoning_pools::summoning_pools::{SummoningPool, SUMMONING_POOLS}, whetblades::whetblades::{Whetblade, WHETBLADES}}, save::save_slot::SaveSlot};
 
     #[derive(Clone)]
     pub enum EventsRoute {
@@ -11,9 +11,8 @@ pub mod events_view_model {
         Cookboks,
         Maps,
         Bosses,
-        NPCS,
-        DoorsFloorsWalls,
-        Misc,
+        SummoningPools,
+        Colosseums,
     }
 
     #[derive(Clone)]
@@ -25,6 +24,8 @@ pub mod events_view_model {
         pub cookbooks: BTreeMap<Cookbook, bool>,
         pub maps: BTreeMap<Map, bool>,
         pub bosses: BTreeMap<Boss, bool>,
+        pub summoning_pools: BTreeMap<SummoningPool, bool>,
+        pub colosseums: BTreeMap<Colosseum, bool>,
     }
 
     impl Default for EventsViewModel {
@@ -37,6 +38,8 @@ pub mod events_view_model {
                 cookbooks: Default::default(),
                 maps: Default::default(),
                 bosses: Default::default(),
+                summoning_pools: Default::default(),
+                colosseums: Default::default(),
              }
         }
     }
@@ -77,13 +80,25 @@ pub mod events_view_model {
             }
 
             // Bosses
-            // for (key, value) in BOSSES.lock().unwrap().iter() {
-            //     println!("{}", value.0);
-            //     let event_flag_info = id_to_offset_lookup[&value.0];
-            //     let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
-            //     events_vm.bosses.insert(*key, on);
-            // }
+            for (key, value) in BOSSES.lock().unwrap().iter() {
+                let event_flag_info = id_to_offset_lookup[&value.0];
+                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                events_vm.bosses.insert(*key, on);
+            }
 
+            // Summoning Pools
+            for (key, value) in SUMMONING_POOLS.lock().unwrap().iter() {
+                let event_flag_info = id_to_offset_lookup[&value.0];
+                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                events_vm.summoning_pools.insert(*key, on);
+            }
+
+            // Colosseums
+            for (key, value) in COLOSSEUMS.lock().unwrap().iter() {
+                let event_flag_info = id_to_offset_lookup[&value.0];
+                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                events_vm.colosseums.insert(*key, on);
+            }
 
             events_vm
         }

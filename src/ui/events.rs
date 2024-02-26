@@ -1,7 +1,7 @@
 pub mod events {
 
     use eframe::egui::{self, Ui};
-    use crate::{db::{cookbooks::books::COOKBOKS, graces::maps::GRACES, map_name::maps::{MapName, MAP_NAME}, maps::maps::MAPS, whetblades::whetblades::WHETBLADES}, vm::{events::events_view_model::EventsRoute, vm::vm::ViewModel}};
+    use crate::{db::{bosses::bosses::BOSSES, colosseums::colosseums::COLOSSEUMS, cookbooks::books::COOKBOKS, graces::maps::GRACES, map_name::maps::{MapName, MAP_NAME}, maps::maps::MAPS, summoning_pools::{self, summoning_pools::SUMMONING_POOLS}, whetblades::whetblades::WHETBLADES}, vm::{events::events_view_model::EventsRoute, vm::vm::ViewModel}};
 
     pub fn events(ui: &mut Ui, vm:&mut ViewModel) {
         egui::SidePanel::left("inventory_menu").show(ui.ctx(), |ui|{
@@ -11,21 +11,19 @@ pub mod events {
                 ui.vertical(|ui| {
                     let sites_of_grace = ui.add_sized([100., 40.], egui::Button::new("Sites Of Grace"));
                     let whetblades = ui.add_sized([100., 40.], egui::Button::new("Whetblades"));
-                    let cookboks = ui.add_sized([100., 40.], egui::Button::new("Cookboks"));
+                    let cookboks = ui.add_sized([100., 40.], egui::Button::new("Cookbooks"));
                     let maps = ui.add_sized([100., 40.], egui::Button::new("Maps"));
                     let bosses = ui.add_sized([100., 40.], egui::Button::new("Bosses"));
-                    let npcs = ui.add_sized([100., 40.], egui::Button::new("NPCS"));
-                    let doors_floors_walls = ui.add_sized([100., 60.], egui::Button::new("Doors\nFloors\nWalls"));
-                    let misc = ui.add_sized([100., 40.], egui::Button::new("Misc"));
+                    let summoning_pools = ui.add_sized([100., 60.], egui::Button::new("Summoning\nPools"));
+                    let colosseums = ui.add_sized([100., 40.], egui::Button::new("Colosseums"));
         
                     if sites_of_grace.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::SitesOfGrace}
                     if whetblades.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::Whetblades}
                     if cookboks.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::Cookboks}
                     if maps.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::Maps}
                     if bosses.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::Bosses}
-                    if npcs.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::NPCS}
-                    if doors_floors_walls.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::DoorsFloorsWalls}
-                    if misc.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::Misc}
+                    if summoning_pools.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::SummoningPools}
+                    if colosseums.clicked() {vm.slots[vm.index].events_vm.current_route = EventsRoute::Colosseums}
         
                     // Highlight active 
                     match vm.slots[vm.index].events_vm.current_route {
@@ -35,9 +33,8 @@ pub mod events {
                         EventsRoute::Cookboks => {cookboks.highlight();},
                         EventsRoute::Maps => {maps.highlight();},
                         EventsRoute::Bosses => {bosses.highlight();},
-                        EventsRoute::NPCS => {npcs.highlight();},
-                        EventsRoute::DoorsFloorsWalls => {doors_floors_walls.highlight();},
-                        EventsRoute::Misc => {misc.highlight();},
+                        EventsRoute::SummoningPools => {summoning_pools.highlight();},
+                        EventsRoute::Colosseums => {colosseums.highlight();},
                     }
                 })
             });
@@ -54,10 +51,9 @@ pub mod events {
                     EventsRoute::Whetblades => {whetblades(ui, vm);},
                     EventsRoute::Cookboks => {cookbooks(ui, vm);},
                     EventsRoute::Maps => {maps(ui, vm);},
-                    EventsRoute::Bosses => {},
-                    EventsRoute::NPCS => {},
-                    EventsRoute::DoorsFloorsWalls => {},
-                    EventsRoute::Misc => {},
+                    EventsRoute::Bosses => {bosses(ui, vm);},
+                    EventsRoute::SummoningPools => {summoning_pools(ui, vm);},
+                    EventsRoute::Colosseums => {colosseums(ui, vm);},
                 }
             });
         });
@@ -110,6 +106,36 @@ pub mod events {
         for (map, on) in maps {
             let map_info: (u32,&str) = MAPS.lock().unwrap()[&map];
             ui.checkbox(on, map_info.1.to_string());
+        }
+    }
+
+    fn bosses(ui: &mut Ui, vm:&mut ViewModel) {
+        let bosses = &mut vm.slots[vm.index].events_vm.bosses;
+        ui.checkbox(&mut false, "");
+
+        for (boss, on) in bosses {
+            let boss_info: (u32,&str) = BOSSES.lock().unwrap()[&boss];
+            ui.checkbox(on, boss_info.1.to_string());
+        }
+    }
+
+    fn summoning_pools(ui: &mut Ui, vm:&mut ViewModel) {
+        let summoning_pools = &mut vm.slots[vm.index].events_vm.summoning_pools;
+        ui.checkbox(&mut false, "");
+
+        for (summoning_pool, on) in summoning_pools {
+            let summoning_pool_info: (u32,&str) = SUMMONING_POOLS.lock().unwrap()[&summoning_pool];
+            ui.checkbox(on, summoning_pool_info.1.to_string());
+        }
+    }
+
+    fn colosseums(ui: &mut Ui, vm:&mut ViewModel) {
+        let colosseums = &mut vm.slots[vm.index].events_vm.colosseums;
+        ui.checkbox(&mut false, "");
+
+        for (colosseum, on) in colosseums {
+            let colosseum_info: (u32,&str) = COLOSSEUMS.lock().unwrap()[&colosseum];
+            ui.checkbox(on, colosseum_info.1.to_string());
         }
     }
 }
