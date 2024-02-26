@@ -187,8 +187,8 @@ impl Read for RideGameData {
 
 #[derive(Clone)]
 pub struct Regions {
-    unlocked_regions_count: u32,
-    unlocked_regions: Vec<u32>
+    pub unlocked_regions_count: u32,
+    pub unlocked_regions: Vec<u32>
 }
 
 impl Default for Regions {

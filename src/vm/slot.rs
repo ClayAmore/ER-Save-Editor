@@ -1,5 +1,5 @@
 pub mod slot_view_model {
-    use crate::{save::save_slot::SaveSlot, vm::{events::events_view_model::EventsViewModel, general::general_view_model::GeneralViewModel, inventory::inventory::InventoryViewModel, stats::stats_view_model::StatsViewModel}};
+    use crate::{save::save_slot::SaveSlot, vm::{events::events_view_model::EventsViewModel, general::general_view_model::GeneralViewModel, inventory::inventory::InventoryViewModel, regions::regions_view_model::RegionsViewModel, stats::stats_view_model::StatsViewModel}};
 
 
     #[derive(Clone)]
@@ -9,6 +9,7 @@ pub mod slot_view_model {
         pub stats_vm: StatsViewModel,
         pub inventory_vm: InventoryViewModel,
         pub events_vm: EventsViewModel,
+        pub regions_vm: RegionsViewModel,
     }
 
     impl Default for SlotViewModel {
@@ -18,7 +19,8 @@ pub mod slot_view_model {
                 general_vm: Default::default(),
                 stats_vm: Default::default(),
                 inventory_vm: Default::default(),
-                events_vm: Default::default()
+                events_vm: Default::default(),
+                regions_vm: Default::default(),
             }
         }
     }
@@ -32,13 +34,15 @@ pub mod slot_view_model {
             let stats_vm = StatsViewModel::from_save(slot);
             let inventory_vm = InventoryViewModel::from_save(slot);
             let events_vm = EventsViewModel::from_save(slot);
+            let regions_vm = RegionsViewModel::from_save(slot);
              
             Self {
                 active,
                 general_vm,
                 stats_vm,
                 inventory_vm,
-                events_vm
+                events_vm,
+                regions_vm,
             }
         }
     }

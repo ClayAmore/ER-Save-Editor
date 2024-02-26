@@ -1,7 +1,7 @@
 pub mod events {
 
     use eframe::egui::{self, Ui};
-    use crate::{db::{bosses::bosses::BOSSES, colosseums::colosseums::COLOSSEUMS, cookbooks::books::COOKBOKS, graces::maps::GRACES, map_name::maps::{MapName, MAP_NAME}, maps::maps::MAPS, summoning_pools::{self, summoning_pools::SUMMONING_POOLS}, whetblades::whetblades::WHETBLADES}, vm::{events::events_view_model::EventsRoute, vm::vm::ViewModel}};
+    use crate::{db::{bosses::bosses::BOSSES, colosseums::colosseums::COLOSSEUMS, cookbooks::books::COOKBOKS, graces::maps::GRACES, map_name::map_name::{MapName, MAP_NAME}, maps::maps::MAPS, summoning_pools::summoning_pools::SUMMONING_POOLS, whetblades::whetblades::WHETBLADES}, vm::{events::events_view_model::EventsRoute, vm::vm::ViewModel}};
 
     pub fn events(ui: &mut Ui, vm:&mut ViewModel) {
         egui::SidePanel::left("inventory_menu").show(ui.ctx(), |ui|{

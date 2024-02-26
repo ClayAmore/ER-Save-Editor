@@ -4,3 +4,4 @@ pub mod general;
 pub mod stats;
 pub mod inventory;
 pub mod events;
+pub mod regions;

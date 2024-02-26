@@ -1,4 +1,4 @@
-pub mod weapon_name {
+pub mod armor_name {
     use std::{collections::HashMap, sync::Mutex};
     use once_cell::sync::Lazy;
 

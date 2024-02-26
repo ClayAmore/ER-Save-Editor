@@ -88,7 +88,7 @@ pub mod bosses {
         BeastmenofFaramAzulaDragonbarrowCave,
         BellBearingHunterIsolatedMerchantsShack,
         BlackBladeKindredBestialSanctum,
-        CleanrotKnightsStillwaterCave,
+        _CleanrotKnightsStillwaterCave, // TODO:: Why is this not used?
         FlyingDragonGreyllGreyollsDragonbarrow,
         GodskinApostleDivineTowerofCaelid,
         NightsCavalryDragonbarrow,

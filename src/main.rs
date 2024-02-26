@@ -10,7 +10,7 @@ use std::path::PathBuf;
 
 use eframe::{egui::{self, Id, LayerId, Order}, epaint::Color32};
 use save::save::save::{Save, SaveType};
-use ui::{events::events::events, general::general::general, inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, stats::stats::stats};
+use ui::{events::events::events, general::general::general, inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
 use vm::vm::vm::ViewModel;
 
 
@@ -125,7 +125,7 @@ impl eframe::App for App {
                     Route::Stats => stats(ui, &mut self.vm),
                     Route::Inventory => inventory(ui, &mut self.vm),
                     Route::EventFlags => events(ui, &mut self.vm),
-                    Route::Regions => todo!(),
+                    Route::Regions => regions(ui, &mut self.vm),
                 }
             });
         }

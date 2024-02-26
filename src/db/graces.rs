@@ -1,7 +1,7 @@
 pub mod maps {
     use std::{collections::HashMap, sync::Mutex};
     use once_cell::sync::Lazy;
-    use crate::db::map_name::maps::MapName;
+    use crate::db::map_name::map_name::MapName;
 
     #[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
     pub enum Grace {

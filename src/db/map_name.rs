@@ -1,4 +1,4 @@
-pub mod maps {
+pub mod map_name {
     use std::{collections::HashMap, sync::Mutex};
     use once_cell::sync::Lazy;
 
