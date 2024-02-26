@@ -17,6 +17,7 @@ pub mod regions_view_model {
             for (region, region_info) in REGIONS.lock().unwrap().iter() {
                 regions.insert(*region, false);
                 region_groups.get_mut(&region_info.2).expect("").push(*region);
+                region_groups.get_mut(&region_info.2).expect("").sort();
             }
 
             Self { region_groups, regions }

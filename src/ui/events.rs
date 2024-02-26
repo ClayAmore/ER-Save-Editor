@@ -61,23 +61,25 @@ pub mod events {
     }
 
     fn graces(ui: &mut Ui, vm:&mut ViewModel) {
-        let maps = &vm.slots[vm.index].events_vm.grace_groups;
-        let graces = &mut vm.slots[vm.index].events_vm.graces;
-        for map in maps {
-            ui.push_id(map.0, |ui| {
-                let collapsing = egui::containers::collapsing_header::CollapsingHeader::new(MAP_NAME.lock().unwrap()[&map.0]);
-                ui.horizontal(|ui|{
-                    ui.checkbox(&mut false, "");
-                    collapsing.show(ui, |ui| {
-                        for grace in map.1 {
-                            let grace_info: (MapName, u32, &str) = GRACES.lock().unwrap()[&grace];
-                            let on = graces.get_mut(grace).expect("");
-                            ui.checkbox(on, grace_info.2.to_string());
-                        }
-                    });
-                })
-            });
-        }
+        ui.vertical(|ui| {
+            let maps = &vm.slots[vm.index].events_vm.grace_groups;
+            let graces = &mut vm.slots[vm.index].events_vm.graces;
+            for map in maps {
+                ui.push_id(map.0, |ui| {
+                    let collapsing = egui::containers::collapsing_header::CollapsingHeader::new(MAP_NAME.lock().unwrap()[&map.0]);
+                    ui.horizontal(|ui|{
+                        ui.checkbox(&mut false, "");
+                        collapsing.show(ui, |ui| {
+                            for grace in map.1 {
+                                let grace_info: (MapName, u32, &str) = GRACES.lock().unwrap()[&grace];
+                                let on = graces.get_mut(grace).expect("");
+                                ui.checkbox(on, grace_info.2.to_string());
+                            }
+                        });
+                    })
+                });
+            }
+        });
     }
 
     fn whetblades(ui: &mut Ui, vm:&mut ViewModel) {

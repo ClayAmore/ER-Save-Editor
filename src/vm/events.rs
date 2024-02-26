@@ -1,5 +1,5 @@
 pub mod events_view_model {
-    use std::collections::{BTreeMap, HashMap};
+    use std::collections::BTreeMap;
 
     use crate::{db::{bosses::bosses::{Boss, BOSSES}, colosseums::colosseums::{Colosseum, COLOSSEUMS}, cookbooks::books::{Cookbook, COOKBOKS}, event_flags::event_flags::EVENT_FLAGS, graces::maps::{Grace, GRACES}, map_name::map_name::{MapName, MAP_NAME}, maps::maps::{Map, MAPS}, summoning_pools::summoning_pools::{SummoningPool, SUMMONING_POOLS}, whetblades::whetblades::{Whetblade, WHETBLADES}}, save::save_slot::SaveSlot};
 
@@ -18,7 +18,7 @@ pub mod events_view_model {
     #[derive(Clone)]
     pub struct EventsViewModel  {
         pub current_route: EventsRoute,
-        pub grace_groups: HashMap<MapName, Vec<Grace>>,
+        pub grace_groups: BTreeMap<MapName, Vec<Grace>>,
         pub graces: BTreeMap<Grace, bool>,
         pub whetblades: BTreeMap<Whetblade, bool>,
         pub cookbooks: BTreeMap<Cookbook, bool>,
@@ -32,7 +32,7 @@ pub mod events_view_model {
         fn default() -> Self {
             Self { 
                 current_route: EventsRoute::None,
-                grace_groups: MAP_NAME.lock().unwrap().iter().map(|m| (*m.0, Vec::new())).collect::<HashMap<_,_>>(),
+                grace_groups: MAP_NAME.lock().unwrap().iter().map(|m| (*m.0, Vec::new())).collect::<BTreeMap<_,_>>(),
                 graces: Default::default(),
                 whetblades: Default::default(),
                 cookbooks: Default::default(),
@@ -56,6 +56,7 @@ pub mod events_view_model {
                 let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
                 events_vm.graces.insert(*key, on);
                 events_vm.grace_groups.get_mut(&value.0).expect("").push(*key);
+                events_vm.grace_groups.get_mut(&value.0).expect("").sort();
             }
 
             // Whetblades
@@ -99,6 +100,10 @@ pub mod events_view_model {
                 let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
                 events_vm.colosseums.insert(*key, on);
             }
+
+            // for (k,v) in events_vm.grace_groups.iter_mut() {
+            //     v.sort_by((a,b) )
+            // }
 
             events_vm
         }
