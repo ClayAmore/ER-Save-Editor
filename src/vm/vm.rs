@@ -1,5 +1,5 @@
 pub mod vm{
-    use crate::{save::save::save::Save, vm::{profile_summary::slot_view_model::ProfileSummaryViewModel, slot::slot_view_model::SlotViewModel}};
+    use crate::{db::{bosses::bosses::BOSSES, colosseums::colosseums::COLOSSEUMS, cookbooks::books::COOKBOKS, event_flags::event_flags::EVENT_FLAGS, graces::maps::GRACES, maps::maps::MAPS, regions::{self, regions::REGIONS}, summoning_pools::summoning_pools::SUMMONING_POOLS, whetblades::whetblades::WHETBLADES}, save::save::save::Save, util::bit::bit::set_bit, vm::{profile_summary::slot_view_model::ProfileSummaryViewModel, slot::slot_view_model::SlotViewModel}};
     
     #[derive(Clone)]
     pub struct ViewModel {
@@ -42,39 +42,128 @@ pub mod vm{
             vm
         }
 
-        pub fn _update_save(&self, save: &mut Save) {
-            // Update Steam ID
-            self._update_steam_id(save);
+        pub fn update_save(&self, save: &mut Save) {
 
-            // Character name
-            self._update_character_name(save);
+            // Update SteamID for UserData10
+            let steam_id =  self.steam_id.parse::<u64>().expect("");
+            save.user_data_10.steam_id = steam_id;
+
+            // Update data for each character
+            for i in 0..0xA {
+                if save.user_data_10.active_slot[i] {
+                    // Update Steam ID
+                    self.update_steam_id(save, i, steam_id);
+
+                    // Character name
+                    self.update_character_name(save, i);
+
+                    // Update Events
+                    self.update_events(save, i);
+
+                    // Update Regions
+                    self.update_regions(save, i);
+                }
+            }
             
         }
 
-        fn _update_steam_id(&self, save: &mut Save) {
-            let steam_id =  self.steam_id.parse::<u64>().expect("");
-            save.user_data_10.steam_id = steam_id;
-            for i in 0..0xA {
-                if save.user_data_10.active_slot[i] {
-                    save.save_slots[i].steam_id = steam_id;
+        fn update_steam_id(&self, save: &mut Save, index: usize, steam_id: u64) {
+            save.save_slots[index].steam_id = steam_id;
+        }
+
+        fn update_character_name(&self, save: &mut Save, index: usize) {
+            let mut character_name: [u16; 0x10] = [0; 0x10];
+            let mut character_name2: [u16; 0x11] = [0; 0x11];
+
+            for (i, char) in self.slots[index].general_vm.character_name.chars().enumerate() {
+                character_name[i] = char as u16;
+                character_name2[i] = char as u16;
+            }
+            save.save_slots[index].player_game_data.character_name.copy_from_slice(&character_name);
+            save.user_data_10.profile_summary[index].character_name.copy_from_slice(&character_name2);
+        }
+
+        fn update_events(&self, save: &mut Save, index: usize) {
+            // Graces
+            for (grace, on) in self.slots[index].events_vm.graces.iter() {
+                let grace_info = GRACES.lock().unwrap()[&grace];
+                let offset = EVENT_FLAGS.lock().unwrap()[&grace_info.1];
+                let event_byte = save.save_slots[index].event_flags.flags[offset.0 as usize];
+                save.save_slots[index].event_flags.flags[offset.0 as usize] = set_bit(event_byte, offset.1, *on);
+                
+            }
+
+            // Whetblades
+            for (whetblade, on) in self.slots[index].events_vm.whetblades.iter() {
+                let whetblade_info = WHETBLADES.lock().unwrap()[&whetblade];
+                let offset = EVENT_FLAGS.lock().unwrap()[&whetblade_info.0];
+                let event_byte = save.save_slots[index].event_flags.flags[offset.0 as usize];
+                save.save_slots[index].event_flags.flags[offset.0 as usize] = set_bit(event_byte, offset.1, *on);
+            }
+
+            // Cookbooks
+            for (cookbook, on) in self.slots[index].events_vm.cookbooks.iter() {
+                let cookbook_info = COOKBOKS.lock().unwrap()[&cookbook];
+                let offset = EVENT_FLAGS.lock().unwrap()[&cookbook_info.0];
+                let event_byte = save.save_slots[index].event_flags.flags[offset.0 as usize];
+                save.save_slots[index].event_flags.flags[offset.0 as usize] = set_bit(event_byte, offset.1, *on);
+            }
+
+            // Maps
+            for (map, on) in self.slots[index].events_vm.maps.iter() {
+                let map_info = MAPS.lock().unwrap()[&map];
+                let offset = EVENT_FLAGS.lock().unwrap()[&map_info.0];
+                let event_byte = save.save_slots[index].event_flags.flags[offset.0 as usize];
+                save.save_slots[index].event_flags.flags[offset.0 as usize] = set_bit(event_byte, offset.1, *on);
+            }
+
+            // Bosses
+            for (boss, on) in self.slots[index].events_vm.bosses.iter() {
+                let boss_info = BOSSES.lock().unwrap()[&boss];
+                let offset = EVENT_FLAGS.lock().unwrap()[&boss_info.0];
+                let event_byte = save.save_slots[index].event_flags.flags[offset.0 as usize];
+                save.save_slots[index].event_flags.flags[offset.0 as usize] = set_bit(event_byte, offset.1, *on);
+            }
+
+            // Summoning Pools
+            for (summoning_pool, on) in self.slots[index].events_vm.summoning_pools.iter() {
+                let summoning_pool_info = SUMMONING_POOLS.lock().unwrap()[&summoning_pool];
+                let offset = EVENT_FLAGS.lock().unwrap()[&summoning_pool_info.0];
+                let event_byte = save.save_slots[index].event_flags.flags[offset.0 as usize];
+                save.save_slots[index].event_flags.flags[offset.0 as usize] = set_bit(event_byte, offset.1, *on);
+            }
+
+            // Colosseums
+            for (colusseum, on) in self.slots[index].events_vm.colosseums.iter() {
+                let colusseum_info = COLOSSEUMS.lock().unwrap()[&colusseum];
+                let offset = EVENT_FLAGS.lock().unwrap()[&colusseum_info.0];
+                let event_byte = save.save_slots[index].event_flags.flags[offset.0 as usize];
+                save.save_slots[index].event_flags.flags[offset.0 as usize] = set_bit(event_byte, offset.1, *on);
+            }
+        }
+
+        fn update_regions(&self, save: &mut Save, index: usize) {
+            let save_slot = &mut save.save_slots[index];
+
+            for (region, activated) in self.slots[index].regions_vm.regions.iter() {
+                let region_id = REGIONS.lock().unwrap()[region].0;
+                let res = save_slot.regions.unlocked_regions.iter().position(|r| *r == region_id);
+                match res {
+                    Some(index) => {
+                        if !(*activated) {
+                            save_slot.regions.unlocked_regions.swap_remove(index);
+                            save_slot.regions.unlocked_regions_count = save_slot.regions.unlocked_regions_count - 1;
+                        }
+                    },
+                    None => {
+                        if *activated {
+                            save_slot.regions.unlocked_regions.push(region_id);
+                            save_slot.regions.unlocked_regions_count = save_slot.regions.unlocked_regions_count + 1;
+                        }
+                    },
                 }
             }
         }
 
-        fn _update_character_name(&self, save: &mut Save) {
-            for i in 0..0xA {
-                if save.user_data_10.active_slot[i] {
-                    let mut character_name: [u16; 0x10] = [0; 0x10];
-                    let mut character_name2: [u16; 0x11] = [0; 0x11];
-
-                    for (j, char) in self.slots[i].general_vm.character_name.chars().enumerate() {
-                        character_name[j] = char as u16;
-                        character_name2[j] = char as u16;
-                    }
-                    save.save_slots[i].player_game_data.character_name.copy_from_slice(&character_name);
-                    save.user_data_10.profile_summary[i].character_name.copy_from_slice(&character_name2);
-                }
-            }
-        }
     }
 }

@@ -1733,9 +1733,15 @@ impl Write for SaveSlot {
         bytes.extend(self._0x80);
 
         // Empty calories
-        bytes.extend(self._rest.to_vec());
+        bytes.extend(vec![0;0x280010-bytes.len()]);
 
         // Recalculate checksum at the end
+        let digest = md5::compute(&bytes[0x10..bytes.len()]);
+        
+        for i in 0..0x10 {
+            bytes[i] = digest[i];
+        }
+
         Ok(bytes)
     }
 }

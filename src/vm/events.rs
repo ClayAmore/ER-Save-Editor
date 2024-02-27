@@ -1,7 +1,7 @@
 pub mod events_view_model {
     use std::collections::BTreeMap;
 
-    use crate::{db::{bosses::bosses::{Boss, BOSSES}, colosseums::colosseums::{Colosseum, COLOSSEUMS}, cookbooks::books::{Cookbook, COOKBOKS}, event_flags::event_flags::EVENT_FLAGS, graces::maps::{Grace, GRACES}, map_name::map_name::{MapName, MAP_NAME}, maps::maps::{Map, MAPS}, summoning_pools::summoning_pools::{SummoningPool, SUMMONING_POOLS}, whetblades::whetblades::{Whetblade, WHETBLADES}}, save::save_slot::SaveSlot};
+    use crate::{db::{bosses::bosses::{Boss, BOSSES}, colosseums::colosseums::{Colosseum, COLOSSEUMS}, cookbooks::books::{Cookbook, COOKBOKS}, event_flags::event_flags::EVENT_FLAGS, graces::maps::{Grace, GRACES}, map_name::map_name::{MapName, MAP_NAME}, maps::maps::{Map, MAPS}, summoning_pools::summoning_pools::{SummoningPool, SUMMONING_POOLS}, whetblades::whetblades::{Whetblade, WHETBLADES}}, save::save_slot::SaveSlot, util::bit::bit::get_bit};
 
     #[derive(Clone)]
     pub enum EventsRoute {
@@ -53,7 +53,7 @@ pub mod events_view_model {
             // Graces
             for (key, value) in GRACES.lock().unwrap().iter() {
                 let event_flag_info = id_to_offset_lookup[&value.1];
-                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                let on = get_bit(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
                 events_vm.graces.insert(*key, on);
                 events_vm.grace_groups.get_mut(&value.0).expect("").push(*key);
                 events_vm.grace_groups.get_mut(&value.0).expect("").sort();
@@ -62,50 +62,46 @@ pub mod events_view_model {
             // Whetblades
             for (key, value) in WHETBLADES.lock().unwrap().iter() {
                 let event_flag_info = id_to_offset_lookup[&value.0];
-                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                let on = get_bit(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
                 events_vm.whetblades.insert(*key, on);
             }
 
             // Cookbooks
             for (key, value) in COOKBOKS.lock().unwrap().iter() {
                 let event_flag_info = id_to_offset_lookup[&value.0];
-                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                let on = get_bit(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
                 events_vm.cookbooks.insert(*key, on);
             }
 
             // Maps
             for (key, value) in MAPS.lock().unwrap().iter() {
                 let event_flag_info = id_to_offset_lookup[&value.0];
-                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                let on = get_bit(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
                 events_vm.maps.insert(*key, on);
             }
 
             // Bosses
             for (key, value) in BOSSES.lock().unwrap().iter() {
                 let event_flag_info = id_to_offset_lookup[&value.0];
-                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                let on = get_bit(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
                 events_vm.bosses.insert(*key, on);
             }
 
             // Summoning Pools
             for (key, value) in SUMMONING_POOLS.lock().unwrap().iter() {
                 let event_flag_info = id_to_offset_lookup[&value.0];
-                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                let on = get_bit(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
                 events_vm.summoning_pools.insert(*key, on);
             }
 
             // Colosseums
             for (key, value) in COLOSSEUMS.lock().unwrap().iter() {
                 let event_flag_info = id_to_offset_lookup[&value.0];
-                let on = Self::is_on(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
+                let on = get_bit(slot.event_flags.flags[event_flag_info.0 as usize], event_flag_info.1);
                 events_vm.colosseums.insert(*key, on);
             }
 
             events_vm
-        }
-
-        fn is_on(event_byte: u8, bit_pos: u8) -> bool {
-            return event_byte & (1 << bit_pos) != 0
         }
     }
 }

@@ -306,6 +306,12 @@ impl Write for UserData10 {
         bytes.extend(self._0x8.to_le_bytes());
         bytes.extend(self._rest.to_vec());
 
+        // Recalculate checksum at the end
+        let digest = md5::compute(&bytes[0x10..bytes.len()]);
+        for i in 0..0x10 {
+            bytes[i] = digest[i];
+        }
+        
         Ok(bytes)
     }
 }
