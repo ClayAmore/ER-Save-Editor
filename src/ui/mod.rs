@@ -1,3 +1,4 @@
+mod custom;
 pub mod menu;
 pub mod none;
 pub mod general;

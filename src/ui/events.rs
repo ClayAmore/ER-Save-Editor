@@ -1,7 +1,9 @@
 pub mod events {
 
+    use std::collections::BTreeMap;
+
     use eframe::egui::{self, Ui};
-    use crate::{db::{bosses::bosses::BOSSES, colosseums::colosseums::COLOSSEUMS, cookbooks::books::COOKBOKS, graces::maps::GRACES, map_name::map_name::{MapName, MAP_NAME}, maps::maps::MAPS, summoning_pools::summoning_pools::SUMMONING_POOLS, whetblades::whetblades::WHETBLADES}, vm::{events::events_view_model::EventsRoute, vm::vm::ViewModel}};
+    use crate::{db::{bosses::bosses::{Boss, BOSSES}, colosseums::colosseums::{Colosseum, COLOSSEUMS}, cookbooks::books::{Cookbook, COOKBOKS}, graces::maps::GRACES, map_name::map_name::{MapName, MAP_NAME}, maps::maps::{Map, MAPS}, summoning_pools::summoning_pools::{SummoningPool, SUMMONING_POOLS}, whetblades::whetblades::{Whetblade, WHETBLADES}}, ui::custom::checkbox::checkbox::{three_states_checkbox, State}, vm::{events::events_view_model::EventsRoute, vm::vm::ViewModel}};
 
     pub fn events(ui: &mut Ui, vm:&mut ViewModel) {
         egui::SidePanel::left("inventory_menu").show(ui.ctx(), |ui|{
@@ -64,11 +66,27 @@ pub mod events {
         ui.vertical(|ui| {
             let maps = &vm.slots[vm.index].events_vm.grace_groups;
             let graces = &mut vm.slots[vm.index].events_vm.graces;
+            select_all_checkbox(ui, graces, "All Graces");
             for map in maps {
                 ui.push_id(map.0, |ui| {
                     let collapsing = egui::containers::collapsing_header::CollapsingHeader::new(MAP_NAME.lock().unwrap()[&map.0]);
                     ui.horizontal(|ui|{
-                        ui.checkbox(&mut false, "");
+                        let mut state = State::Off;
+                        if map.1.iter().all(|g| graces[&g]) {
+                            state = State::On;
+                        }
+                        else if map.1.iter().any(|g| graces[&g]) {
+                            state = State::InBetween;
+                        }
+
+                        if three_states_checkbox(ui, &state).clicked() {
+                            match state {
+                                State::Off => map.1.iter().for_each(|g| *graces.get_mut(g).expect("") = true),
+                                State::On => map.1.iter().for_each(|g| *graces.get_mut(g).expect("") = false),
+                                State::InBetween => map.1.iter().for_each(|g| *graces.get_mut(g).expect("") = true),
+                            }
+                        }
+
                         collapsing.show(ui, |ui| {
                             for grace in map.1 {
                                 let grace_info: (MapName, u32, &str) = GRACES.lock().unwrap()[&grace];
@@ -76,7 +94,7 @@ pub mod events {
                                 ui.checkbox(on, grace_info.2.to_string());
                             }
                         });
-                    })
+                    });
                 });
             }
         });
@@ -84,7 +102,7 @@ pub mod events {
 
     fn whetblades(ui: &mut Ui, vm:&mut ViewModel) {
         let whetblades = &mut vm.slots[vm.index].events_vm.whetblades;
-        ui.checkbox(&mut false, "");
+        select_all_checkbox::<Whetblade>(ui, whetblades, "All Whetblades");
         for (whetblade, on) in whetblades {
             let whetblade_info: (u32,&str) = WHETBLADES.lock().unwrap()[&whetblade];
             ui.checkbox(on, whetblade_info.1.to_string());
@@ -93,8 +111,7 @@ pub mod events {
 
     fn cookbooks(ui: &mut Ui, vm:&mut ViewModel) {
         let cookbooks = &mut vm.slots[vm.index].events_vm.cookbooks;
-        ui.checkbox(&mut false, "");
-
+        select_all_checkbox::<Cookbook>(ui, cookbooks, "All Cookbooks");
         for (cookbook, on) in cookbooks {
             let cookbook_info: (u32,&str) = COOKBOKS.lock().unwrap()[&cookbook];
             ui.checkbox(on, cookbook_info.1.to_string());
@@ -103,8 +120,7 @@ pub mod events {
 
     fn maps(ui: &mut Ui, vm:&mut ViewModel) {
         let maps = &mut vm.slots[vm.index].events_vm.maps;
-        ui.checkbox(&mut false, "");
-
+        select_all_checkbox::<Map>(ui, maps, "All Maps");
         for (map, on) in maps {
             let map_info: (u32,&str) = MAPS.lock().unwrap()[&map];
             ui.checkbox(on, map_info.1.to_string());
@@ -113,8 +129,7 @@ pub mod events {
 
     fn bosses(ui: &mut Ui, vm:&mut ViewModel) {
         let bosses = &mut vm.slots[vm.index].events_vm.bosses;
-        ui.checkbox(&mut false, "");
-
+        select_all_checkbox::<Boss>(ui, bosses, "All Bosses");
         for (boss, on) in bosses {
             let boss_info: (u32,&str) = BOSSES.lock().unwrap()[&boss];
             ui.checkbox(on, boss_info.1.to_string());
@@ -123,8 +138,7 @@ pub mod events {
 
     fn summoning_pools(ui: &mut Ui, vm:&mut ViewModel) {
         let summoning_pools = &mut vm.slots[vm.index].events_vm.summoning_pools;
-        ui.checkbox(&mut false, "");
-
+        select_all_checkbox::<SummoningPool>(ui, summoning_pools, "All Summoning Pools");
         for (summoning_pool, on) in summoning_pools {
             let summoning_pool_info: (u32,&str) = SUMMONING_POOLS.lock().unwrap()[&summoning_pool];
             ui.checkbox(on, summoning_pool_info.1.to_string());
@@ -133,11 +147,32 @@ pub mod events {
 
     fn colosseums(ui: &mut Ui, vm:&mut ViewModel) {
         let colosseums = &mut vm.slots[vm.index].events_vm.colosseums;
-        ui.checkbox(&mut false, "");
-
+        select_all_checkbox::<Colosseum>(ui, colosseums, "All Colusseums");
         for (colosseum, on) in colosseums {
             let colosseum_info: (u32,&str) = COLOSSEUMS.lock().unwrap()[&colosseum];
             ui.checkbox(on, colosseum_info.1.to_string());
         }
+    }
+
+    fn select_all_checkbox<T>(ui: &mut Ui, map: &mut BTreeMap<T, bool>, label: &str) {
+        let mut state = State::Off;
+        if map.values().all(|w|*w) {
+            state = State::On;
+        }
+        else if map.values().any(|w|*w) {
+            state = State::InBetween;
+        }
+
+        ui.horizontal(|ui| {
+            if three_states_checkbox(ui, &state).clicked() {
+                match state {
+                    State::Off => map.values_mut().for_each(|w| *w = true),
+                    State::On => map.values_mut().for_each(|w| *w = false),
+                    State::InBetween => map.values_mut().for_each(|w| *w = true),
+                }
+            }
+            ui.label(label);
+        });
+        ui.separator();
     }
 }
