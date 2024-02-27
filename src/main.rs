@@ -2,18 +2,20 @@
 //use std::env;
 mod vm;
 mod save;
+mod util;
 mod read;
 mod write;
 mod ui;
 mod db;
 
-use std::path::PathBuf;
+use std::{fs::File, io::Write, path::PathBuf};
 
 use eframe::{egui::{self, Id, LayerId, Order}, epaint::Color32};
+use rfd::FileDialog;
 use save::save::save::{Save, SaveType};
 use ui::{events::events::events, general::general::general, inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
 use vm::vm::vm::ViewModel;
- 
+use crate::write::write::Write as w; 
 
 
 fn main() -> Result<(), eframe::Error> {
@@ -27,6 +29,7 @@ fn main() -> Result<(), eframe::Error> {
     eframe::run_native("Save Editor", options, Box::new(|creation_context| {
         let mut fonts = egui::FontDefinitions::default();
         egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
+        egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Fill);
         creation_context.egui_ctx.set_fonts(fonts);
         Box::new(App::new(creation_context))
     }))
@@ -48,12 +51,65 @@ impl App {
             vm: ViewModel::default()
         }
     }
+
+    fn open(&mut self, path: PathBuf) {
+        self.save = Save::from_path(&path).expect("Failed to read save");
+        self.vm = ViewModel::from_save(&self.save);
+        self.picked_path = path.clone();
+    }
+
+    fn save(&mut self, path: PathBuf) {
+        self.vm.update_save(&mut self.save);
+        let mut f = File::create(path).expect("");
+        let bytes = self.save.write().expect("");
+        let res = f.write_all(&bytes);
+
+        match res {
+            Ok(_) => {},
+            Err(_) => todo!(),
+        }
+    }
+
+    fn open_file_dialog() -> Option<PathBuf> {
+        FileDialog::new()
+        .add_filter("SL2", &["sl2", "Regular Save File"])
+        .add_filter("text", &["txt", "Save Wizard"])
+        .set_directory("/")
+        .pick_file()
+    } 
+
+    fn save_file_dialog() -> Option<PathBuf> {
+        FileDialog::new()
+        .add_filter("SL2", &["sl2", "Regular Save File"])
+        .add_filter("text", &["txt", "Save Wizard"])
+        .set_directory("/")
+        .save_file()
+    } 
 }
 
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.set_zoom_factor(1.75);
+        // TOP PANEL
+        egui::TopBottomPanel::top("toolbar").show(ctx, |ui| {
+            ui.horizontal(| ui| {
+                if ui.button(egui::RichText::new(format!("{} open", egui_phosphor::regular::FOLDER_OPEN))).clicked() {
+                    let files = Self::open_file_dialog();
+                    match files {
+                        Some(path) => self.open(path),
+                        None => {},
+                    }
+                }
+                if ui.button(egui::RichText::new(format!("{} save", egui_phosphor::regular::FLOPPY_DISK))).clicked() {
+                    let files = Self::save_file_dialog();
+                    match files {
+                        Some(path) => self.save(path),
+                        None => {},
+                    }
+                }
+            });
+        });
 
         // TOP PANEL
         egui::TopBottomPanel::top("top").show(ctx, |ui| {
@@ -70,7 +126,7 @@ impl eframe::App for App {
                     },
                 };
 
-                ui.columns(3,| uis| {
+                ui.columns(2,| uis| {
                     if self.vm.active {
                         egui::Frame::none().show(&mut uis[1], |ui| {
                             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
@@ -167,10 +223,7 @@ impl eframe::App for App {
                     if !i.raw.dropped_files.is_empty() {
                         let file = i.raw.dropped_files[0].clone();
                         let path: std::path::PathBuf = file.path.expect("Error!");
-                        
-                        self.save = Save::from_path(&path).expect("Failed to read save");
-                        self.vm = ViewModel::from_save(&self.save);
-                        self.picked_path = path.clone();
+                        self.open(path);
                     }
                 });
             });
