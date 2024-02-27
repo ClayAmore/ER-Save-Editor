@@ -21,8 +21,13 @@ pub mod general_view_model {
             let steam_id = slot.steam_id.to_string();
 
             // Character Name
-            let character_name_vec = slot.player_game_data.character_name.to_vec();
-            let character_name = String::from_utf8(character_name_vec).expect("");
+            let character_name = slot.player_game_data.character_name;
+            let mut character_name_trimmed: [u16; 0x10] = [0;0x10];
+            for (i, char) in character_name.iter().enumerate() {
+                if *char == 0 { break; }
+                character_name_trimmed[i] = *char;
+            }
+            let character_name = String::from_utf16(&character_name_trimmed).expect("");
              
             Self {
                 steam_id,

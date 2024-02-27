@@ -43,7 +43,6 @@ pub mod vm{
         }
 
         pub fn _update_save(&self, save: &mut Save) {
-
             // Update Steam ID
             self._update_steam_id(save);
 
@@ -65,16 +64,15 @@ pub mod vm{
         fn _update_character_name(&self, save: &mut Save) {
             for i in 0..0xA {
                 if save.user_data_10.active_slot[i] {
-                    let name_bytes = self.slots[i].general_vm.character_name.as_bytes();
-                    let mut character_name: [u8; 32] = [b'0'; 32];
-                    let mut character_name2: [u8; 34] = [b'0'; 34];
+                    let mut character_name: [u16; 0x10] = [0; 0x10];
+                    let mut character_name2: [u16; 0x11] = [0; 0x11];
 
-                    for i in 0..name_bytes.len() {
-                        character_name[i] = name_bytes[i];
-                        character_name2[i] = name_bytes[i];
+                    for (j, char) in self.slots[i].general_vm.character_name.chars().enumerate() {
+                        character_name[j] = char as u16;
+                        character_name2[j] = char as u16;
                     }
-                    save.save_slots[i].player_game_data.character_name = character_name;
-                    save.user_data_10.profile_summary[i].character_name = character_name2;
+                    save.save_slots[i].player_game_data.character_name.copy_from_slice(&character_name);
+                    save.user_data_10.profile_summary[i].character_name.copy_from_slice(&character_name2);
                 }
             }
         }

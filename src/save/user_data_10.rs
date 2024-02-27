@@ -77,7 +77,7 @@ impl Write for PCOptionData {
 
 #[derive(Copy, Clone)]
 pub struct ProfileSummary{
-    pub character_name: [u8; 0x22],
+    pub character_name: [u16; 0x11],
     pub level: u32,
     _0x28: u32 ,
     _0x2c: u32 ,
@@ -98,7 +98,7 @@ pub struct ProfileSummary{
 impl Default for ProfileSummary {
     fn default() -> Self {
         Self {
-            character_name: [0x0; 0x22],
+            character_name: [0x0; 0x11],
             level: 0,
             _0x28: 0,
             _0x2c: 0,
@@ -121,8 +121,7 @@ impl Default for ProfileSummary {
 impl Read for ProfileSummary {
     fn read(br: &mut BinaryReader) -> Result<ProfileSummary, io::Error> {
         let mut profile_summary = ProfileSummary::default();
-        let character_name = br.read_bytes(0x22)?;
-        profile_summary.character_name.copy_from_slice(character_name);
+        for i in 0..0x11 { profile_summary.character_name[i] = br.read_u16()?;}
         profile_summary.level = br.read_u32()?;
         profile_summary._0x28 = br.read_u32()?;
         profile_summary._0x2c = br.read_u32()?;
@@ -145,7 +144,7 @@ impl Read for ProfileSummary {
 impl Write for ProfileSummary{
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
-        bytes.extend(self.character_name);
+        for i in 0..0x11 { bytes.extend(self.character_name[i].to_le_bytes());}
         bytes.extend(self.level.to_le_bytes());
         bytes.extend(self._0x28.to_le_bytes());
         bytes.extend(self._0x2c.to_le_bytes());

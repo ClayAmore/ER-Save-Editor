@@ -1077,7 +1077,7 @@ pub struct PlayerGameData {
     pub souls: u32,
     pub soulsmemory: u32,
     _0x28: [u8; 0x28],
-    pub character_name: [u8; 0x20],
+    pub character_name: [u16; 0x10],
     _0x5c: [u8; 0x5c],
     pub password: [u8; 0x12],
     pub group_password1: [u8; 0x12],
@@ -1119,7 +1119,7 @@ impl Default for PlayerGameData {
             souls: Default::default(),
             soulsmemory: Default::default(),
             _0x28: [0; 0x28],
-            character_name: Default::default(),
+            character_name: [0;0x10],
             _0x5c: [0; 0x5c],
             password: Default::default(),
             group_password1: Default::default(),
@@ -1182,8 +1182,9 @@ impl Read for PlayerGameData {
         player_game_data._0x28.copy_from_slice(br.read_bytes(0x28)?);
 
         // Character Name
-        let character_name = br.read_bytes(0x20)?;
-        player_game_data.character_name.copy_from_slice(character_name);
+        for i in 0..0x10 {
+            player_game_data.character_name[i] = br.read_u16()?;
+        }
 
         player_game_data._0x5c.copy_from_slice(br.read_bytes(0x5c)?);
 
@@ -1262,7 +1263,9 @@ impl Write for PlayerGameData {
         bytes.extend(self._0x28);
 
         // Character Name
-        bytes.extend(self.character_name);
+        for i in 0..0x10 {
+            bytes.extend(self.character_name[i].to_le_bytes());
+        }
 
         bytes.extend(self._0x5c);
 
@@ -1388,7 +1391,7 @@ pub struct SaveSlot {
     _unk_lists: Vec<UknownList>,
     pub player_coords: PlayerCoords,
     _game_man_unkown_values: [u8; 0xf],
-    _0x1_2: u8,
+    _0x1_2: u32,
     _cs_net_data_chunks: Vec<u8>,
     pub world_area_weather: WorldAreaWeather,
     pub world_area_time: WorldAreaTime,
@@ -1570,7 +1573,7 @@ impl Read for SaveSlot {
         
         save_slot._game_man_unkown_values.copy_from_slice(br.read_bytes(0xf)?);
 
-        save_slot._0x1_2 = br.read_u8()?;
+        save_slot._0x1_2 = br.read_u32()?;
         // Value should always be 2 for active accounts. 0 for empty ones.
         assert!(save_slot._0x1_2 == 2 || save_slot._0x1_2 == 0);
 
@@ -1705,7 +1708,7 @@ impl Write for SaveSlot {
 
         bytes.extend(self._game_man_unkown_values);
 
-        bytes.push(self._0x1_2);
+        bytes.extend(self._0x1_2.to_le_bytes());
 
         // CSNetMan
         bytes.extend(self._cs_net_data_chunks.to_vec());
@@ -1717,7 +1720,7 @@ impl Write for SaveSlot {
         bytes.extend(self.world_area_time.write()?);
 
         bytes.extend(self._0x10_1);
-
+        
         // Steam ID
         bytes.extend(self.steam_id.to_le_bytes());
 

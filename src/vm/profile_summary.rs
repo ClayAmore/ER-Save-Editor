@@ -22,8 +22,8 @@ pub mod slot_view_model {
             let active = true;
             
             // Character Name
-            let character_name_vec = profile_summary.character_name.to_vec();
-            let character_name = String::from_utf8(character_name_vec).expect("");
+            let character_name = profile_summary.character_name;
+            let character_name = String::from_utf16(&character_name).expect("");
              
             Self {
                 active,
