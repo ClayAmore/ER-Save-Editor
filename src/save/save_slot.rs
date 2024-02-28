@@ -707,10 +707,10 @@ impl Write for EquipInventoryItem {
 
 #[derive(Clone)]
 pub struct EquipInventoryData {
-    pub inventory_distinct_item_count: i32,
-    pub inventory_items: Vec<EquipInventoryItem>,
-    pub inventory_distinct_item_count2: i32,
-    pub inventory_items2: Vec<EquipInventoryItem>,
+    pub common_inventory_items_distinct_count: i32,
+    pub common_items: Vec<EquipInventoryItem>,
+    pub key_inventory_items_distinct_count: i32,
+    pub key_items: Vec<EquipInventoryItem>,
     _0x4: i32,
     _0x4_1: i32,
 }
@@ -718,10 +718,10 @@ pub struct EquipInventoryData {
 impl Default for EquipInventoryData {
     fn default() -> Self {
         Self { 
-            inventory_distinct_item_count: Default::default(),
-            inventory_items: vec![],
-            inventory_distinct_item_count2: Default::default(),
-            inventory_items2: vec![],
+            common_inventory_items_distinct_count: Default::default(),
+            common_items: vec![],
+            key_inventory_items_distinct_count: Default::default(),
+            key_items: vec![],
             _0x4: -1,
             _0x4_1: -1,
         }
@@ -732,16 +732,16 @@ impl EquipInventoryData {
     fn read(br: &mut BinaryReader, length1: usize, length2: usize) -> Result<EquipInventoryData, io::Error> {
         let mut equip_inventory_data = EquipInventoryData::default();
 
-        equip_inventory_data.inventory_distinct_item_count = br.read_i32()?;
+        equip_inventory_data.common_inventory_items_distinct_count = br.read_i32()?;
         
         for _i in 0..length1 {
-            equip_inventory_data.inventory_items.push(EquipInventoryItem::read(br)?);
+            equip_inventory_data.common_items.push(EquipInventoryItem::read(br)?);
         }
         
-        equip_inventory_data.inventory_distinct_item_count2 = br.read_i32()?;
+        equip_inventory_data.key_inventory_items_distinct_count = br.read_i32()?;
 
         for _i in 0..length2 {
-            equip_inventory_data.inventory_items2.push(EquipInventoryItem::read(br)?);
+            equip_inventory_data.key_items.push(EquipInventoryItem::read(br)?);
         }
 
         equip_inventory_data._0x4 = br.read_i32()?;
@@ -753,16 +753,16 @@ impl EquipInventoryData {
     fn write(&self, length1: usize, length2: usize) -> Result<Vec<u8>, io::Error>{
         let mut bytes: Vec<u8> = Vec::new();
 
-        bytes.extend(self.inventory_distinct_item_count.to_le_bytes());
+        bytes.extend(self.common_inventory_items_distinct_count.to_le_bytes());
 
         for i in 0..length1 {
-            bytes.extend(self.inventory_items[i].write()?);
+            bytes.extend(self.common_items[i].write()?);
         }
 
-        bytes.extend(self.inventory_distinct_item_count2.to_le_bytes());
+        bytes.extend(self.key_inventory_items_distinct_count.to_le_bytes());
 
         for i in 0..length2 {
-            bytes.extend(self.inventory_items2[i].write()?);
+            bytes.extend(self.key_items[i].write()?);
         }
 
         bytes.extend(self._0x4.to_le_bytes());

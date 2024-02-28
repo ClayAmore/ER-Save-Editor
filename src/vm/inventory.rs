@@ -5,7 +5,8 @@ pub mod inventory {
     #[derive(Clone)]
     pub enum InventoryRoute {
         None,
-        Items,
+        CommonItems,
+        KeyItems,
         Weapons,
         Armors,
         AshOfWar,
@@ -103,7 +104,8 @@ pub mod inventory {
 
     #[derive(Clone)]
     pub struct InventoryStorage {
-        pub items: Vec<InventoryItemViewModel>,
+        pub common_items: Vec<InventoryItemViewModel>,
+        pub key_items: Vec<InventoryItemViewModel>,
         pub weapons: Vec<InventoryItemViewModel>,
         pub armors: Vec<InventoryItemViewModel>,
         pub aows: Vec<InventoryItemViewModel>,
@@ -114,7 +116,8 @@ pub mod inventory {
     impl Default for InventoryStorage {
         fn default() -> Self{
             Self{ 
-                items: Default::default(),
+                common_items: Default::default(),
+                key_items: Default::default(),
                 weapons: Default::default(),
                 armors: Default::default(),
                 aows: Default::default(),
@@ -156,8 +159,8 @@ pub mod inventory {
         }
 
         fn fill_stroage_type(equip_inventory_data: &EquipInventoryData, gaitem_map: &HashMap<i32,&GaItem>, inventory_storage: &mut InventoryStorage) {
-            for i in 0..equip_inventory_data.inventory_distinct_item_count {
-                let equip_invenotry_item = &equip_inventory_data.inventory_items[i as usize];
+            for i in 0..equip_inventory_data.common_inventory_items_distinct_count {
+                let equip_invenotry_item = &equip_inventory_data.common_items[i as usize];
 
                 if equip_invenotry_item.ga_item_handle == -1 || equip_invenotry_item.ga_item_handle == 0 { continue; };
 
@@ -180,7 +183,7 @@ pub mod inventory {
                     },
                     InventoryGaitemType::ITEM => {
                         let inventory_item_vm = InventoryItemViewModel::from_save(equip_invenotry_item, &GaItem::default(), InventoryGaitemType::ITEM);
-                        inventory_storage.items.push( inventory_item_vm);
+                        inventory_storage.common_items.push( inventory_item_vm);
                     },
                     InventoryGaitemType::AOW => {
                         let gaitem = gaitem_map[&equip_invenotry_item.ga_item_handle];
@@ -189,9 +192,18 @@ pub mod inventory {
                     },
                 }
             }
+
+            for i in 0..equip_inventory_data.key_inventory_items_distinct_count {
+                let equip_invenotry_item = &equip_inventory_data.key_items[i as usize];
+                if equip_invenotry_item.ga_item_handle == -1 || equip_invenotry_item.ga_item_handle == 0 { continue; };
+                let inventory_item_vm = InventoryItemViewModel::from_save(equip_invenotry_item, &GaItem::default(), InventoryGaitemType::ITEM);
+                inventory_storage.key_items.push( inventory_item_vm);
+            }
+
             inventory_storage.weapons.sort_by(|a, b| a.item_name.cmp(&b.item_name));
             inventory_storage.armors.sort_by(|a, b| a.item_name.cmp(&b.item_name));
-            inventory_storage.items.sort_by(|a, b| a.item_name.cmp(&b.item_name));
+            inventory_storage.common_items.sort_by(|a, b| a.item_name.cmp(&b.item_name));
+            inventory_storage.key_items.sort_by(|a, b| a.item_name.cmp(&b.item_name));
             inventory_storage.aows.sort_by(|a, b| a.item_name.cmp(&b.item_name));
         }
 

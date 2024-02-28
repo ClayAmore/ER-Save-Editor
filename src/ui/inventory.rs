@@ -1,7 +1,10 @@
 pub mod inventory {
+    use std::cmp::Ordering;
+
     use eframe::{egui::{self, Layout, TextFormat, Ui}, epaint::{text::LayoutJob, Color32}};
     use egui_extras::{Column, TableBuilder};
     use crate::vm::{inventory::inventory::{InventoryItemViewModel, InventoryRoute}, vm::vm::ViewModel};
+    use strsim::sorensen_dice;
 
     pub fn inventory(ui: &mut Ui, vm:&mut ViewModel) {
         egui::SidePanel::left("inventory_menu").show(ui.ctx(), |ui|{
@@ -9,13 +12,15 @@ pub mod inventory {
             .id_source("left")
             .show(ui, |ui| {
                 ui.vertical(|ui| {
-                    let items = ui.add_sized([100., 40.], egui::Button::new("Items"));
+                    let common_items = ui.add_sized([100., 40.], egui::Button::new("Common Items"));
+                    let key_items = ui.add_sized([100., 40.], egui::Button::new("Key Items"));
                     let weapons = ui.add_sized([100., 40.], egui::Button::new("Weapons"));
                     let armors = ui.add_sized([100., 40.], egui::Button::new("Armors"));
                     let ashofwar = ui.add_sized([100., 40.], egui::Button::new("Ash of War"));
                     let talismans = ui.add_sized([100., 40.], egui::Button::new("Talismans"));
         
-                    if items.clicked() {vm.slots[vm.index].inventory_vm.current_route = InventoryRoute::Items}
+                    if common_items.clicked() {vm.slots[vm.index].inventory_vm.current_route = InventoryRoute::CommonItems}
+                    if key_items.clicked() {vm.slots[vm.index].inventory_vm.current_route = InventoryRoute::KeyItems}
                     if weapons.clicked() {vm.slots[vm.index].inventory_vm.current_route = InventoryRoute::Weapons}
                     if armors.clicked() {vm.slots[vm.index].inventory_vm.current_route = InventoryRoute::Armors}
                     if ashofwar.clicked() {vm.slots[vm.index].inventory_vm.current_route = InventoryRoute::AshOfWar}
@@ -24,7 +29,8 @@ pub mod inventory {
                     // Highlight active 
                     match vm.slots[vm.index].inventory_vm.current_route {
                         InventoryRoute::None => {},
-                        InventoryRoute::Items => {items.highlight();},
+                        InventoryRoute::CommonItems => {common_items.highlight();},
+                        InventoryRoute::KeyItems => {key_items.highlight();},
                         InventoryRoute::Weapons => {weapons.highlight();},
                         InventoryRoute::Armors => {armors.highlight();},
                         InventoryRoute::AshOfWar => {ashofwar.highlight();},
@@ -38,14 +44,38 @@ pub mod inventory {
             egui::ScrollArea::vertical()
             .id_source("left")
             .show(ui, |ui| {
+                let mut empty: Vec<InventoryItemViewModel> = vec![];
+                let inventory_vm = &mut vm.slots[vm.index].inventory_vm;
+                let current_inventory_list = match inventory_vm.current_route {
+                    InventoryRoute::None => &mut empty,
+                    InventoryRoute::CommonItems => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].common_items,
+                    InventoryRoute::KeyItems => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].key_items,
+                    InventoryRoute::Weapons => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].weapons,
+                    InventoryRoute::Armors => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].armors,
+                    InventoryRoute::AshOfWar => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].aows,
+                    InventoryRoute::Talismans => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].accessories,
+                };
+                
+                // Sort by highest match
+                current_inventory_list.sort_by(|a,b| {
+                    if inventory_vm.filter_text.is_empty() {
+                        return a.item_name.cmp(&b.item_name);
+                    }
+                    let distance_a = sorensen_dice(&a.item_name.to_lowercase(), &inventory_vm.filter_text.to_lowercase());
+                    let distance_b = sorensen_dice(&b.item_name.to_lowercase(), &inventory_vm.filter_text.to_lowercase());
+                    if distance_a < distance_b { return Ordering::Greater; }
+                    else if distance_a > distance_b { return Ordering::Less; }
+                    return Ordering::Equal;
+                });
+
                 ui.columns(2, |uis| {
                     let equipped_button = uis[0].add_sized([100.,40.], egui::widgets::Button::new("Equipped"));
                     let storage_button = uis[1].add_sized([100.,40.], egui::widgets::Button::new("Storage Box"));
 
-                    if equipped_button.clicked() {vm.slots[vm.index].inventory_vm.at_storage_box = false;};
-                    if storage_button.clicked() {vm.slots[vm.index].inventory_vm.at_storage_box = true;};
+                    if equipped_button.clicked() {inventory_vm.at_storage_box = false;};
+                    if storage_button.clicked() {inventory_vm.at_storage_box = true;};
 
-                    if vm.slots[vm.index].inventory_vm.at_storage_box {storage_button.highlight();}
+                    if inventory_vm.at_storage_box {storage_button.highlight();}
                     else {equipped_button.highlight();}
                 });
         
@@ -53,19 +83,8 @@ pub mod inventory {
         
                 ui.horizontal(|ui|{
                     let height = 20.;
-                    ui.add_sized([ui.available_size().x,height], egui::widgets::TextEdit::singleline(&mut vm.slots[vm.index].inventory_vm.filter_text));
+                    ui.add_sized([ui.available_size().x,height], egui::widgets::TextEdit::singleline(&mut inventory_vm.filter_text));
                 });
-        
-                let mut empty: Vec<InventoryItemViewModel> = vec![];
-                let inventory_vm = &mut vm.slots[vm.index].inventory_vm;
-                let current_inventory_list = match inventory_vm.current_route {
-                    InventoryRoute::None => &mut empty,
-                    InventoryRoute::Items => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].items,
-                    InventoryRoute::Weapons => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].weapons,
-                    InventoryRoute::Armors => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].armors,
-                    InventoryRoute::AshOfWar => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].aows,
-                    InventoryRoute::Talismans => &mut inventory_vm.storage[inventory_vm.at_storage_box as usize].accessories,
-                };
         
                 let available_width = ui.available_width()/2.;
                 let table = TableBuilder::new(ui)
@@ -111,7 +130,11 @@ pub mod inventory {
                     });
                 })
                 .body(|mut body| {
-                    for item in current_inventory_list {
+                    for item in current_inventory_list.iter().filter(|i|{
+                        if inventory_vm.filter_text.is_empty() { return true; }
+                        let distance = sorensen_dice(&i.item_name.to_lowercase(), &inventory_vm.filter_text.to_lowercase());
+                        distance > 0.3
+                    }).collect::<Vec<&InventoryItemViewModel>>() {
                         body.row(24., |mut row| {
                             row.col(|ui| {
                                 ui.label(format!("{}",item.item_id));
