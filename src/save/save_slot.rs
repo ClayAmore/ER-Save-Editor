@@ -1078,7 +1078,11 @@ pub struct PlayerGameData {
     pub soulsmemory: u32,
     _0x28: [u8; 0x28],
     pub character_name: [u16; 0x10],
-    _0x5c: [u8; 0x5c],
+    _0x3: [u8; 0x3],
+    pub arche_type: u8,
+    _0x3_1: [u8; 0x3],
+    pub gift: u8,
+    _0x54: [u8; 0x54],
     pub password: [u8; 0x12],
     pub group_password1: [u8; 0x12],
     pub group_password2: [u8; 0x12],
@@ -1120,7 +1124,11 @@ impl Default for PlayerGameData {
             soulsmemory: Default::default(),
             _0x28: [0; 0x28],
             character_name: [0;0x10],
-            _0x5c: [0; 0x5c],
+            _0x3: [0;0x3],
+            arche_type: 0,
+            _0x3_1: [0;0x3],
+            gift:0,
+            _0x54: [0; 0x54],
             password: Default::default(),
             group_password1: Default::default(),
             group_password2: Default::default(),
@@ -1186,7 +1194,17 @@ impl Read for PlayerGameData {
             player_game_data.character_name[i] = br.read_u16()?;
         }
 
-        player_game_data._0x5c.copy_from_slice(br.read_bytes(0x5c)?);
+        player_game_data._0x3.copy_from_slice(br.read_bytes(0x3)?);
+
+        // ArcheType
+        player_game_data.arche_type = br.read_u8()?;
+
+        player_game_data._0x3.copy_from_slice(br.read_bytes(0x3)?);
+        
+        // Gift
+        player_game_data.gift = br.read_u8()?;
+
+        player_game_data._0x54.copy_from_slice(br.read_bytes(0x54)?);
 
         // Passwords
         let password = br.read_bytes(0x12)?;
@@ -1267,7 +1285,17 @@ impl Write for PlayerGameData {
             bytes.extend(self.character_name[i].to_le_bytes());
         }
 
-        bytes.extend(self._0x5c);
+        bytes.extend(self._0x3);
+
+        // ArcheType
+        bytes.push(self.arche_type);
+
+        bytes.extend(self._0x3_1);
+
+        // Gift
+        bytes.push(self.gift);
+
+        bytes.extend(self._0x54);
 
         // Passwords
         bytes.extend(self.password);

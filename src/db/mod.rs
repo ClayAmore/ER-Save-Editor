@@ -13,3 +13,4 @@ pub mod event_flags;
 pub mod summoning_pools;
 pub mod colosseums;
 pub mod regions;
+pub mod classes;

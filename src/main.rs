@@ -74,6 +74,7 @@ impl App {
         FileDialog::new()
         .add_filter("SL2", &["sl2", "Regular Save File"])
         .add_filter("text", &["txt", "Save Wizard"])
+        .add_filter("*", &["*", "All files"])
         .set_directory("/")
         .pick_file()
     } 

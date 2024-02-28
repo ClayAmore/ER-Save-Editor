@@ -54,7 +54,10 @@ pub mod vm{
                     // Update Steam ID
                     self.update_steam_id(save, i, steam_id);
 
-                    // Character name
+                    // Update Stats 
+                    self.update_stas(save, i);
+
+                    // Update Character name
                     self.update_character_name(save, i);
 
                     // Update Events
@@ -81,6 +84,35 @@ pub mod vm{
             }
             save.save_slots[index].player_game_data.character_name.copy_from_slice(&character_name);
             save.user_data_10.profile_summary[index].character_name.copy_from_slice(&character_name2);
+        }
+
+        fn update_stas(&self, save: &mut Save, index: usize) {
+            let player_game_data = &mut save.save_slots[index].player_game_data;
+            let profile_summary = &mut save.user_data_10.profile_summary[index];
+            let stats_vm = &self.slots[index].stats_vm;
+
+            let level = 
+                stats_vm.vigor +
+                stats_vm.mind +
+                stats_vm.endurance +
+                stats_vm.strength +
+                stats_vm.dexterity +
+                stats_vm.intelligence +
+                stats_vm.faith +
+                stats_vm.arcane - 79;
+
+            player_game_data.level = level;
+            player_game_data.vigor = stats_vm.vigor;
+            player_game_data.mind = stats_vm.mind;
+            player_game_data.endurance = stats_vm.endurance;
+            player_game_data.strength = stats_vm.strength;
+            player_game_data.dexterity = stats_vm.dexterity;
+            player_game_data.intelligence = stats_vm.intelligence;
+            player_game_data.faith = stats_vm.faith;
+            player_game_data.arcane = stats_vm.arcane;
+
+            profile_summary.level = level;
+
         }
 
         fn update_events(&self, save: &mut Save, index: usize) {
@@ -163,6 +195,10 @@ pub mod vm{
                     },
                 }
             }
+        }
+
+        fn _update_inventory(&self, _save: &mut Save, _index: usize) {
+            // Increment IDX
         }
 
     }
