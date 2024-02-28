@@ -117,13 +117,13 @@ impl eframe::App for App {
             if self.picked_path.exists() {
                 let save_type = match self.save.save_type {
                     SaveType::Unknown => {
-                        "Plattform: Unknown"
+                        "Platform: Unknown"
                     }
                     SaveType::PC => {
-                        "Plattform: PC"
+                        "Platform: PC"
                     }
                     SaveType::SaveWizard => {
-                        "Plattform: Save Wizard"
+                        "Platform: Save Wizard"
                     },
                 };
 
