@@ -1,5 +1,5 @@
 pub mod vm{
-    use crate::{db::{bosses::bosses::BOSSES, colosseums::colosseums::COLOSSEUMS, cookbooks::books::COOKBOKS, event_flags::event_flags::EVENT_FLAGS, graces::maps::GRACES, maps::maps::MAPS, regions::regions::REGIONS, summoning_pools::summoning_pools::SUMMONING_POOLS, whetblades::whetblades::WHETBLADES}, save::save::save::Save, util::bit::bit::set_bit, vm::{profile_summary::slot_view_model::ProfileSummaryViewModel, slot::slot_view_model::SlotViewModel}};
+    use crate::{db::{bosses::bosses::BOSSES, colosseums::colosseums::COLOSSEUMS, cookbooks::books::COOKBOKS, event_flags::event_flags::EVENT_FLAGS, graces::maps::GRACES, maps::maps::MAPS, regions::regions::REGIONS, stats::stats::{FP, HP, SP}, summoning_pools::summoning_pools::SUMMONING_POOLS, whetblades::whetblades::WHETBLADES}, save::save::save::Save, util::bit::bit::set_bit, vm::{profile_summary::slot_view_model::ProfileSummaryViewModel, slot::slot_view_model::SlotViewModel}};
     
     #[derive(Clone)]
     pub struct ViewModel {
@@ -43,7 +43,6 @@ pub mod vm{
         }
 
         pub fn update_save(&self, save: &mut Save) {
-
             // Update SteamID for UserData10
             let steam_id =  self.steam_id.parse::<u64>().expect("");
             save.user_data_10.steam_id = steam_id;
@@ -54,8 +53,11 @@ pub mod vm{
                     // Update Steam ID
                     self.update_steam_id(save, i, steam_id);
 
+                    // Update Gender 
+                    self.update_gender(save, i);
+
                     // Update Stats 
-                    self.update_stas(save, i);
+                    self.update_stats(save, i);
 
                     // Update Character name
                     self.update_character_name(save, i);
@@ -86,7 +88,12 @@ pub mod vm{
             save.user_data_10.profile_summary[index].character_name.copy_from_slice(&character_name2);
         }
 
-        fn update_stas(&self, save: &mut Save, index: usize) {
+        fn update_gender(&self, save: &mut Save, index: usize) {
+            let player_game_data = &mut save.save_slots[index].player_game_data;
+            player_game_data.gender = self.slots[index].stats_vm.gender as u8;
+        }
+
+        fn update_stats(&self, save: &mut Save, index: usize) {
             let player_game_data = &mut save.save_slots[index].player_game_data;
             let profile_summary = &mut save.user_data_10.profile_summary[index];
             let stats_vm = &self.slots[index].stats_vm;
@@ -100,6 +107,15 @@ pub mod vm{
                 stats_vm.intelligence +
                 stats_vm.faith +
                 stats_vm.arcane - 79;
+
+            player_game_data.health = HP[stats_vm.vigor as usize] as u32;
+            player_game_data.base_max_health = HP[stats_vm.vigor as usize] as u32;
+
+            player_game_data.fp = FP[stats_vm.mind as usize] as u32;
+            player_game_data.base_max_fp = FP[stats_vm.mind as usize] as u32;
+
+            player_game_data.sp = SP[stats_vm.endurance as usize] as u32;
+            player_game_data.base_max_sp = SP[stats_vm.endurance as usize] as u32;
 
             player_game_data.level = level;
             player_game_data.vigor = stats_vm.vigor;

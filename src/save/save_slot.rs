@@ -1078,7 +1078,8 @@ pub struct PlayerGameData {
     pub soulsmemory: u32,
     _0x28: [u8; 0x28],
     pub character_name: [u16; 0x10],
-    _0x3: [u8; 0x3],
+    _0x2: [u8; 0x2],
+    pub gender: u8,
     pub arche_type: u8,
     _0x3_1: [u8; 0x3],
     pub gift: u8,
@@ -1124,7 +1125,8 @@ impl Default for PlayerGameData {
             soulsmemory: Default::default(),
             _0x28: [0; 0x28],
             character_name: [0;0x10],
-            _0x3: [0;0x3],
+            _0x2: [0;0x2],
+            gender: 0,
             arche_type: 0,
             _0x3_1: [0;0x3],
             gift:0,
@@ -1194,12 +1196,16 @@ impl Read for PlayerGameData {
             player_game_data.character_name[i] = br.read_u16()?;
         }
 
-        player_game_data._0x3.copy_from_slice(br.read_bytes(0x3)?);
+        player_game_data._0x2.copy_from_slice(br.read_bytes(0x2)?);
+        
+        // Gender
+        player_game_data.gender = br.read_u8()?;
+        assert!(player_game_data.gender == 0 || player_game_data.gender == 1);
 
         // ArcheType
         player_game_data.arche_type = br.read_u8()?;
 
-        player_game_data._0x3.copy_from_slice(br.read_bytes(0x3)?);
+        player_game_data._0x3_1.copy_from_slice(br.read_bytes(0x3)?);
         
         // Gift
         player_game_data.gift = br.read_u8()?;
@@ -1285,7 +1291,10 @@ impl Write for PlayerGameData {
             bytes.extend(self.character_name[i].to_le_bytes());
         }
 
-        bytes.extend(self._0x3);
+        bytes.extend(self._0x2);
+
+        // Gender
+        bytes.push(self.gender);
 
         // ArcheType
         bytes.push(self.arche_type);

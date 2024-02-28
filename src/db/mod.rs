@@ -14,3 +14,4 @@ pub mod summoning_pools;
 pub mod colosseums;
 pub mod regions;
 pub mod classes;
+pub mod stats;

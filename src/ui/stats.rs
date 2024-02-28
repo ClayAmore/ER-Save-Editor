@@ -1,9 +1,9 @@
 pub mod stats {
     use std::ops::RangeInclusive;
 
-    use eframe::{egui::{self, Ui}};
+    use eframe::egui::{self, Ui};
     use egui_extras::{Column, TableBody, TableBuilder};
-    use crate::{db::classes::classes::STARTER_CLASSES, vm::vm::vm::ViewModel};
+    use crate::{db::classes::classes::STARTER_CLASSES, vm::{stats::stats_view_model::Gender, vm::vm::ViewModel}};
 
     pub fn stats(ui: &mut Ui,  vm: &mut ViewModel) {
         egui::Frame::default()
@@ -12,6 +12,17 @@ pub mod stats {
                 ui.with_layout(egui::Layout::top_down(egui::Align::Min), |ui|{
 
                     ui.heading(vm.slots[vm.index].stats_vm.arche_type.to_string());
+                    ui.add_space(8.0);
+
+                    ui.horizontal(|ui|{
+                        if ui.radio(vm.slots[vm.index].stats_vm.gender == Gender::Male, "Male").clicked(){
+                            vm.slots[vm.index].stats_vm.gender = Gender::Male;
+                        };
+                        if ui.radio(vm.slots[vm.index].stats_vm.gender == Gender::Female, "Female").clicked(){
+                            vm.slots[vm.index].stats_vm.gender = Gender::Female;
+                        };
+                    });
+
                     ui.add_space(8.0);
 
                     let class = &STARTER_CLASSES.lock().unwrap()[&vm.slots[vm.index].stats_vm.arche_type];
@@ -27,7 +38,6 @@ pub mod stats {
                         vm.slots[vm.index].stats_vm.faith + 
                         vm.slots[vm.index].stats_vm.arcane-
                         79;
-                    ui.label(format!("Level: {}", level));
 
 
                     let table = TableBuilder::new(ui)
@@ -36,6 +46,17 @@ pub mod stats {
                     .column(Column::initial(100.0));
 
                     table.body(|mut body| {
+
+                        // Level
+                        body.row(24., |mut row| {
+                            row.col(|ui| { 
+                                ui.label("Level:"); }); 
+                            row.col(|ui| { 
+                                ui.label(format!("{:6}", level));
+                            });
+                        });
+                        
+                        // Stats
                         self::stat_field(&mut body, class.vigor..=99, "Vigor:", &mut vm.slots[vm.index].stats_vm.vigor);
                         self::stat_field(&mut body, class.mind..=99, "Mind:", &mut vm.slots[vm.index].stats_vm.mind);
                         self::stat_field(&mut body, class.endurance..=99, "Endurance:", &mut vm.slots[vm.index].stats_vm.endurance);
@@ -45,8 +66,10 @@ pub mod stats {
                         self::stat_field(&mut body, class.faith..=99, "Faith:", &mut vm.slots[vm.index].stats_vm.faith);
                         self::stat_field(&mut body, class.arcane..=99, "Arcane:", &mut vm.slots[vm.index].stats_vm.arcane);
 
+                        // Space
+                        self::space(&mut body, 8.);
 
-                        self::space(&mut body);
+                        // Souls
                         let field = egui::widgets::DragValue::new(&mut vm.slots[vm.index].stats_vm.souls)
                             .clamp_range(0..=99999999)
                             .custom_formatter(|n, _|{
@@ -80,8 +103,8 @@ pub mod stats {
         });
     }
 
-    fn space(body: &mut TableBody) {
-        body.row(24., |mut row| {
+    fn space(body: &mut TableBody, height: f32) {
+        body.row(height, |mut row| {
             row.col(|_| {
             });
             row.col(|_| {
