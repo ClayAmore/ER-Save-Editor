@@ -1390,7 +1390,7 @@ impl Write for GaItem {
 
 #[derive(Clone)]
 pub struct SaveSlot {
-    _0x10: u32,
+    pub ver: u32,
     pub map_id: u32,
     _0x18: [u8; 0x18],
     pub ga_items: Vec<GaItem>,
@@ -1442,7 +1442,7 @@ pub struct SaveSlot {
 impl Default for SaveSlot {
     fn default() -> Self {
         Self {
-            _0x10: 0,
+            ver: 0,
             map_id: 0,
             _0x18: [0x0; 0x18],
             ga_items: vec![GaItem::default(); 0x1400],
@@ -1501,7 +1501,7 @@ impl Read for SaveSlot {
         let end = br.pos + 0x280000;
 
         // Unknown
-        save_slot._0x10 = br.read_u32()?;
+        save_slot.ver = br.read_u32()?;
 
         // MapId
         save_slot.map_id = br.read_u32()?;
@@ -1636,7 +1636,7 @@ impl Write for SaveSlot {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
         
-        bytes.extend(self._0x10.to_le_bytes());
+        bytes.extend(self.ver.to_le_bytes());
 
         // MapId
         bytes.extend(self.map_id.to_le_bytes());

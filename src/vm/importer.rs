@@ -63,8 +63,14 @@ pub mod general_view_model {
         }
 
         pub fn import_character(&mut self, to_save: &mut Save, vm: &mut ViewModel) {
+
+            // Retain slot version
+            let mut from_slot = self.from_save.save_type.get_slot(self.selected_from_index).clone();
+            let to_slot = to_save.save_type.get_slot(self.selected_to_index);
+            from_slot.ver = to_slot.ver;
+
             // Save Slot
-            to_save.save_type.set_slot(self.selected_to_index, self.from_save.save_type.get_slot(self.selected_from_index));
+            to_save.save_type.set_slot(self.selected_to_index, &from_slot);
             
             // Profile Summary
             to_save.save_type.set_profile_summary(self.selected_to_index, self.from_save.save_type.get_profile_summary(self.selected_from_index));
