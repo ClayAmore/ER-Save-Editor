@@ -56,9 +56,9 @@ pub mod vm{
 
                     // Update Character name
                     save_type.set_character_name(i, self.slots[i].general_vm.character_name.to_string());
-
+                    
                     // Update Gender
-                    save_type.set_character_gender(i, self.slots[i].stats_vm.gender as u8); 
+                    save_type.set_character_gender(i, self.slots[i].general_vm.gender as u8); 
 
                     // Update Stats 
                     self.update_stats(save_type, i);

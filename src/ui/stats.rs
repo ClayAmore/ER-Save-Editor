@@ -3,7 +3,7 @@ pub mod stats {
 
     use eframe::egui::{self, Ui};
     use egui_extras::{Column, TableBody, TableBuilder};
-    use crate::{db::classes::classes::STARTER_CLASSES, vm::{stats::stats_view_model::Gender, vm::vm::ViewModel}};
+    use crate::{db::classes::classes::STARTER_CLASSES, vm::vm::vm::ViewModel};
 
     pub fn stats(ui: &mut Ui,  vm: &mut ViewModel) {
         egui::Frame::default()
@@ -12,17 +12,6 @@ pub mod stats {
                 ui.with_layout(egui::Layout::top_down(egui::Align::Min), |ui|{
 
                     ui.heading(vm.slots[vm.index].stats_vm.arche_type.to_string());
-                    ui.add_space(8.0);
-
-                    ui.horizontal(|ui|{
-                        if ui.radio(vm.slots[vm.index].stats_vm.gender == Gender::Male, "Male").clicked(){
-                            vm.slots[vm.index].stats_vm.gender = Gender::Male;
-                        };
-                        if ui.radio(vm.slots[vm.index].stats_vm.gender == Gender::Female, "Female").clicked(){
-                            vm.slots[vm.index].stats_vm.gender = Gender::Female;
-                        };
-                    });
-
                     ui.add_space(8.0);
 
                     let class = &STARTER_CLASSES.lock().unwrap()[&vm.slots[vm.index].stats_vm.arche_type];
