@@ -10,11 +10,11 @@ mod db;
 
 use std::{fs::File, io::Write, path::PathBuf};
 
-use eframe::{egui::{self, Id, LayerId, Order}, epaint::Color32};
+use eframe::{egui::{self, Align, Id, LayerId, Layout, Order, Rounding}, epaint::Color32};
 use rfd::FileDialog;
 use save::save::save::{Save, SaveType};
-use ui::{events::events::events, general::general::general, inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
-use vm::vm::vm::ViewModel;
+use ui::{events::events::events, general::general::general, importer::import::character_importer, inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
+use vm::{importer::general_view_model::ImporterViewModel, vm::vm::ViewModel};
 use crate::write::write::Write as w; 
 
 
@@ -31,6 +31,11 @@ fn main() -> Result<(), eframe::Error> {
         egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
         egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Fill);
         creation_context.egui_ctx.set_fonts(fonts);
+        let mut visuals = creation_context.egui_ctx.style().visuals.clone();
+        let rounding = 3.;
+        visuals.window_rounding = Rounding::default().at_least(rounding);
+        visuals.window_highlight_topmost = false;
+        creation_context.egui_ctx.set_visuals(visuals);
         Box::new(App::new(creation_context))
     }))
 }
@@ -39,7 +44,9 @@ pub struct App {
     save: Save,
     vm: ViewModel,
     picked_path: PathBuf,
-    current_route: Route
+    current_route: Route,
+    importer_vm: ImporterViewModel,
+    importer_open: bool,
 }
 
 impl App {
@@ -48,7 +55,9 @@ impl App {
             save: Save::default(), 
             picked_path: Default::default(), 
             current_route: Route::None,
-            vm: ViewModel::default()
+            vm: ViewModel::default(),
+            importer_vm: Default::default(),
+            importer_open: Default::default()
         }
     }
 
@@ -94,23 +103,46 @@ impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.set_zoom_factor(1.75);
         // TOP PANEL
-        egui::TopBottomPanel::top("toolbar").show(ctx, |ui| {
-            ui.horizontal(| ui| {
-                if ui.button(egui::RichText::new(format!("{} open", egui_phosphor::regular::FOLDER_OPEN))).clicked() {
-                    let files = Self::open_file_dialog();
-                    match files {
-                        Some(path) => self.open(path),
-                        None => {},
+        egui::TopBottomPanel::top("toolbar").default_height(35.).show(ctx, |ui| {
+            ui.columns(2, |uis|{
+                uis[0].with_layout(Layout::left_to_right(Align::Center),| ui| {
+                    if ui.button(egui::RichText::new(format!("{} open", egui_phosphor::regular::FOLDER_OPEN))).clicked() {
+                        let files = Self::open_file_dialog();
+                        match files {
+                            Some(path) => self.open(path),
+                            None => {},
+                        }
                     }
-                }
-                if ui.button(egui::RichText::new(format!("{} save", egui_phosphor::regular::FLOPPY_DISK))).clicked() {
-                    let files = Self::save_file_dialog();
-                    match files {
-                        Some(path) => self.save(path),
-                        None => {},
+                    if ui.button(egui::RichText::new(format!("{} save", egui_phosphor::regular::FLOPPY_DISK))).clicked() {
+                        let files = Self::save_file_dialog();
+                        match files {
+                            Some(path) => self.save(path),
+                            None => {},
+                        }
                     }
-                }
+                });
+                
+                uis[1].with_layout(Layout::right_to_left(egui::Align::Center),|ui| {
+                    let import_button = egui::widgets::Button::new(egui::RichText::new(format!("{} Import Character", egui_phosphor::regular::DOWNLOAD_SIMPLE)));
+                    if ui.add_enabled(!self.vm.steam_id.is_empty(), import_button).clicked() {
+                        let files = Self::open_file_dialog();
+                        match files {
+                            Some(path) => {
+                                match Save::from_path(&path) {
+                                    Ok(save) => {
+                                        self.importer_vm = ImporterViewModel::new(save, &self.vm);
+                                        self.importer_open = true;
+                                    },
+                                    Err(_) => {},
+                                }
+                            },
+                            None => {},
+                        }
+                    }
+                    character_importer(ui, &mut self.importer_open, &mut self.importer_vm, &mut self.save, &mut self.vm);
+                });
             });
+
         });
 
         // TOP PANEL
@@ -135,7 +167,7 @@ impl eframe::App for App {
                             .char_limit(17)
                             .desired_width(125.);
                             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                ui.label(format!("Character: {}", self.vm.profile_summary[self.vm.index].character_name));
+                                ui.label(format!("Character: {}", self.vm.slots[self.vm.index].general_vm.character_name));
                                 
                                 match self.save.save_type {
                                     SaveType::Unknown => {},
@@ -170,7 +202,7 @@ impl eframe::App for App {
                         ui.vertical(|ui| {
                             for i in 0..0xA {
                                 if self.vm.profile_summary[i].active {
-                                    let button = ui.add_sized([120., 40.], egui::Button::new(&self.vm.profile_summary[i].character_name));
+                                    let button = ui.add_sized([120., 40.], egui::Button::new(&self.vm.slots[i].general_vm.character_name));
                                     if button.clicked() {self.vm.index = i;}
                                     if self.vm.index == i {button.highlight();}
                                 }

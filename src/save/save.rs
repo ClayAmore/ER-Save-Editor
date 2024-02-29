@@ -377,11 +377,27 @@ pub mod save {
             }
         }
 
+        pub fn set_profile_summary(&mut self, index:usize, profile_summary: ProfileSummary) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {pc_save.user_data_10.profile_summary[index] = profile_summary},
+                SaveType::PlayStation(ps_save) => {ps_save.user_data_10.profile_summary[index] = profile_summary},
+            }
+        }
+
         pub fn get_slot(&self, index: usize) -> &SaveSlot {
             match self {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => &pc_save.save_slots[index].save_slot,
                 SaveType::PlayStation(ps_save) => &ps_save.save_slots[index],
+            }
+        }
+
+        pub fn set_slot(&mut self, index:usize, save_slot: &SaveSlot) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {pc_save.save_slots[index].save_slot = save_slot.clone()},
+                SaveType::PlayStation(ps_save) => {ps_save.save_slots[index] = save_slot.clone()},
             }
         }
     }

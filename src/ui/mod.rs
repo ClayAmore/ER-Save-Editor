@@ -6,3 +6,4 @@ pub mod stats;
 pub mod inventory;
 pub mod events;
 pub mod regions;
+pub mod importer;
