@@ -11,3 +11,5 @@ None, go nuts.
 Q: Will this ban me?<br/>
 A: There's no guarantee that you won't be banned. None of these features have been tested online.
 
+## Credits
+![image](https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/710c9ee6-c3df-4665-be6b-d96bce1ebf46)
