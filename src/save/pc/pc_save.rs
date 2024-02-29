@@ -1,13 +1,13 @@
 use std::io;
 use binary_reader::BinaryReader;
-use crate::{read::read::Read, save::common::user_data_11::UserData11, write::write::Write};
-use super::{save_header::SaveHeader, save_slot::PCSaveSlot, user_data_10::UserData10};
+use crate::{read::read::Read, write::write::Write};
+use super::{save_header::SaveHeader, save_slot::PCSaveSlot, user_data_10::UserData10, user_data_11::PcUserData11};
 
 pub struct PCSave {
     pub header: SaveHeader,
     pub save_slots: Vec<PCSaveSlot>,
     pub user_data_10: UserData10,
-    pub user_data_11: UserData11
+    pub user_data_11: PcUserData11
 }
 impl Default for PCSave {
     fn default() -> Self {
@@ -15,7 +15,7 @@ impl Default for PCSave {
             header: SaveHeader::default(),
             save_slots: vec![PCSaveSlot::default(); 0xA],
             user_data_10: UserData10::default(),
-            user_data_11: UserData11::default()
+            user_data_11: PcUserData11::default()
         }
     }
 }
@@ -30,7 +30,7 @@ impl Read for PCSave {
         }
 
         save.user_data_10 = UserData10::read(br)?;
-        save.user_data_11 = UserData11::read(br)?;
+        save.user_data_11 = PcUserData11::read(br)?;
         
         Ok(save)
     }

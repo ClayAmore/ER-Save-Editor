@@ -73,7 +73,7 @@ impl App {
     fn open_file_dialog() -> Option<PathBuf> {
         FileDialog::new()
         .add_filter("SL2", &["sl2", "Regular Save File"])
-        .add_filter("text", &["txt", "Save Wizard"])
+        .add_filter("TXT", &["txt", "Save Wizard Exported TXT File"])
         .add_filter("*", &["*", "All files"])
         .set_directory("/")
         .pick_file()
@@ -82,7 +82,8 @@ impl App {
     fn save_file_dialog() -> Option<PathBuf> {
         FileDialog::new()
         .add_filter("SL2", &["sl2", "Regular Save File"])
-        .add_filter("text", &["txt", "Save Wizard"])
+        .add_filter("TXT", &["txt", "Save Wizard Exported TXT File"])
+        .add_filter("*", &["*", "Any format"])
         .set_directory("/")
         .save_file()
     } 
