@@ -10,14 +10,14 @@ pub struct SaveHeader {
 impl Default for SaveHeader {
     fn default() -> Self {
         Self {
-            data: vec![Default::default();0x300],
+            data: vec![Default::default();0x70],
         }
     }
 }
 impl Read for SaveHeader {
     fn read(br: &mut BinaryReader) -> Result<SaveHeader, io::Error> {
         let mut header = SaveHeader::default();
-        header.data.copy_from_slice(br.read_bytes(0x300)?);
+        header.data.copy_from_slice(br.read_bytes(0x70)?);
         Ok(header)
     }
 }

@@ -32,11 +32,11 @@ pub mod save {
 
         pub fn set_global_steam_id(&mut self, steam_id: u64) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.user_data_10.steam_id = steam_id;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(_) => {},
             }
         }
 
@@ -50,7 +50,7 @@ pub mod save {
 
         pub fn get_character_steam_id(&self, index: usize) -> u64 {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.steam_id
                 }
@@ -60,11 +60,11 @@ pub mod save {
 
         pub fn set_character_steam_id(&mut self, index: usize, steam_id: u64) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.steam_id = steam_id;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(_) => {},
             }
         }
 
@@ -76,190 +76,228 @@ pub mod save {
                 character_name2[i] = char as u16;
             }
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.character_name.copy_from_slice(&character_name);
                     pc_save.user_data_10.profile_summary[index].character_name.copy_from_slice(&character_name2);
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.character_name.copy_from_slice(&character_name);
+                    ps_save.user_data_10.profile_summary[index].character_name.copy_from_slice(&character_name2);
+                },
             }
         }
 
         pub fn set_character_gender(&mut self, index: usize, gender: u8) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.gender = gender;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.gender = gender;
+                },
             }
         }
 
         pub fn set_character_health(&mut self, index: usize, health: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.health = health;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.health = health;
+                },
             }
         }
 
         pub fn set_character_base_max_health(&mut self, index: usize, base_max_health: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.base_max_health = base_max_health;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.base_max_health = base_max_health;
+                },
             }
         }
 
         pub fn set_character_fp(&mut self, index: usize, fp: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.fp = fp;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.fp = fp;
+                },
             }
         }
 
         pub fn set_character_base_max_fp(&mut self, index: usize, base_max_fp: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.base_max_fp = base_max_fp;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.base_max_fp = base_max_fp;
+                },
             }
         }
 
         pub fn set_character_sp(&mut self, index: usize, sp: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.sp = sp;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.sp = sp;
+                },
             }
         }
 
         pub fn set_character_base_max_sp(&mut self, index: usize, base_max_sp: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.base_max_sp = base_max_sp;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.base_max_sp = base_max_sp;
+                },
             }
         }
         
         pub fn set_character_level(&mut self, index: usize, level: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.level = level;
                     pc_save.user_data_10.profile_summary[index].level = level;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.level = level;
+                },
             }
         }
 
         pub fn set_character_vigor(&mut self, index: usize, vigor: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.vigor = vigor;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.vigor = vigor;
+                },
             }
         }
 
         pub fn set_character_mind(&mut self, index: usize, mind: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.mind = mind;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.mind = mind;
+                },
             }
         }
 
         pub fn set_character_endurance(&mut self, index: usize, endurance: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.endurance = endurance;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.endurance = endurance;
+                },
             }
         }
 
         pub fn set_character_strength(&mut self, index: usize, strength: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.strength = strength;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.strength = strength;
+                },
             }
         }
 
         pub fn set_character_dexterity(&mut self, index: usize, dexterity: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.dexterity = dexterity;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.dexterity = dexterity;
+                },
             }
         }
 
         pub fn set_character_intelligence(&mut self, index: usize, intelligence: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.intelligence = intelligence;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.intelligence = intelligence;
+                },
             }
         }
 
         pub fn set_character_faith(&mut self, index: usize, faith: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.faith = faith;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.faith = faith;
+                },
             }
         }
 
         pub fn set_character_arcane(&mut self, index: usize, arcane: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.arcane = arcane;
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.arcane = arcane;
+                },
             }
         }
 
         pub fn set_character_event_flag(&mut self, index: usize, offset: usize, bit_pos: u8, state: bool) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let event_byte = pc_save.save_slots[index].save_slot.event_flags.flags[offset];
                     pc_save.save_slots[index].save_slot.event_flags.flags[offset] = set_bit(event_byte, bit_pos, state);
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    let event_byte = ps_save.save_slots[index].event_flags.flags[offset];
+                    ps_save.save_slots[index].event_flags.flags[offset] = set_bit(event_byte, bit_pos, state);
+                },
             }
         }
 
         pub fn add_region(&mut self, index: usize, region_id: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let res = pc_save.save_slots[index].save_slot.regions.unlocked_regions.iter().position(|r| *r == region_id);
                     match res {
@@ -270,13 +308,22 @@ pub mod save {
                         },
                     }
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    let res = ps_save.save_slots[index].regions.unlocked_regions.iter().position(|r| *r == region_id);
+                    match res {
+                        Some(i) => {},
+                        None => {
+                            ps_save.save_slots[index].regions.unlocked_regions.push(region_id);
+                            ps_save.save_slots[index].regions.unlocked_regions_count = ps_save.save_slots[index].regions.unlocked_regions_count + 1;
+                        },
+                    }
+                },
             }
         }
 
         pub fn remove_region(&mut self, index: usize, region_id: u32) {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let res = pc_save.save_slots[index].save_slot.regions.unlocked_regions.iter().position(|r| *r == region_id);
                     match res {
@@ -287,13 +334,22 @@ pub mod save {
                         None => {},
                     }
                 }
-                SaveType::PlayStation(_) => todo!(),
+                SaveType::PlayStation(ps_save) => {
+                    let res = ps_save.save_slots[index].regions.unlocked_regions.iter().position(|r| *r == region_id);
+                    match res {
+                        Some(i) => {
+                            ps_save.save_slots[index].regions.unlocked_regions.swap_remove(i);
+                            ps_save.save_slots[index].regions.unlocked_regions_count = ps_save.save_slots[index].regions.unlocked_regions_count - 1;
+                        },
+                        None => {},
+                    }
+                },
             }
         }
 
         pub fn get_profile_summary(&self, index: usize) -> ProfileSummary {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => pc_save.user_data_10.profile_summary[index],
                 SaveType::PlayStation(ps_save) => ps_save.user_data_10.profile_summary[index],
             }
@@ -301,7 +357,7 @@ pub mod save {
 
         pub fn get_slot(&self, index: usize) -> &SaveSlot {
             match self {
-                SaveType::Unknown => todo!(),
+                SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => &pc_save.save_slots[index].save_slot,
                 SaveType::PlayStation(ps_save) => &ps_save.save_slots[index],
             }
