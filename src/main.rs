@@ -124,7 +124,7 @@ impl eframe::App for App {
                         "Platform: PC"
                     }
                     SaveType::PlayStation(_) => {
-                        "Platform: Save Wizard"
+                        "Platform: Playstation"
                     },
                 };
 
