@@ -1,4 +1,4 @@
 pub mod common;
 mod pc;
-mod save_wizard;
+mod playstation;
 pub mod save;

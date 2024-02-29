@@ -3,128 +3,21 @@ pub mod save {
     use binary_reader::BinaryReader;
     use crate::{
         read::read::Read, save::{
-            common::{
-                save_slot::SaveSlot, user_data_10::ProfileSummary, user_data_11::UserData11
-            },
-            pc::{
-                save_header::SaveHeader as PCSaveHeader, save_slot::PCSaveSlot, user_data_10::UserData10 as PCUserData10
-            }, 
-            save_wizard::{
-                save_header::SaveHeader as PSSaveHeader,
-                user_data_10::UserData10 as PSUserData10,
-            }, 
+            common::{ save_slot::SaveSlot, user_data_10::ProfileSummary },
+            pc::pc_save::PCSave, 
+            playstation::ps_save::PSSave, 
         }, util::bit::bit::set_bit, write::write::Write
     };
 
     // Using a checksum of the regulation bin file to check for Save Wizard .txt save file
     const REGULATION_MD5_CHECKSUM: [u8; 0x10] = [0x9D, 0xE4, 0x83, 0x80, 0x78, 0xB2, 0x28, 0x9D, 0x83, 0x8D, 0x28, 0x7A, 0x24, 0x31, 0xE6, 0x45];
 
-    pub struct PCSave {
-        pub header: PCSaveHeader,
-        pub save_slots: Vec<PCSaveSlot>,
-        pub user_data_10: PCUserData10,
-        pub user_data_11: UserData11
-    }
-    impl Default for PCSave {
-        fn default() -> Self {
-            Self {
-                header: PCSaveHeader::default(),
-                save_slots: vec![PCSaveSlot::default(); 0xA],
-                user_data_10: PCUserData10::default(),
-                user_data_11: UserData11::default()
-            }
-        }
-    }
-    impl Read for PCSave {
-        fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
-            let mut save = PCSave::default();
-
-            save.header = PCSaveHeader::read(br)?;
-
-            for i in 0..0xA {
-                save.save_slots[i] = PCSaveSlot::read(br)?;
-            }
-
-            save.user_data_10 = PCUserData10::read(br)?;
-            save.user_data_11 = UserData11::read(br)?;
-            
-            Ok(save)
-        }
-    }
-    impl Write for PCSave {
-        fn write(&self) -> Result<Vec<u8>, io::Error> {
-            let mut bytes: Vec<u8> = Vec::new();
-
-            // Header
-            bytes.extend(self.header.write()?);
-
-            for i in 0..0xA {
-                bytes.extend(self.save_slots[i].write()?)
-            }
-
-            bytes.extend(self.user_data_10.write()?);
-            bytes.extend(self.user_data_11.write()?);
-
-            Ok(bytes)
-        }
-    }
-
-    pub struct PSSave {
-        pub header: PSSaveHeader,
-        pub save_slots: Vec<SaveSlot>,
-        pub user_data_10: PSUserData10,
-        pub user_data_11: UserData11
-    }
-    impl Default for PSSave {
-        fn default() -> Self {
-            Self {
-                header: Default::default(),
-                save_slots: vec![SaveSlot::default(); 0xA],
-                user_data_10: PSUserData10::default(),
-                user_data_11: UserData11::default()
-            }
-        }
-    }
-    impl Read for PSSave {
-        fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
-            let mut save = PSSave::default();
-
-            save.header = PSSaveHeader::read(br)?;
-
-            for i in 0..0xA {
-                save.save_slots[i] = SaveSlot::read(br)?;
-            }
-
-            save.user_data_10 = PSUserData10::read(br)?;
-            save.user_data_11 = UserData11::read(br)?;
-            
-            Ok(save)
-        }
-    }
-    impl Write for PSSave {
-        fn write(&self) -> Result<Vec<u8>, io::Error> {
-            let mut bytes: Vec<u8> = Vec::new();
-
-            // Header
-            bytes.extend(self.header.write()?);
-
-            for i in 0..0xA {
-                bytes.extend(self.save_slots[i].write()?)
-            }
-
-            bytes.extend(self.user_data_10.write()?);
-            bytes.extend(self.user_data_11.write()?);
-
-            Ok(bytes)
-        }
-    }
-
     pub enum SaveType {
         Unknown,
         PC(PCSave),
-        SaveWizard(PSSave)
+        PlayStation(PSSave)
     }
-
+    
     #[allow(unused)]
     impl SaveType {
         pub fn get_global_steam_id(&self) -> u64 {
@@ -133,7 +26,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.user_data_10.steam_id
                 }
-                SaveType::SaveWizard(_) => 0,
+                SaveType::PlayStation(_) => 0,
             }
         }
 
@@ -143,7 +36,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.user_data_10.steam_id = steam_id;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -151,7 +44,7 @@ pub mod save {
             match self {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => pc_save.user_data_10.active_slot,
-                SaveType::SaveWizard(ps_save) => ps_save.user_data_10.active_slot,
+                SaveType::PlayStation(ps_save) => ps_save.user_data_10.active_slot,
             }
         }
 
@@ -161,7 +54,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.steam_id
                 }
-                SaveType::SaveWizard(_) => 0,
+                SaveType::PlayStation(_) => 0,
             }
         }
 
@@ -171,7 +64,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.steam_id = steam_id;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -188,7 +81,7 @@ pub mod save {
                     pc_save.save_slots[index].save_slot.player_game_data.character_name.copy_from_slice(&character_name);
                     pc_save.user_data_10.profile_summary[index].character_name.copy_from_slice(&character_name2);
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -198,7 +91,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.gender = gender;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -208,7 +101,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.health = health;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -218,7 +111,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.base_max_health = base_max_health;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -228,7 +121,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.fp = fp;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -238,7 +131,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.base_max_fp = base_max_fp;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -248,7 +141,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.sp = sp;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -258,7 +151,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.base_max_sp = base_max_sp;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
         
@@ -269,7 +162,7 @@ pub mod save {
                     pc_save.save_slots[index].save_slot.player_game_data.level = level;
                     pc_save.user_data_10.profile_summary[index].level = level;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -279,7 +172,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.vigor = vigor;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -289,7 +182,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.mind = mind;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -299,7 +192,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.endurance = endurance;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -309,7 +202,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.strength = strength;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -319,7 +212,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.dexterity = dexterity;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -329,7 +222,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.intelligence = intelligence;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -339,7 +232,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.faith = faith;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -349,7 +242,7 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.player_game_data.arcane = arcane;
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -360,7 +253,7 @@ pub mod save {
                     let event_byte = pc_save.save_slots[index].save_slot.event_flags.flags[offset];
                     pc_save.save_slots[index].save_slot.event_flags.flags[offset] = set_bit(event_byte, bit_pos, state);
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -377,7 +270,7 @@ pub mod save {
                         },
                     }
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -394,7 +287,7 @@ pub mod save {
                         None => {},
                     }
                 }
-                SaveType::SaveWizard(_) => todo!(),
+                SaveType::PlayStation(_) => todo!(),
             }
         }
 
@@ -402,7 +295,7 @@ pub mod save {
             match self {
                 SaveType::Unknown => todo!(),
                 SaveType::PC(pc_save) => pc_save.user_data_10.profile_summary[index],
-                SaveType::SaveWizard(ps_save) => ps_save.user_data_10.profile_summary[index],
+                SaveType::PlayStation(ps_save) => ps_save.user_data_10.profile_summary[index],
             }
         }
 
@@ -410,7 +303,7 @@ pub mod save {
             match self {
                 SaveType::Unknown => todo!(),
                 SaveType::PC(pc_save) => &pc_save.save_slots[index].save_slot,
-                SaveType::SaveWizard(ps_save) => &ps_save.save_slots[index],
+                SaveType::PlayStation(ps_save) => &ps_save.save_slots[index],
             }
         }
     }
@@ -435,7 +328,7 @@ pub mod save {
                 save.save_type = SaveType::PC(PCSave::read(br)?);
             }
             else if Self::is_ps_save_wizard(br) {
-                save.save_type = SaveType::SaveWizard(PSSave::read(br)?);
+                save.save_type = SaveType::PlayStation(PSSave::read(br)?);
             }
             else {
                 return Err( std::io::Error::new(io::ErrorKind::InvalidData, "Invalid data!") );
@@ -450,7 +343,7 @@ pub mod save {
             let save_bytes: Vec<u8> =  match &self.save_type {
                 SaveType::Unknown => Vec::new(),
                 SaveType::PC(pc_save) => pc_save.write()?,
-                SaveType::SaveWizard(ps_save) => ps_save.write()?,
+                SaveType::PlayStation(ps_save) => ps_save.write()?,
             };
             Ok(save_bytes)
         }
