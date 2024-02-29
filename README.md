@@ -2,7 +2,7 @@
 
 Tool for editing Elden Ring save files. Compatible with PC and Playstation Save Wizard exported saves.
 
-![image](https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/035d2b56-fe82-477e-92df-164d483885a0)
+![image](https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/7d9e9090-5929-4757-8ca2-d50c65a02daf)
 
 ## Permissions
 None, go nuts.
