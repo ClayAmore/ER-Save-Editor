@@ -104,6 +104,8 @@ pub mod vm{
             save_type.set_character_intelligence(index, stats_vm.intelligence);
             save_type.set_character_faith(index, stats_vm.faith);
             save_type.set_character_arcane(index, stats_vm.arcane);
+
+            save_type.set_character_souls(index, stats_vm.souls);
         }
 
         fn update_events(&self, save_type: &mut SaveType, index: usize) {

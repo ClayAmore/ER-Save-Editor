@@ -281,6 +281,28 @@ pub mod save {
             }
         }
 
+        pub fn set_character_souls(&mut self, index: usize, souls: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let orgininal_soulsmemory = pc_save.save_slots[index].save_slot.player_game_data.soulsmemory;
+                    let orgininal_souls = pc_save.save_slots[index].save_slot.player_game_data.soulsmemory;
+                    pc_save.save_slots[index].save_slot.player_game_data.souls = souls;
+                    if souls > orgininal_souls {
+                        pc_save.save_slots[index].save_slot.player_game_data.soulsmemory = orgininal_soulsmemory + souls;
+                    }
+                }
+                SaveType::PlayStation(ps_save) => {
+                    let orgininal_soulsmemory = ps_save.save_slots[index].player_game_data.soulsmemory;
+                    let orgininal_souls = ps_save.save_slots[index].player_game_data.soulsmemory;
+                    ps_save.save_slots[index].player_game_data.souls = souls;
+                    if souls > orgininal_souls {
+                        ps_save.save_slots[index].player_game_data.soulsmemory = orgininal_soulsmemory + souls;
+                    }
+                },
+            }
+        }
+
         pub fn set_character_event_flag(&mut self, index: usize, offset: usize, bit_pos: u8, state: bool) {
             match self {
                 SaveType::Unknown => panic!("Why are we here?"),
