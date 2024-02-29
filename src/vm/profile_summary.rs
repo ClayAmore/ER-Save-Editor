@@ -1,5 +1,5 @@
 pub mod slot_view_model {
-    use crate::save::{user_data_10::ProfileSummary};
+    use crate::save::common::user_data_10::ProfileSummary;
 
 
     #[derive(Clone)]

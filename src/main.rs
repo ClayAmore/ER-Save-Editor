@@ -59,7 +59,7 @@ impl App {
     }
 
     fn save(&mut self, path: PathBuf) {
-        self.vm.update_save(&mut self.save);
+        self.vm.update_save(&mut self.save.save_type);
         let mut f = File::create(path).expect("");
         let bytes = self.save.write().expect("");
         let res = f.write_all(&bytes);
@@ -119,10 +119,10 @@ impl eframe::App for App {
                     SaveType::Unknown => {
                         "Platform: Unknown"
                     }
-                    SaveType::PC => {
+                    SaveType::PC(_) => {
                         "Platform: PC"
                     }
-                    SaveType::SaveWizard => {
+                    SaveType::SaveWizard(_) => {
                         "Platform: Save Wizard"
                     },
                 };

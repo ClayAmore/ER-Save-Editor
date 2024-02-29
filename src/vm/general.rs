@@ -1,5 +1,6 @@
 pub mod general_view_model {
-    use crate::save::save_slot::SaveSlot;
+    use crate::save::common::save_slot::SaveSlot;
+
 
 
     #[derive(Clone)]

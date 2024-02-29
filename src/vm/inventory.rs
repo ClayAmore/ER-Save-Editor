@@ -1,6 +1,6 @@
 pub mod inventory {
     use std::collections::HashMap;
-    use crate::{db::{ accessory_name::accessory_name::ACCESSORY_NAME, aow_name::aow_name::AOW_NAME, armor_name::armor_name::ARMOR_NAME, item_name::item_name::ITEM_NAME, weapon_name::weapon_name::WEAPON_NAME}, save::save_slot::{EquipInventoryData, EquipInventoryItem, GaItem, SaveSlot}};
+    use crate::{db::{ accessory_name::accessory_name::ACCESSORY_NAME, aow_name::aow_name::AOW_NAME, armor_name::armor_name::ARMOR_NAME, item_name::item_name::ITEM_NAME, weapon_name::weapon_name::WEAPON_NAME}, save::common::save_slot::{EquipInventoryData, EquipInventoryItem, GaItem, SaveSlot}};
 
     #[derive(Clone)]
     pub enum InventoryRoute {

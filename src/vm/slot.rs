@@ -1,5 +1,5 @@
 pub mod slot_view_model {
-    use crate::{save::save_slot::SaveSlot, vm::{events::events_view_model::EventsViewModel, general::general_view_model::GeneralViewModel, inventory::inventory::InventoryViewModel, regions::regions_view_model::RegionsViewModel, stats::stats_view_model::StatsViewModel}};
+    use crate::{save::common::save_slot::SaveSlot, vm::{events::events_view_model::EventsViewModel, general::general_view_model::GeneralViewModel, inventory::inventory::InventoryViewModel, regions::regions_view_model::RegionsViewModel, stats::stats_view_model::StatsViewModel}};
 
 
     #[derive(Clone)]
@@ -26,8 +26,7 @@ pub mod slot_view_model {
     }
     
     impl SlotViewModel {
-        pub fn from_save(slot:& SaveSlot) -> Self {
-            
+        pub fn from_save(slot:&SaveSlot) -> Self {
             let active = true;
             
             let general_vm = GeneralViewModel::from_save(slot);

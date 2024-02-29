@@ -1,7 +1,7 @@
 pub mod regions_view_model {
     use std::collections::BTreeMap;
 
-    use crate::{db::{map_name::map_name::MapName, regions::regions::{Region, ID_TO_REGION, REGIONS}}, save::save_slot::SaveSlot};
+    use crate::{db::{map_name::map_name::MapName, regions::regions::{Region, ID_TO_REGION, REGIONS}}, save::common::save_slot::SaveSlot};
 
     #[derive(Clone)]
     pub struct RegionsViewModel  {

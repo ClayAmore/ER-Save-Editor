@@ -1,5 +1,5 @@
 pub mod stats_view_model {
-    use crate::{db::classes::classes::ArcheType, save::save_slot::SaveSlot};
+    use crate::{db::classes::classes::ArcheType, save::common::save_slot::SaveSlot};
 
     #[derive(Clone, PartialEq, Eq, Copy)]
     pub enum Gender {

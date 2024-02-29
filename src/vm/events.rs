@@ -1,7 +1,7 @@
 pub mod events_view_model {
     use std::collections::BTreeMap;
 
-    use crate::{db::{bosses::bosses::{Boss, BOSSES}, colosseums::colosseums::{Colosseum, COLOSSEUMS}, cookbooks::books::{Cookbook, COOKBOKS}, event_flags::event_flags::EVENT_FLAGS, graces::maps::{Grace, GRACES}, map_name::map_name::{MapName, MAP_NAME}, maps::maps::{Map, MAPS}, summoning_pools::summoning_pools::{SummoningPool, SUMMONING_POOLS}, whetblades::whetblades::{Whetblade, WHETBLADES}}, save::save_slot::SaveSlot, util::bit::bit::get_bit};
+    use crate::{db::{bosses::bosses::{Boss, BOSSES}, colosseums::colosseums::{Colosseum, COLOSSEUMS}, cookbooks::books::{Cookbook, COOKBOKS}, event_flags::event_flags::EVENT_FLAGS, graces::maps::{Grace, GRACES}, map_name::map_name::{MapName, MAP_NAME}, maps::maps::{Map, MAPS}, summoning_pools::summoning_pools::{SummoningPool, SUMMONING_POOLS}, whetblades::whetblades::{Whetblade, WHETBLADES}}, save::common::save_slot::SaveSlot, util::bit::bit::get_bit};
 
     #[derive(Clone)]
     pub enum EventsRoute {

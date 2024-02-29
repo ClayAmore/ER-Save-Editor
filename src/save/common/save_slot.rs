@@ -202,7 +202,7 @@ impl Default for EventFlags {
     fn default() -> Self {
         Self { 
             flags: vec![Default::default(); 0x1bf99f]
-         }
+        }
     }
 }
 
@@ -1390,7 +1390,6 @@ impl Write for GaItem {
 
 #[derive(Clone)]
 pub struct SaveSlot {
-    pub checksum: [u8; 0x10],
     _0x10: u32,
     pub map_id: u32,
     _0x18: [u8; 0x18],
@@ -1443,7 +1442,6 @@ pub struct SaveSlot {
 impl Default for SaveSlot {
     fn default() -> Self {
         Self {
-            checksum: [0x0; 0x10],
             _0x10: 0,
             map_id: 0,
             _0x18: [0x0; 0x18],
@@ -1500,10 +1498,7 @@ impl Read for SaveSlot {
         let mut save_slot = SaveSlot::default();
 
         // Slot end position
-        let end = br.pos + 0x280010;
-
-        // Checksum
-        save_slot.checksum.copy_from_slice(br.read_bytes(0x10)?);
+        let end = br.pos + 0x280000;
 
         // Unknown
         save_slot._0x10 = br.read_u32()?;
@@ -1640,9 +1635,6 @@ impl Read for SaveSlot {
 impl Write for SaveSlot {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
-
-        // Checksum
-        bytes.extend(self.checksum);
         
         bytes.extend(self._0x10.to_le_bytes());
 
@@ -1770,14 +1762,7 @@ impl Write for SaveSlot {
         bytes.extend(self._0x80);
 
         // Empty calories
-        bytes.extend(vec![0;0x280010-bytes.len()]);
-
-        // Recalculate checksum at the end
-        let digest = md5::compute(&bytes[0x10..bytes.len()]);
-        
-        for i in 0..0x10 {
-            bytes[i] = digest[i];
-        }
+        bytes.extend(vec![0;0x280000-bytes.len()]);
 
         Ok(bytes)
     }
