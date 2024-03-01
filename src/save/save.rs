@@ -36,7 +36,9 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.user_data_10.steam_id = steam_id;
                 }
-                SaveType::PlayStation(_) => {},
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.user_data_10.steam_id = 0;
+                },
             }
         }
 
@@ -64,7 +66,9 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     pc_save.save_slots[index].save_slot.steam_id = steam_id;
                 }
-                SaveType::PlayStation(_) => {},
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].steam_id = 0;
+                },
             }
         }
 
