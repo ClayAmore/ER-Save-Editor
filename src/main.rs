@@ -10,10 +10,10 @@ mod db;
 
 use std::{fs::File, io::Write, path::PathBuf};
 
-use eframe::{egui::{self, Align, Id, LayerId, Layout, Order, Rounding}, epaint::Color32};
+use eframe::{egui::{self, text::LayoutJob, Align, FontSelection, Id, LayerId, Layout, Order, RichText, Rounding, Style}, epaint::Color32};
 use rfd::FileDialog;
 use save::save::save::{Save, SaveType};
-use ui::{events::events::events, general::general::general, importer::import::character_importer, inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
+use ui::{events::events::events, general::general::general, importer::import::character_importer, inventory::inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
 use vm::{importer::general_view_model::ImporterViewModel, vm::vm::ViewModel};
 use crate::write::write::Write as w; 
 
@@ -161,7 +161,7 @@ impl eframe::App for App {
                 };
 
                 ui.columns(2,| uis| {
-                    if self.vm.active {
+                    if self.vm.active.is_some_and(|valid| valid) {
                         egui::Frame::none().show(&mut uis[1], |ui| {
                             let steam_id_text_edit = egui::widgets::TextEdit::singleline(&mut self.vm.steam_id)
                             .char_limit(17)
@@ -194,7 +194,7 @@ impl eframe::App for App {
         });
 
         // Character List Panel
-        if !self.vm.steam_id.is_empty() {
+        if self.vm.active.is_some_and(|valid| valid) {
             egui::SidePanel::left("characters").show(ctx, |ui| {
                 egui::ScrollArea::vertical()
                     .id_source("left")
@@ -212,17 +212,13 @@ impl eframe::App for App {
             });
 
             // Slot Section Panel
-            if self.vm.active {
-                egui::SidePanel::left("slot_sections_menu").show(ctx, |ui| {
-                    egui::ScrollArea::vertical()
-                        .id_source("left")
-                        .show(ui, |ui| {
-                            ui.vertical(|ui| {
-                                menu(ui, self);
-                            })
-                        });
+            egui::SidePanel::left("slot_sections_menu").show(ctx, |ui| {
+                egui::ScrollArea::vertical() .id_source("left") .show(ui, |ui| {
+                    ui.vertical(|ui| {
+                        menu(ui, self);
+                    })
                 });
-            }
+            });
 
             // Main Content
             egui::CentralPanel::default().show(ctx, |ui| {
@@ -236,10 +232,8 @@ impl eframe::App for App {
                 }
             });
         }
-
         // No file loaded View
         else {
-
             // Listen for dragged files and update path
             egui::CentralPanel::default().show(ctx, |ui| {
                 // Check if hovering a file
@@ -263,7 +257,26 @@ impl eframe::App for App {
                         ui.label(egui::RichText::new(path));
                     }
                     else {
-                        ui.label("Drop a save file here or click 'Open' to browse");
+                        let style = Style::default();
+                        let mut layout_job = LayoutJob::default();
+                        if self.vm.active.is_some_and(|valid| !valid) {
+                            RichText::new("Save file has invalid data!\n\n")
+                            .color(Color32::DARK_RED)
+                            .append_to(
+                                &mut layout_job,
+                                &style,
+                                FontSelection::Default,
+                                Align::Center,
+                            );
+                        }
+                        RichText::new("Drop a save file here or click 'Open' to browse")
+                        .append_to(
+                            &mut layout_job,
+                            &style,
+                            FontSelection::Default,
+                            Align::Center,
+                        );
+                        ui.label(layout_job);
                     }
                 });
 

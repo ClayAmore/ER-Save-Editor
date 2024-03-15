@@ -3,7 +3,7 @@ pub mod save {
     use binary_reader::BinaryReader;
     use crate::{
         read::read::Read, save::{
-            common::{ save_slot::SaveSlot, user_data_10::ProfileSummary },
+            common::{ save_slot::{EquipInventoryData, GaItem, SaveSlot}, user_data_10::ProfileSummary, user_data_11::UserData11 },
             pc::pc_save::PCSave, 
             playstation::ps_save::PSSave, 
         }, util::bit::bit::set_bit, write::write::Write
@@ -402,6 +402,44 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {pc_save.save_slots[index].save_slot = save_slot.clone()},
                 SaveType::PlayStation(ps_save) => {ps_save.save_slots[index] = save_slot.clone()},
+            }
+        }
+        
+        pub fn get_user_data_11(&mut self) -> &UserData11{
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => &pc_save.user_data_11.user_data_11,
+                SaveType::PlayStation(ps_save) => &ps_save.user_data_11,
+            }
+        }
+
+        pub fn get_regulation(&self) -> &[u8]{
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => &pc_save.user_data_11.user_data_11.regulation,
+                SaveType::PlayStation(ps_save) => &ps_save.user_data_11.regulation,
+            }
+        }
+
+        pub fn set_gaitem_map(&mut self, index: usize, ga_items: Vec<GaItem>) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {pc_save.save_slots[index].save_slot.ga_items = ga_items;}
+                SaveType::PlayStation(ps_save) => {ps_save.save_slots[index].ga_items = ga_items;}
+            }
+        }
+
+        pub fn set_equip_inventory(&mut self, index: usize, equip_inventory_data: [EquipInventoryData; 2]) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    pc_save.save_slots[index].save_slot.equip_inventory_data = equip_inventory_data[0].clone();
+                    pc_save.save_slots[index].save_slot.storage_inventory_data = equip_inventory_data[1].clone();
+                }
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].equip_inventory_data = equip_inventory_data[0].clone();
+                    ps_save.save_slots[index].storage_inventory_data = equip_inventory_data[1].clone();
+                }
             }
         }
     }

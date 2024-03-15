@@ -1,11 +1,11 @@
-use std::io;
+use std::io::Error;
 use binary_reader::BinaryReader;
-
-use crate::{read::read::Read, write::write::Write};
+use crate::write::write::Write;
+use crate::read::read::Read;
 
 pub struct UserData11 {
     unk: [u8;0x10],
-    regulation: Vec<u8>,
+    pub regulation: Vec<u8>,
     rest: Vec<u8>,
 }
 
@@ -20,7 +20,7 @@ impl Default for UserData11 {
 }
 
 impl Read for UserData11 {
-    fn read(br: &mut BinaryReader) -> Result<UserData11, io::Error> {
+    fn read(br: &mut BinaryReader) -> Result<UserData11, Error> {
         let mut user_data_11 = UserData11::default();
         user_data_11.unk.copy_from_slice(br.read_bytes(0x10)?);
         user_data_11.regulation.copy_from_slice(br.read_bytes(0x1c5f70)?);
@@ -31,7 +31,7 @@ impl Read for UserData11 {
 }
 
 impl Write for UserData11 {
-    fn write(&self) -> Result<Vec<u8>, io::Error> {
+    fn write(&self) -> Result<Vec<u8>, Error> {
         let mut bytes: Vec<u8> = Vec::new();
         bytes.extend(self.unk);
         bytes.extend(self.regulation.to_vec());

@@ -1,5 +1,5 @@
 pub mod general_view_model {
-    use crate::{save::save::save::Save, vm::{slot::slot_view_model::SlotViewModel, vm::vm::ViewModel}};
+    use crate::{save::save::save::Save, util::validator::validator::Validator, vm::{slot::slot_view_model::SlotViewModel, vm::vm::ViewModel}};
 
     #[derive(Default, Clone)]
     pub struct Character {
@@ -10,6 +10,7 @@ pub mod general_view_model {
 
 
     pub struct ImporterViewModel  {
+        pub valid: bool,
         pub selected_from_index: usize,
         pub selected_to_index: usize,
         pub from_list: [Character; 0x10],
@@ -20,6 +21,7 @@ pub mod general_view_model {
     impl Default for ImporterViewModel {
         fn default() -> Self {
             Self { 
+                valid: false,
                 selected_from_index: 0,
                 selected_to_index: 0,
                 from_list: Default::default(), 
@@ -32,6 +34,10 @@ pub mod general_view_model {
     impl ImporterViewModel {
         pub fn new(from: Save, vm: &ViewModel) -> Self {
             let mut importer_view_model = ImporterViewModel::default();
+
+            importer_view_model.valid = Validator::new(&from).validate();
+
+            if !importer_view_model.valid {return importer_view_model;}
 
             importer_view_model.from_save = from;
 

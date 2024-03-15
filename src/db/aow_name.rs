@@ -4,6 +4,7 @@ pub mod aow_name {
 
     pub static AOW_NAME: Lazy<Mutex<HashMap<u32, &str>>> = Lazy::new(|| {
         Mutex::new(HashMap::from([
+            (0, ""),
             (10,"test gem 1"),
             (20,"test gem 2"),
             (30,"test gem 3"),

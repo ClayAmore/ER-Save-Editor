@@ -154,10 +154,10 @@ impl Write for UknownList {
 
 #[derive(Clone)]
 pub struct GaItem2 {
-    id: i32,
-    unk: i32,
-    reinforce_type: i32,
-    unk1: i32,
+    pub id: i32,
+    pub unk: i32,
+    pub reinforce_type: i32,
+    pub unk1: i32,
 }
 
 impl Default for GaItem2 {
@@ -224,15 +224,15 @@ impl Write for EventFlags {
 
 #[derive(Clone)]
 pub struct GaItemData {
-    unk: i32,
-    unk1: i32,
-    ga_items: Vec<GaItem2>
+    pub distinct_aquired_items_count: i32,
+    pub unk1: i32,
+    pub ga_items: Vec<GaItem2>
 }
 
 impl Default for GaItemData {
     fn default() -> Self {
         Self {
-            unk: Default::default(),
+            distinct_aquired_items_count: Default::default(),
             unk1: Default::default(),
             ga_items: vec![GaItem2::default(); 0x1b58]
         }
@@ -242,7 +242,7 @@ impl Default for GaItemData {
 impl Read for GaItemData {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut ga_item_data = GaItemData::default();
-        ga_item_data.unk = br.read_i32()?;
+        ga_item_data.distinct_aquired_items_count = br.read_i32()?;
         ga_item_data.unk1 = br.read_i32()?;
         for i in 0..0x1b58 {
             ga_item_data.ga_items[i] = GaItem2::read(br)?;
@@ -254,7 +254,7 @@ impl Read for GaItemData {
 impl Write for GaItemData {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
-        bytes.extend(self.unk.to_le_bytes());
+        bytes.extend(self.distinct_aquired_items_count.to_le_bytes());
         bytes.extend(self.unk1.to_le_bytes());
 
         for i in 0..0x1b58 {
@@ -358,9 +358,9 @@ impl Write for Regions {
 
 #[derive(Clone)]
 pub struct EquipPhysicsData {
-    slot1: i16,
+    pub slot1: i16,
     _0x2: i16,
-    slot2: i16,
+    pub slot2: i16,
     _0x2_1: i16,
 }
 
@@ -449,7 +449,6 @@ impl Default for EquipProjectileData {
         }
     }
 }
-
 impl Read for EquipProjectileData {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut equip_projectile_data = EquipProjectileData::default();
@@ -465,7 +464,6 @@ impl Read for EquipProjectileData {
         Ok(equip_projectile_data)
     }
 }
-
 impl Write for EquipProjectileData {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
@@ -482,10 +480,191 @@ impl Write for EquipProjectileData {
     }
 }
 
+#[derive(Clone, Default)]
+pub struct EquippedItems {
+    pub left_hand_armament1: i32,
+    pub right_hand_armament1: i32,
+    pub left_hand_armament2: i32,
+    pub right_hand_armament2: i32,
+    pub left_hand_armament3: i32,
+    pub right_hand_armament3: i32,
+    pub arrows1: i32,
+    pub bolts1: i32,
+    pub arrows2: i32,
+    pub bolts2: i32,
+    _unk1: i32,
+    _unk2: i32,
+    pub head: i32,
+    pub chest: i32,
+    pub arms: i32,
+    pub legs: i32,
+    _unk3: i32,
+    pub talisman1: i32,
+    pub talisman2: i32,
+    pub talisman3: i32,
+    pub talisman4: i32,
+    _unk4: i32, //Most likely covenant.
+    pub quickitem1: i16,
+    _padding: i16,
+    pub quickitem2: i16,
+    _padding2: i16,
+    pub quickitem3: i16,
+    _padding3: i16,
+    pub quickitem4: i16,
+    _padding4: i16,
+    pub quickitem5: i16,
+    _padding5: i16,
+    pub quickitem6: i16,
+    _padding6: i16,
+    pub quickitem7: i16,
+    _padding7: i16,
+    pub quickitem8: i16,
+    _padding8: i16,
+    pub quickitem9: i16,
+    _padding9: i16,
+    pub quickitem10: i16,
+    _padding10: i16,
+    pub pouch1: i16,
+    _padding11: i16,
+    pub pouch2: i16,
+    _padding12: i16,
+    pub pouch3: i16,
+    _padding13: i16,
+    pub pouch4: i16,
+    _padding14: i16,
+    pub pouch5: i16,
+    _padding15: i16,
+    pub pouch6: i16,
+    _padding16: i16,
+    _padding17: i32,
+}
+impl Read for EquippedItems {
+    fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
+        let mut equipped_items = EquippedItems::default();
+        equipped_items.left_hand_armament1 = br.read_i32()?;
+        equipped_items.right_hand_armament1 = br.read_i32()?;
+        equipped_items.left_hand_armament2 = br.read_i32()?;
+        equipped_items.right_hand_armament2 = br.read_i32()?;
+        equipped_items.left_hand_armament3 = br.read_i32()?;
+        equipped_items.right_hand_armament3 = br.read_i32()?;
+        equipped_items.arrows1 = br.read_i32()?;
+        equipped_items.bolts1 = br.read_i32()?;
+        equipped_items.arrows2 = br.read_i32()?;
+        equipped_items.bolts2 = br.read_i32()?;
+        equipped_items._unk1 = br.read_i32()?;
+        equipped_items._unk2 = br.read_i32()?;
+        equipped_items.head = br.read_i32()?;
+        equipped_items.chest = br.read_i32()?;
+        equipped_items.arms = br.read_i32()?;
+        equipped_items.legs = br.read_i32()?;
+        equipped_items._unk3 = br.read_i32()?;
+        equipped_items.talisman1 = br.read_i32()?;
+        equipped_items.talisman2 = br.read_i32()?;
+        equipped_items.talisman3 = br.read_i32()?;
+        equipped_items.talisman4 = br.read_i32()?;
+        equipped_items._unk4 = br.read_i32()?;
+        equipped_items.quickitem1 = br.read_i16()?;
+        equipped_items._padding = br.read_i16()?;
+        equipped_items.quickitem2 = br.read_i16()?;
+        equipped_items._padding2 = br.read_i16()?;
+        equipped_items.quickitem3 = br.read_i16()?;
+        equipped_items._padding3 = br.read_i16()?;
+        equipped_items.quickitem4 = br.read_i16()?;
+        equipped_items._padding4 = br.read_i16()?;
+        equipped_items.quickitem5 = br.read_i16()?;
+        equipped_items._padding5 = br.read_i16()?;
+        equipped_items.quickitem6 = br.read_i16()?;
+        equipped_items._padding6 = br.read_i16()?;
+        equipped_items.quickitem7 = br.read_i16()?;
+        equipped_items._padding7 = br.read_i16()?;
+        equipped_items.quickitem8 = br.read_i16()?;
+        equipped_items._padding8 = br.read_i16()?;
+        equipped_items.quickitem9 = br.read_i16()?;
+        equipped_items._padding9 = br.read_i16()?;
+        equipped_items.quickitem10 = br.read_i16()?;
+        equipped_items._padding10 = br.read_i16()?;
+        equipped_items.pouch1 = br.read_i16()?;
+        equipped_items._padding11 = br.read_i16()?;
+        equipped_items.pouch2 = br.read_i16()?;
+        equipped_items._padding12 = br.read_i16()?;
+        equipped_items.pouch3 = br.read_i16()?;
+        equipped_items._padding13 = br.read_i16()?;
+        equipped_items.pouch4 = br.read_i16()?;
+        equipped_items._padding14 = br.read_i16()?;
+        equipped_items.pouch5 = br.read_i16()?;
+        equipped_items._padding15 = br.read_i16()?;
+        equipped_items.pouch6 = br.read_i16()?;
+        equipped_items._padding16 = br.read_i16()?;
+        equipped_items._padding17 = br.read_i32()?;
+        Ok(equipped_items)
+    }
+}
+impl Write for EquippedItems {
+    fn write(&self) -> Result<Vec<u8>, io::Error> {
+        let mut bytes: Vec<u8> = Vec::new();
+        bytes.extend(self.left_hand_armament1.to_le_bytes());
+        bytes.extend(self.right_hand_armament1.to_le_bytes());
+        bytes.extend(self.left_hand_armament2.to_le_bytes());
+        bytes.extend(self.right_hand_armament2.to_le_bytes());
+        bytes.extend(self.left_hand_armament3.to_le_bytes());
+        bytes.extend(self.right_hand_armament3.to_le_bytes());
+        bytes.extend(self.arrows1.to_le_bytes());
+        bytes.extend(self.bolts1.to_le_bytes());
+        bytes.extend(self.arrows2.to_le_bytes());
+        bytes.extend(self.bolts2.to_le_bytes());
+        bytes.extend(self._unk1.to_le_bytes());
+        bytes.extend(self._unk2.to_le_bytes());
+        bytes.extend(self.head.to_le_bytes());
+        bytes.extend(self.chest.to_le_bytes());
+        bytes.extend(self.arms.to_le_bytes());
+        bytes.extend(self.legs.to_le_bytes());
+        bytes.extend(self._unk3.to_le_bytes());
+        bytes.extend(self.talisman1.to_le_bytes());
+        bytes.extend(self.talisman2.to_le_bytes());
+        bytes.extend(self.talisman3.to_le_bytes());
+        bytes.extend(self.talisman4.to_le_bytes());
+        bytes.extend(self._unk4.to_le_bytes());
+        bytes.extend(self.quickitem1.to_le_bytes());
+        bytes.extend(self._padding.to_le_bytes());
+        bytes.extend(self.quickitem2.to_le_bytes());
+        bytes.extend(self._padding2.to_le_bytes());
+        bytes.extend(self.quickitem3.to_le_bytes());
+        bytes.extend(self._padding3.to_le_bytes());
+        bytes.extend(self.quickitem4.to_le_bytes());
+        bytes.extend(self._padding4.to_le_bytes());
+        bytes.extend(self.quickitem5.to_le_bytes());
+        bytes.extend(self._padding5.to_le_bytes());
+        bytes.extend(self.quickitem6.to_le_bytes());
+        bytes.extend(self._padding6.to_le_bytes());
+        bytes.extend(self.quickitem7.to_le_bytes());
+        bytes.extend(self._padding7.to_le_bytes());
+        bytes.extend(self.quickitem8.to_le_bytes());
+        bytes.extend(self._padding8.to_le_bytes());
+        bytes.extend(self.quickitem9.to_le_bytes());
+        bytes.extend(self._padding9.to_le_bytes());
+        bytes.extend(self.quickitem10.to_le_bytes());
+        bytes.extend(self._padding10.to_le_bytes());
+        bytes.extend(self.pouch1.to_le_bytes());
+        bytes.extend(self._padding11.to_le_bytes());
+        bytes.extend(self.pouch2.to_le_bytes());
+        bytes.extend(self._padding12.to_le_bytes());
+        bytes.extend(self.pouch3.to_le_bytes());
+        bytes.extend(self._padding13.to_le_bytes());
+        bytes.extend(self.pouch4.to_le_bytes());
+        bytes.extend(self._padding14.to_le_bytes());
+        bytes.extend(self.pouch5.to_le_bytes());
+        bytes.extend(self._padding15.to_le_bytes());
+        bytes.extend(self.pouch6.to_le_bytes());
+        bytes.extend(self._padding16.to_le_bytes());
+        bytes.extend(self._padding17.to_le_bytes());
+        Ok(bytes)
+    }
+}
+
 
 #[derive(Clone)]
 pub struct EquipItem {
-    item_id: i16,
+    pub item_id: i16,
     unk: i16,
     unk2: i32,
 }
@@ -522,9 +701,9 @@ impl Write for EquipItem {
 
 #[derive(Clone)]
 pub struct EquipItemData {
-    quick_slot_items: Vec<EquipItem>,
-    active_slot: i32,
-    pouch_items: Vec<EquipItem>,
+    pub quick_slot_items: Vec<EquipItem>,
+    pub active_slot: i32,
+    pub pouch_items: Vec<EquipItem>,
     _0x8: [u8; 0x8],
 }
 
@@ -663,9 +842,9 @@ impl Write for EquipMagicData {
 }
 
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct EquipInventoryItem {
-    pub ga_item_handle: i32,
+    pub ga_item_handle: u32,
     pub quantity: i32,
     pub inventory_index: i32
 }
@@ -684,7 +863,7 @@ impl Read for EquipInventoryItem{
     fn read(br: &mut BinaryReader) -> Result<EquipInventoryItem, io::Error> {
         let mut equip_inventory_item = EquipInventoryItem::default();
         
-        equip_inventory_item.ga_item_handle = br.read_i32()?;
+        equip_inventory_item.ga_item_handle = br.read_u32()?;
         equip_inventory_item.quantity = br.read_i32()?;
         equip_inventory_item.inventory_index = br.read_i32()?;
 
@@ -711,8 +890,8 @@ pub struct EquipInventoryData {
     pub common_items: Vec<EquipInventoryItem>,
     pub key_inventory_items_distinct_count: i32,
     pub key_items: Vec<EquipInventoryItem>,
-    _0x4: i32,
-    _0x4_1: i32,
+    pub _0x4: i32,
+    pub next_acquisition_sort_id: i32,
 }
 
 impl Default for EquipInventoryData {
@@ -723,7 +902,7 @@ impl Default for EquipInventoryData {
             key_inventory_items_distinct_count: Default::default(),
             key_items: vec![],
             _0x4: -1,
-            _0x4_1: -1,
+            next_acquisition_sort_id: -1,
         }
     }
 }
@@ -745,7 +924,7 @@ impl EquipInventoryData {
         }
 
         equip_inventory_data._0x4 = br.read_i32()?;
-        equip_inventory_data._0x4_1 = br.read_i32()?;
+        equip_inventory_data.next_acquisition_sort_id = br.read_i32()?;
 
         Ok(equip_inventory_data)
     }
@@ -766,7 +945,7 @@ impl EquipInventoryData {
         }
 
         bytes.extend(self._0x4.to_le_bytes());
-        bytes.extend(self._0x4_1.to_le_bytes());
+        bytes.extend(self.next_acquisition_sort_id.to_le_bytes());
 
         Ok(bytes)
     }
@@ -774,35 +953,35 @@ impl EquipInventoryData {
 
 #[derive(Clone)]
 pub struct ChrAsm {
-    arm_style: i32,
-    left_hand_active_slot: i32,
-    right_hand_active_slot: i32,
-    left_arrow_active_slot: i32,
-    right_arrow_active_slot: i32,
-    left_bolt_active_slot: i32,
-    right_bolt_active_slot: i32,
-    left_hand_armament1: i32,
-    right_hand_armament1: i32,
-    left_hand_armament2: i32,
-    right_hand_armament2: i32,
-    left_hand_armament3: i32,
-    right_hand_armament3: i32,
-    arrows1: i32,
-    bolts1: i32,
-    arrows2: i32,
-    bolts2: i32,
-    _0x4: i32,
-    _0x4_1: i32,
-    head: i32,
-    chest: i32,
-    arms: i32,
-    legs: i32,
-    _0x4_2: i32,
-    talisman1: i32,
-    talisman2: i32,
-    talisman3: i32,
-    talisman4: i32,
-    talisman5: i32
+    pub arm_style: i32,
+    pub left_hand_active_slot: i32,
+    pub right_hand_active_slot: i32,
+    pub left_arrow_active_slot: i32,
+    pub right_arrow_active_slot: i32,
+    pub left_bolt_active_slot: i32,
+    pub right_bolt_active_slot: i32,
+    pub left_hand_armament1: i32,
+    pub right_hand_armament1: i32,
+    pub left_hand_armament2: i32,
+    pub right_hand_armament2: i32,
+    pub left_hand_armament3: i32,
+    pub right_hand_armament3: i32,
+    pub arrows1: i32,
+    pub bolts1: i32,
+    pub arrows2: i32,
+    pub bolts2: i32,
+    pub _0x4: i32,
+    pub _0x4_1: i32,
+    pub head: i32,
+    pub chest: i32,
+    pub arms: i32,
+    pub legs: i32,
+    pub _0x4_2: i32,
+    pub talisman1: i32,
+    pub talisman2: i32,
+    pub talisman3: i32,
+    pub talisman4: i32,
+    pub talisman5: i32
 }
 
 impl Default for ChrAsm {
@@ -1322,22 +1501,22 @@ impl Write for PlayerGameData {
 
 #[derive(Copy, Clone)]
 pub struct GaItem {
-    pub gaitem_handle: i32,
+    pub gaitem_handle: u32,
     pub item_id: u32,
     pub unk2: i32,
     pub unk3: i32,
-    pub aow_gaitem_handle: i32,
+    pub aow_gaitem_handle: u32,
     pub unk5: u8
 }
 
 impl Default for GaItem {
     fn default() -> Self {
         Self { 
-            gaitem_handle: -1, 
+            gaitem_handle: 0, 
             item_id: 0, 
             unk2: -1, 
             unk3: -1, 
-            aow_gaitem_handle: -1, 
+            aow_gaitem_handle: u32::MAX, 
             unk5: 0
         }
     }
@@ -1346,14 +1525,14 @@ impl Default for GaItem {
 impl Read for GaItem {
     fn read(br: &mut BinaryReader) -> Result<GaItem, io::Error> {
         let mut ga_item = GaItem::default();
-        ga_item.gaitem_handle = br.read_i32()?;
+        ga_item.gaitem_handle = br.read_u32()?;
         ga_item.item_id = br.read_u32()?;
 
         // Weapon
         if ga_item.item_id != 0 && (ga_item.item_id & 0xf0000000) == 0 {
             ga_item.unk2 = br.read_i32()?;
             ga_item.unk3 = br.read_i32()?;
-            ga_item.aow_gaitem_handle = br.read_i32()?;
+            ga_item.aow_gaitem_handle = br.read_u32()?;
             ga_item.unk5 = br.read_bytes(1)?[0];
         }
         // Armor
@@ -1404,7 +1583,7 @@ pub struct SaveSlot {
     pub equip_item_data: EquipItemData,
     pub equip_gesture_data: [i32;0x6],
     pub equip_projectile_data: EquipProjectileData,
-    _0x9c: [u8; 0x9c],
+    pub equipped_items: EquippedItems,
     pub equip_physics_data: EquipPhysicsData,
     _0x4: u32,
     _face_data: [u8;0x12f],
@@ -1456,7 +1635,7 @@ impl Default for SaveSlot {
             equip_item_data: EquipItemData::default(),
             equip_gesture_data: [Default::default(); 0x6],
             equip_projectile_data: EquipProjectileData::default(),
-            _0x9c: [0x0; 0x9c],
+            equipped_items: EquippedItems::default(),
             equip_physics_data: EquipPhysicsData::default(),
             _0x4: 0,
             _face_data: [0x0;0x12f],
@@ -1545,8 +1724,8 @@ impl Read for SaveSlot {
         // Equipped Projectiles 
         save_slot.equip_projectile_data = EquipProjectileData::read(br)?;
 
-        // Same equip data again. Skipping it 
-        save_slot._0x9c.copy_from_slice(br.read_bytes(0x9c)?);
+        // Equip data again
+        save_slot.equipped_items = EquippedItems::read(br)?;
         
         // Equipped physics
         save_slot.equip_physics_data = EquipPhysicsData::read(br)?;
@@ -1678,7 +1857,7 @@ impl Write for SaveSlot {
         // Equipped Projectiles 
         bytes.extend(self.equip_projectile_data.write()?);
 
-        bytes.extend(self._0x9c);
+        bytes.extend(self.equipped_items.write()?);
 
         // Equipped physics
         bytes.extend(self.equip_physics_data.write()?);

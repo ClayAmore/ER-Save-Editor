@@ -4,6 +4,7 @@ pub mod weapon_name {
 
     pub static WEAPON_NAME: Lazy<Mutex<HashMap<u32, &str>>> = Lazy::new(|| {
         Mutex::new(HashMap::from([
+            (0, ""),
             (1000,""),
             (1100,""),
             (1200,""),

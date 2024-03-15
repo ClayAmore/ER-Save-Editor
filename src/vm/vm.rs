@@ -1,13 +1,24 @@
-pub mod vm{
-    use crate::{db::{bosses::bosses::BOSSES, colosseums::colosseums::COLOSSEUMS, cookbooks::books::COOKBOKS, event_flags::event_flags::EVENT_FLAGS, graces::maps::GRACES, maps::maps::MAPS, regions::regions::REGIONS, stats::stats::{FP, HP, SP}, summoning_pools::summoning_pools::SUMMONING_POOLS, whetblades::whetblades::WHETBLADES}, save::save::save::{Save, SaveType}, vm::{profile_summary::slot_view_model::ProfileSummaryViewModel, slot::slot_view_model::SlotViewModel}};
+pub mod vm {
+    use crate::{
+        db::{
+            bosses::bosses::BOSSES, 
+            colosseums::colosseums::COLOSSEUMS, 
+            cookbooks::books::COOKBOKS, 
+            event_flags::event_flags::EVENT_FLAGS, 
+            graces::maps::GRACES, maps::maps::MAPS, 
+            regions::regions::REGIONS, 
+            stats::stats::{FP, HP, SP}, 
+            summoning_pools::summoning_pools::SUMMONING_POOLS, 
+            whetblades::whetblades::WHETBLADES}, save::{common::save_slot::{EquipInventoryData, EquipInventoryItem, GaItem}, save::save::{Save, SaveType}}, util::validator::validator::Validator, vm::{profile_summary::slot_view_model::ProfileSummaryViewModel, regulation::regulation_view_model::RegulationViewModel, slot::slot_view_model::SlotViewModel}};
     
     #[derive(Clone)]
     pub struct ViewModel {
-        pub active: bool,
+        pub active: Option<bool>,
         pub index: usize, 
         pub steam_id: String,
         pub profile_summary: [ProfileSummaryViewModel; 0xA],
-        pub slots: [SlotViewModel; 0xA]
+        pub slots: [SlotViewModel; 0xA],
+        pub regulation: RegulationViewModel,
     }
 
     impl Default for ViewModel{
@@ -17,7 +28,8 @@ pub mod vm{
                 index: Default::default(),
                 steam_id: Default::default(), 
                 slots: Default::default(),
-                profile_summary: Default::default()
+                profile_summary: Default::default(),
+                regulation: Default::default(),
             }
         }
     }
@@ -25,11 +37,15 @@ pub mod vm{
     impl ViewModel {
         pub fn from_save(save: &Save) -> Self {
             let mut vm = ViewModel::default();
-
-            vm.active = true;
+            
+            vm.active = Some(Validator::new(&save).validate());
+            if vm.active.is_some_and(|v| !v) {return vm;}
 
             // Steam Id
             vm.steam_id = save.save_type.get_global_steam_id().to_string();
+
+            // Regulation (Params)
+            vm.regulation = RegulationViewModel::from_save(save.save_type.get_regulation());
 
             // Get active characters
             for (index, active) in save.save_type.active_slots().iter().enumerate() {
@@ -58,7 +74,10 @@ pub mod vm{
                     save_type.set_character_name(i, self.slots[i].general_vm.character_name.to_string());
                     
                     // Update Gender
-                    save_type.set_character_gender(i, self.slots[i].general_vm.gender as u8); 
+                    save_type.set_character_gender(i, self.slots[i].general_vm.gender as u8);
+
+                    // Update Inventory (Held + Storage Box)
+                    // self.update_inventory(save_type, i);
 
                     // Update Stats 
                     self.update_stats(save_type, i);
@@ -171,8 +190,148 @@ pub mod vm{
             }
         }
 
-        fn _update_inventory(&self, _save: &mut Save, _index: usize) {
-            // Increment IDX
+        fn _wip_update_inventory(&self, save_type: &mut SaveType, index: usize) {
+            // Gaitem Map
+            let mut new_gaitem_list = [GaItem::default(); 0x1400];
+            let mut new_gaitems = self.slots[index].inventory_vm.gaitem_map.values().collect::<Vec<&GaItem>>();
+            new_gaitems.sort_by(|a,b| b.gaitem_handle.cmp(&a.gaitem_handle));
+            for (i, gaitem) in new_gaitems.iter().enumerate() { new_gaitem_list[i] = **gaitem; }
+            save_type.set_gaitem_map(index, new_gaitem_list.to_vec());
+
+            // Held items
+            let mut new_inventory = [EquipInventoryItem::default();0xA80];
+            let mut new_inventory_key_items = [EquipInventoryItem::default();0x180];
+            
+            let mut i = 0;
+            for weapon in &self.slots[index].inventory_vm.storage[0].weapons {
+                new_inventory[i] = EquipInventoryItem{
+                    ga_item_handle: weapon.ga_item_handle,
+                    inventory_index: weapon.inventory_index,
+                    quantity: weapon.quantity,
+                };
+                i = i+1;
+            }
+            for armor in &self.slots[index].inventory_vm.storage[0].armors {
+                new_inventory[i] = EquipInventoryItem{
+                    ga_item_handle: armor.ga_item_handle,
+                    inventory_index: armor.inventory_index,
+                    quantity: armor.quantity,
+                };
+                i = i+1;
+            }
+            for accessory in &self.slots[index].inventory_vm.storage[0].accessories {
+                new_inventory[i] = EquipInventoryItem{
+                    ga_item_handle: accessory.ga_item_handle,
+                    inventory_index: accessory.inventory_index,
+                    quantity: accessory.quantity,
+                };
+                i = i+1;
+            }
+            for common_item in &self.slots[index].inventory_vm.storage[0].common_items {
+                new_inventory[i] = EquipInventoryItem{
+                    ga_item_handle: common_item.ga_item_handle,
+                    inventory_index: common_item.inventory_index,
+                    quantity: common_item.quantity,
+                };
+                i = i+1;
+            }
+            for aow in &self.slots[index].inventory_vm.storage[0].aows {
+                new_inventory[i] = EquipInventoryItem{
+                    ga_item_handle: aow.ga_item_handle,
+                    inventory_index: aow.inventory_index,
+                    quantity: aow.quantity,
+                };
+                i = i+1;
+            }
+
+            
+            let mut i = 0;
+            for key_item in &self.slots[index].inventory_vm.storage[0].key_items {
+                new_inventory_key_items[i] = EquipInventoryItem{
+                    ga_item_handle: key_item.ga_item_handle,
+                    inventory_index: key_item.inventory_index,
+                    quantity: key_item.quantity,
+                };
+                i = i+1;
+            }
+
+            // Storage box items
+            let mut new_storage_box_common_items = [EquipInventoryItem::default();0xA80];
+            let mut new_storage_box_key_items = [EquipInventoryItem::default();0x180];
+            
+            
+            let mut i = 0;
+            for weapon in &self.slots[index].inventory_vm.storage[1].weapons {
+                new_storage_box_common_items[i] = EquipInventoryItem{
+                    ga_item_handle: weapon.ga_item_handle,
+                    inventory_index: weapon.inventory_index,
+                    quantity: weapon.quantity,
+                };
+                i = i+1;
+            }
+            for armor in &self.slots[index].inventory_vm.storage[1].armors {
+                new_storage_box_common_items[i] = EquipInventoryItem{
+                    ga_item_handle: armor.ga_item_handle,
+                    inventory_index: armor.inventory_index,
+                    quantity: armor.quantity,
+                };
+                i = i+1;
+            }
+            for accessory in &self.slots[index].inventory_vm.storage[1].accessories {
+                new_storage_box_common_items[i] = EquipInventoryItem{
+                    ga_item_handle: accessory.ga_item_handle,
+                    inventory_index: accessory.inventory_index,
+                    quantity: accessory.quantity,
+                };
+                i = i+1;
+            }
+            for common_item in &self.slots[index].inventory_vm.storage[1].common_items {
+                new_storage_box_common_items[i] = EquipInventoryItem{
+                    ga_item_handle: common_item.ga_item_handle,
+                    inventory_index: common_item.inventory_index,
+                    quantity: common_item.quantity,
+                };
+                i = i+1;
+            }
+            for aow in &self.slots[index].inventory_vm.storage[1].aows {
+                new_storage_box_common_items[i] = EquipInventoryItem{
+                    ga_item_handle: aow.ga_item_handle,
+                    inventory_index: aow.inventory_index,
+                    quantity: aow.quantity,
+                };
+                i = i+1;
+            }
+
+            let mut i = 0;
+            for key_item in &self.slots[index].inventory_vm.storage[1].key_items {
+                new_storage_box_key_items[i] = EquipInventoryItem{
+                    ga_item_handle: key_item.ga_item_handle,
+                    inventory_index: key_item.inventory_index,
+                    quantity: key_item.quantity,
+                };
+                i = i+1;
+            }
+
+            save_type.set_equip_inventory(index, [
+               EquipInventoryData {
+                common_inventory_items_distinct_count: self.slots[index].inventory_vm.storage[0].common_item_count,
+                key_inventory_items_distinct_count: self.slots[index].inventory_vm.storage[0].key_item_count,
+                common_items: new_inventory.to_vec(),
+                key_items: new_inventory_key_items.to_vec(),
+                next_acquisition_sort_id: self.slots[index].inventory_vm.storage[0].next_acquisition_sort_order_index,
+                _0x4: save_type.get_slot(index).equip_inventory_data._0x4
+               },
+               EquipInventoryData {
+                common_inventory_items_distinct_count: self.slots[index].inventory_vm.storage[1].common_item_count,
+                key_inventory_items_distinct_count: self.slots[index].inventory_vm.storage[1].key_item_count,
+                common_items: new_inventory.to_vec(),
+                key_items: new_inventory_key_items.to_vec(),
+                next_acquisition_sort_id: self.slots[index].inventory_vm.storage[1].next_acquisition_sort_order_index,
+                _0x4: save_type.get_slot(index).storage_inventory_data._0x4
+               }
+            ]);
+
+            // Update Gaitem
         }
     }
 }

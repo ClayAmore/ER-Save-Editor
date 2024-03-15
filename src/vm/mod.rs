@@ -7,3 +7,4 @@ pub mod inventory;
 pub mod regions;
 pub mod importer;
 pub mod vm;
+pub mod regulation;

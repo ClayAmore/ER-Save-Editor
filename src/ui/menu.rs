@@ -8,7 +8,7 @@ pub mod menu {
         Stats,
         Inventory,
         EventFlags,
-        Regions
+        Regions,
     }
 
     pub fn menu(ui: &mut Ui, app:&mut App) {
