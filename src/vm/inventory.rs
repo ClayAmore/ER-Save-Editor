@@ -215,6 +215,7 @@ pub mod inventory {
         pub naked_body: InventoryItemViewModel,
         pub naked_arms: InventoryItemViewModel,
         pub naked_legs: InventoryItemViewModel,
+        pub log: Vec<String>,
 
         next_gaitem_handle: u32,
         part_gaitem_handle: u8,
@@ -244,6 +245,7 @@ pub mod inventory {
                 part_gaitem_handle: Default::default(),
                 next_ash_of_war_gaitem_index: Default::default(),
                 next_armament_or_armor_index: Default::default(),
+                log: Default::default(),
             }
         }
     }
@@ -961,6 +963,7 @@ pub mod inventory {
 
                 },
             }
+            self.log.push(format!("> Added {} {}", match item.quantity { Some(n) => n, None => 1 }, item.name))
         }
     }
 }

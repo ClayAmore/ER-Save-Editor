@@ -441,7 +441,6 @@ pub mod equipment {
                                     },
                                     InventorySubTypeRoute::WeaponRight => {
                                         let pos = equipment_vm.current_equipped_items.iter().position(|id| *id == equipment_vm.right_hand_armaments[equipment_vm.current_index].equip_index).unwrap();
-                                        println!("{}", item.equip_index);
                                         equipment_vm.right_hand_armaments[equipment_vm.current_index].gaitem_handle = item.ga_item_handle;
                                         equipment_vm.right_hand_armaments[equipment_vm.current_index].id = item.item_id;
                                         equipment_vm.right_hand_armaments[equipment_vm.current_index].equip_index = item.equip_index;

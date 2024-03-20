@@ -227,23 +227,31 @@ pub fn add_inventory(ui: &mut Ui, vm:&mut ViewModel) {
                                     }
                                 });
                             },
-                            InventoryTypeRoute::Armors => {
-                            },
-                            InventoryTypeRoute::AshOfWar => {
-                            },
-                            InventoryTypeRoute::Talismans => {
-                            },
+                            InventoryTypeRoute::Armors|
+                            InventoryTypeRoute::AshOfWar |
+                            InventoryTypeRoute::Talismans => {},
                         };
                         
-                        egui::TopBottomPanel::bottom("add_button").show(ui.ctx(), |ui|{
-                            egui::Frame::none().inner_margin(8.).show(ui, |ui|{
-                                ui.add_enabled_ui(true, |ui| {
-                                    if ui.add_sized([ui.available_width(), 40.], egui::Button::new("Add")).clicked() {
-                                        inventory_vm.add_to_inventory(&regulation_vm.selected_item);
-                                    }
-                                })
-                            });
+                        egui::Frame::none().inner_margin(8.).show(ui, |ui|{
+                            ui.add_enabled_ui(true, |ui| {
+                                if ui.add_sized([ui.available_width(), 40.], egui::Button::new("Add")).clicked() {
+                                    inventory_vm.add_to_inventory(&regulation_vm.selected_item);
+                                }
+                            })
                         });
+                    }
+                });
+            });
+        });
+        ui.separator();
+        ui.with_layout(Layout::top_down(egui::Align::Min), |ui| {
+            ui.push_id("log", |ui| {
+                egui::ScrollArea::vertical()
+                    .auto_shrink(false)
+                    .max_height(ui.available_height()-8.)
+                    .show_rows(ui, 10., inventory_vm.log.len(), |ui, row_range|{
+                    for i in row_range {
+                        ui.label(egui::RichText::new(&inventory_vm.log[i]).monospace().size(10.));
                     }
                 });
             });
