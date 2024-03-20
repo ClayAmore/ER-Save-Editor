@@ -17,12 +17,14 @@ use ui::{equipment::equipment::equipment, events::events::events, general::gener
 use vm::{importer::general_view_model::ImporterViewModel, vm::vm::ViewModel};
 use crate::write::write::Write as w; 
 
+const WINDOW_WIDTH: f32 = 1920.;
+const WINDOW_HEIGHT: f32 = 960.;
 
 fn main() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
 
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_inner_size([1280.0, 720.0]),
+        viewport: egui::ViewportBuilder::default().with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT]),
         ..Default::default()
     };
 

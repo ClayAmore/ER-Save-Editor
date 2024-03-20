@@ -275,8 +275,8 @@ pub mod inventory {
             inventory_vm.next_ash_of_war_gaitem_index = inventory_vm.next_ash_of_war_gaitem_index + 1;
             inventory_vm.next_armament_or_armor_index = inventory_vm.next_armament_or_armor_index + 1;
 
-            inventory_vm.fill_stroage_type(&slot.equip_inventory_data, slot.equip_inventory_data.next_acquisition_sort_id, slot.equip_inventory_data.next_equip_index + 1,0);
-            inventory_vm.fill_stroage_type(&slot.storage_inventory_data, slot.storage_inventory_data.next_acquisition_sort_id, slot.equip_inventory_data.next_equip_index + 1 ,1);
+            inventory_vm.fill_stroage_type(&slot.equip_inventory_data, slot.equip_inventory_data.next_acquisition_sort_id, slot.equip_inventory_data.next_equip_index,0);
+            inventory_vm.fill_stroage_type(&slot.storage_inventory_data, slot.storage_inventory_data.next_acquisition_sort_id, slot.storage_inventory_data.next_equip_index ,1);
             
             inventory_vm
         }
@@ -285,9 +285,6 @@ pub mod inventory {
             let inventory_storage = &mut self.storage[inventory_storage_index];
 
             for (index, item) in equip_inventory_data.common_items.iter().enumerate() {
-
-                // Skip empty entries
-                // if equip_invenotry_item.ga_item_handle == u32::MAX || equip_invenotry_item.ga_item_handle == 0 { continue; };
 
                 // Determine item type from gaitem_handle
                 let inventory_gaitem_type = InventoryGaitemType::from(item.ga_item_handle & 0xf0000000);
@@ -337,7 +334,6 @@ pub mod inventory {
             }
 
             for key_item in equip_inventory_data.key_items.iter() {
-                // if key_item.ga_item_handle == u32::MAX || key_item.ga_item_handle == 0 { continue; };
                 let inventory_item_vm = InventoryItemViewModel::from_save(key_item, 0, &GaItem::default(), InventoryGaitemType::ITEM);
                 inventory_storage.key_items.push(inventory_item_vm);
             }
@@ -621,7 +617,7 @@ pub mod inventory {
                     let storage = &mut self.storage[0];
                     let items = &mut storage.common_items;
                     let items_next_index = storage.common_item_count;
-                    let items_next_equip_index = storage.next_equip_index;
+                    let items_next_equip_index = 0x180 + storage.common_item_count;
                     let items_next_acquisiton_sort_order_index = storage.next_acquisition_sort_order_index;
                     items[items_next_index as usize] = InventoryItemViewModel{
                         ga_item_handle: gaitem_handle,
@@ -672,7 +668,7 @@ pub mod inventory {
                     let storage = &mut self.storage[0];
                     let common_items = &mut storage.common_items;
                     let common_items_next_index = storage.common_item_count;
-                    let common_items_next_equip_index = storage.next_equip_index;
+                    let common_items_next_equip_index = 0x180 + storage.common_item_count;
                     let common_items_next_acquisiton_sort_order_index = storage.next_acquisition_sort_order_index;
                     common_items[common_items_next_index as usize] = InventoryItemViewModel{
                         ga_item_handle: gaitem_handle,
@@ -693,7 +689,7 @@ pub mod inventory {
                             ..Default::default()
                         };
                         // Increment gaitem data index
-                        self.gaitem_data.distinct_aquired_items_count = next_gaitem_data_index + 1;
+                        self.gaitem_data.distinct_aquired_items_count = self.gaitem_data.distinct_aquired_items_count + 1;
                     }
 
                     // Increment indexes for gaitem map
@@ -713,7 +709,7 @@ pub mod inventory {
                     let storage = &mut self.storage[0];
                     let common_items = &mut storage.common_items;
                     let common_items_next_index = storage.common_item_count;
-                    let common_items_next_equip_index = storage.next_equip_index;
+                    let common_items_next_equip_index = 0x180 + storage.common_item_count;
                     let common_items_next_acquisiton_sort_order_index = storage.next_acquisition_sort_order_index;
                     common_items[common_items_next_index as usize] = InventoryItemViewModel{
                         ga_item_handle: gaitem_handle,
@@ -734,7 +730,7 @@ pub mod inventory {
                             ..Default::default()
                         };
                         // Increment gaitem data index
-                        self.gaitem_data.distinct_aquired_items_count = next_gaitem_data_index + 1;
+                        self.gaitem_data.distinct_aquired_items_count = self.gaitem_data.distinct_aquired_items_count + 1;
                     }
 
                     // Increment indexes for common items
@@ -763,7 +759,7 @@ pub mod inventory {
                                     ..Default::default()
                                 };
                                 // Increment gaitem data index
-                                self.gaitem_data.distinct_aquired_items_count = next_gaitem_data_index + 1;
+                                self.gaitem_data.distinct_aquired_items_count = self.gaitem_data.distinct_aquired_items_count + 1;
                             }
                         }
 
@@ -778,8 +774,8 @@ pub mod inventory {
                             available_quantity as i32
                         }
                         else {
-                            let key_items_next_index = self.storage[0].common_item_count;
-                            let key_items_next_equip_index = self.storage[0].next_equip_index;
+                            let key_items_next_index = self.storage[0].key_item_count;
+                            let key_items_next_equip_index = 0x180 + self.storage[0].key_item_count;
                             let key_items_next_acquisiton_sort_order_index = self.storage[0].next_acquisition_sort_order_index;
                             let available_quantity = item.max_held as u32;
                             self.storage[0].key_items[key_items_next_index as usize] = InventoryItemViewModel{
@@ -793,7 +789,7 @@ pub mod inventory {
                             };
 
                             // Increment indexes for common items
-                            self.storage[0].common_item_count = self.storage[0].common_item_count + 1;
+                            self.storage[0].key_item_count = self.storage[0].key_item_count + 1;
                             self.storage[0].next_equip_index = self.storage[0].next_equip_index + 1;
                             self.storage[0].next_acquisition_sort_order_index = self.storage[0].next_acquisition_sort_order_index + 1;
                             available_quantity as i32
@@ -807,8 +803,8 @@ pub mod inventory {
                                 box_item.quantity = box_item.quantity + available_quantity;
                             }
                             else {
-                                let key_items_next_index = self.storage[1].common_item_count;
-                                let key_items_next_equip_index = self.storage[1].next_equip_index;
+                                let key_items_next_index = self.storage[1].key_item_count;
+                                let key_items_next_equip_index = 0x180 + self.storage[1].key_item_count;
                                 let key_items_next_acquisiton_sort_order_index = self.storage[1].next_acquisition_sort_order_index;
                                 let available_quantity = item.max_storage as u32;
                                 self.storage[1].key_items[key_items_next_index as usize] = InventoryItemViewModel{
@@ -822,7 +818,7 @@ pub mod inventory {
                                 };
 
                                 // Increment indexes for common items
-                                self.storage[1].common_item_count = self.storage[1].common_item_count + 1;
+                                self.storage[1].key_item_count = self.storage[1].key_item_count + 1;
                                 self.storage[1].next_equip_index = self.storage[1].next_equip_index + 1;
                                 self.storage[1].next_acquisition_sort_order_index = self.storage[1].next_acquisition_sort_order_index + 1;
                             };
@@ -861,7 +857,7 @@ pub mod inventory {
                         }
                         else {
                             let common_items_next_index = self.storage[0].common_item_count;
-                            let common_items_next_equip_index = self.storage[0].next_equip_index;
+                            let common_items_next_equip_index = 0x180 + self.storage[0].common_item_count;
                             let common_items_next_acquisiton_sort_order_index = self.storage[0].next_acquisition_sort_order_index;
                             let available_quantity = item.max_held as u32;
                             self.storage[0].common_items[common_items_next_index as usize] = InventoryItemViewModel{
@@ -890,7 +886,7 @@ pub mod inventory {
                             }
                             else {
                                 let common_items_next_index = self.storage[1].common_item_count;
-                                let common_items_next_equip_index = self.storage[1].next_equip_index;
+                                let common_items_next_equip_index = 0x180 + self.storage[1].common_item_count;
                                 let common_items_next_acquisiton_sort_order_index = self.storage[1].next_acquisition_sort_order_index;
                                 let available_quantity = item.max_storage as u32;
                                 self.storage[1].common_items[common_items_next_index as usize] = InventoryItemViewModel{
@@ -926,7 +922,7 @@ pub mod inventory {
                     let storage = &mut self.storage[0];
                     let common_items = &mut storage.common_items;
                     let common_items_next_index = storage.common_item_count;
-                    let common_items_next_equip_index = storage.next_equip_index;
+                    let common_items_next_equip_index = 0x180 + storage.common_item_count;
                     let common_items_next_acquisiton_sort_order_index = storage.next_acquisition_sort_order_index;
                     common_items[common_items_next_index as usize] = InventoryItemViewModel{
                         ga_item_handle: gaitem_handle,
