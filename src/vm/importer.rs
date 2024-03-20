@@ -35,7 +35,7 @@ pub mod general_view_model {
         pub fn new(from: Save, vm: &ViewModel) -> Self {
             let mut importer_view_model = ImporterViewModel::default();
 
-            importer_view_model.valid = Validator::new(&from).validate();
+            importer_view_model.valid = Validator::validate(&from);
 
             if !importer_view_model.valid {return importer_view_model;}
 

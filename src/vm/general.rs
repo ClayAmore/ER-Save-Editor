@@ -1,11 +1,24 @@
 pub mod general_view_model {
     use crate::save::common::save_slot::SaveSlot;
 
-    #[derive(Clone, PartialEq, Eq, Copy)]
+    #[derive(Default, Clone)]
+    pub struct MapID {
+        area_id: u8,
+        block_id: u8,
+        region_id: u8,
+        index_id: u8,
+    }
+    impl ToString for MapID {
+        fn to_string(&self) -> String {
+            format!("{:02}{:02}{:02}{:02}", self.area_id, self.block_id, self.region_id, self.index_id)
+        }
+    }
+
+    #[derive(Default, Clone, PartialEq, Eq, Copy)]
     pub enum Gender {
         Female,
         Male,
-        Uknown,
+        #[default]Uknown,
     }
 
     impl TryFrom<u8> for Gender {
@@ -19,21 +32,12 @@ pub mod general_view_model {
         }
     }
 
-    #[derive(Clone)]
+    #[derive(Default, Clone)]
     pub struct GeneralViewModel  {
         pub steam_id: String,
         pub character_name: String,
         pub gender: Gender,
-    }
-
-    impl Default for GeneralViewModel {
-        fn default() -> Self {
-            Self { 
-                steam_id: Default::default(), 
-                character_name: Default::default(),
-                gender: Gender::Uknown, 
-            }
-        }
+        pub map_id: String,
     }
 
     impl GeneralViewModel {
@@ -53,10 +57,19 @@ pub mod general_view_model {
 
             let gender = Gender::try_from(slot.player_game_data.gender).expect("");
              
+            let map_id = MapID{ 
+                area_id: slot.map_id[3],  
+                block_id: slot.map_id[2],  
+                region_id: slot.map_id[1],  
+                index_id: slot.map_id[0],
+            }.to_string();
+            
+
             Self {
                 steam_id,
                 character_name,
-                gender
+                gender,
+                map_id,
             }
         }
     }

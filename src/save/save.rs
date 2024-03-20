@@ -3,7 +3,7 @@ pub mod save {
     use binary_reader::BinaryReader;
     use crate::{
         read::read::Read, save::{
-            common::{ save_slot::{EquipInventoryData, GaItem, SaveSlot}, user_data_10::ProfileSummary, user_data_11::UserData11 },
+            common::{ save_slot::{EquipInventoryData, GaItem, GaItemData, SaveSlot}, user_data_10::ProfileSummary, user_data_11::UserData11 },
             pc::pc_save::PCSave, 
             playstation::ps_save::PSSave, 
         }, util::bit::bit::set_bit, write::write::Write
@@ -429,17 +429,251 @@ pub mod save {
             }
         }
 
-        pub fn set_equip_inventory(&mut self, index: usize, equip_inventory_data: [EquipInventoryData; 2]) {
+        pub fn set_held_inventory(&mut self, index: usize, held_inventory: EquipInventoryData) {
             match self {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
-                    pc_save.save_slots[index].save_slot.equip_inventory_data = equip_inventory_data[0].clone();
-                    pc_save.save_slots[index].save_slot.storage_inventory_data = equip_inventory_data[1].clone();
+                    pc_save.save_slots[index].save_slot.equip_inventory_data = held_inventory;
                 }
                 SaveType::PlayStation(ps_save) => {
-                    ps_save.save_slots[index].equip_inventory_data = equip_inventory_data[0].clone();
-                    ps_save.save_slots[index].storage_inventory_data = equip_inventory_data[1].clone();
+                    ps_save.save_slots[index].equip_inventory_data = held_inventory;
                 }
+            }
+        }
+
+        pub fn set_storage_box_inventory(&mut self, index: usize, storage_box_inventory: EquipInventoryData) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    pc_save.save_slots[index].save_slot.storage_inventory_data = storage_box_inventory;
+                }
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].storage_inventory_data = storage_box_inventory;
+                }
+            }
+        }
+
+        pub fn set_gaitem_item_data(&mut self, index: usize, gaitem_data: GaItemData) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    pc_save.save_slots[index].save_slot.ga_item_data = gaitem_data;
+                }
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].ga_item_data = gaitem_data;
+                }
+            }
+        }
+
+        pub fn set_quickslot_item(&mut self, slot_index: usize, quickslot_index: usize,  gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    pc_save.save_slots[slot_index].save_slot.equipped_items.quickitems[quickslot_index] = item_id;
+                    pc_save.save_slots[slot_index].save_slot.equip_item_data.quick_slot_items[quickslot_index].item_id = gaitem_handle;
+                    pc_save.save_slots[slot_index].save_slot.equip_item_data.quick_slot_items[quickslot_index].equipment_index = equip_index;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[slot_index].equipped_items.quickitems[quickslot_index] = item_id;
+                    ps_save.save_slots[slot_index].equip_item_data.quick_slot_items[quickslot_index].item_id = gaitem_handle;
+                    ps_save.save_slots[slot_index].equip_item_data.quick_slot_items[quickslot_index].equipment_index = equip_index;
+                },
+            }
+        }
+
+        pub fn set_pouch_item(&mut self, slot_index: usize, pouch_index: usize,  gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    pc_save.save_slots[slot_index].save_slot.equipped_items.pouch[pouch_index] = item_id;
+                    pc_save.save_slots[slot_index].save_slot.equip_item_data.pouch_items[pouch_index].item_id = gaitem_handle;
+                    pc_save.save_slots[slot_index].save_slot.equip_item_data.pouch_items[pouch_index].equipment_index = equip_index;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[slot_index].equipped_items.pouch[pouch_index] = item_id;
+                    ps_save.save_slots[slot_index].equip_item_data.pouch_items[pouch_index].item_id = gaitem_handle;
+                    ps_save.save_slots[slot_index].equip_item_data.pouch_items[pouch_index].equipment_index = equip_index;
+                },
+            }
+        }
+
+        pub fn set_left_weapon_slot(&mut self, slot_index: usize, weapon_slot_index: usize,  gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    slot.equip_data.left_hand_armaments[weapon_slot_index] = equip_index;
+                    slot.chr_asm.left_hand_armaments[weapon_slot_index] = item_id;
+                    slot.chr_asm2.left_hand_armaments[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.left_hand_armaments[weapon_slot_index] = item_id;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    let slot = &mut ps_save.save_slots[slot_index];
+                    slot.equip_data.left_hand_armaments[weapon_slot_index] = equip_index;
+                    slot.chr_asm.left_hand_armaments[weapon_slot_index] = item_id;
+                    slot.chr_asm2.left_hand_armaments[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.left_hand_armaments[weapon_slot_index] = item_id;
+                },
+            }
+        }
+        
+        pub fn set_right_weapon_slot(&mut self, slot_index: usize, weapon_slot_index: usize,  gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    slot.equip_data.right_hand_armaments[weapon_slot_index] = equip_index;
+                    slot.chr_asm.right_hand_armaments[weapon_slot_index] = item_id;
+                    slot.chr_asm2.right_hand_armaments[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.right_hand_armaments[weapon_slot_index] = item_id;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    let slot = &mut ps_save.save_slots[slot_index];
+                    slot.equip_data.right_hand_armaments[weapon_slot_index] = equip_index;
+                    slot.chr_asm.right_hand_armaments[weapon_slot_index] = item_id;
+                    slot.chr_asm2.right_hand_armaments[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.right_hand_armaments[weapon_slot_index] = item_id;
+                },
+            }
+        }
+        
+        pub fn set_arrow_slot(&mut self, slot_index: usize, weapon_slot_index: usize,  gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    slot.equip_data.arrows[weapon_slot_index] = equip_index;
+                    slot.chr_asm.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
+                    slot.chr_asm2.arrows[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.arrows[weapon_slot_index] = item_id;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    let slot = &mut ps_save.save_slots[slot_index];
+                    slot.equip_data.arrows[weapon_slot_index] = equip_index;
+                    slot.chr_asm.arrows[weapon_slot_index] = item_id;
+                    slot.chr_asm2.arrows[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.arrows[weapon_slot_index] = item_id;
+                },
+            }
+        }
+        
+        pub fn set_bolt_slot(&mut self, slot_index: usize, weapon_slot_index: usize,  gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    slot.equip_data.bolts[weapon_slot_index] = equip_index;
+                    slot.chr_asm.bolts[weapon_slot_index] = item_id;
+                    slot.chr_asm2.bolts[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.bolts[weapon_slot_index] = item_id;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    let slot = &mut ps_save.save_slots[slot_index];
+                    slot.equip_data.bolts[weapon_slot_index] = equip_index;
+                    slot.chr_asm.bolts[weapon_slot_index] = item_id;
+                    slot.chr_asm2.bolts[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.bolts[weapon_slot_index] = item_id;
+                },
+            }
+        }
+        
+        pub fn set_talisman_slot(&mut self, slot_index: usize, weapon_slot_index: usize,  gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    slot.equip_data.talismans[weapon_slot_index] = equip_index;
+                    slot.chr_asm.talismans[weapon_slot_index] = item_id;
+                    slot.chr_asm2.talismans[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.talismans[weapon_slot_index] = item_id | 0x20000000;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    let slot = &mut ps_save.save_slots[slot_index];
+                    slot.equip_data.talismans[weapon_slot_index] = equip_index;
+                    slot.chr_asm.talismans[weapon_slot_index] = item_id;
+                    slot.chr_asm2.talismans[weapon_slot_index] = gaitem_handle;
+                    slot.equipped_items.talismans[weapon_slot_index] = item_id | 0x20000000;
+                },
+            }
+        }
+        
+        pub fn set_head_gear(&mut self, slot_index: usize, gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    slot.equip_data.head = equip_index;
+                    slot.chr_asm.head = item_id;
+                    slot.chr_asm2.head = gaitem_handle;
+                    slot.equipped_items.head = item_id | 0x10000000;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    let slot = &mut ps_save.save_slots[slot_index];
+                    slot.equip_data.head = equip_index;
+                    slot.chr_asm.head = item_id;
+                    slot.chr_asm2.head = gaitem_handle;
+                    slot.equipped_items.head = item_id | 0x10000000;
+                },
+            }
+        }
+        
+        pub fn set_chest_piece(&mut self, slot_index: usize, gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    slot.equip_data.chest = equip_index;
+                    slot.chr_asm.chest = item_id;
+                    slot.chr_asm2.chest = gaitem_handle;
+                    slot.equipped_items.chest = item_id | 0x10000000;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    let slot = &mut ps_save.save_slots[slot_index];
+                    slot.equip_data.chest = equip_index;
+                    slot.chr_asm.chest = item_id;
+                    slot.chr_asm2.chest = gaitem_handle;
+                    slot.equipped_items.chest = item_id | 0x10000000;
+                },
+            }
+        }
+        
+        pub fn set_gauntlets(&mut self, slot_index: usize, gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    slot.equip_data.arms = equip_index;
+                    slot.chr_asm.arms = item_id;
+                    slot.chr_asm2.arms = gaitem_handle;
+                    slot.equipped_items.arms = item_id | 0x10000000;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    let slot = &mut ps_save.save_slots[slot_index];
+                    slot.equip_data.arms = equip_index;
+                    slot.chr_asm.arms = item_id;
+                    slot.chr_asm2.arms = gaitem_handle;
+                    slot.equipped_items.arms = item_id | 0x10000000;
+                },
+            }
+        }
+        
+        pub fn set_leggings(&mut self, slot_index: usize, gaitem_handle: u32, item_id: u32, equip_index: u32) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    slot.equip_data.legs = equip_index;
+                    slot.chr_asm.legs = item_id;
+                    slot.chr_asm2.legs = gaitem_handle;
+                    slot.equipped_items.legs = item_id | 0x10000000;
+                },
+                SaveType::PlayStation(ps_save) => {
+                    let slot = &mut ps_save.save_slots[slot_index];
+                    slot.equip_data.legs = equip_index;
+                    slot.chr_asm.legs = item_id;
+                    slot.chr_asm2.legs = gaitem_handle;
+                    slot.equipped_items.legs = item_id | 0x10000000;
+                },
             }
         }
     }

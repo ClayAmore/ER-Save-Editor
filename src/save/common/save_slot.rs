@@ -72,10 +72,10 @@ impl Write for WorldAreaWeather {
 
 #[derive(Clone)]
 pub struct PlayerCoords {
-    player_coords: (f32, f32, f32),
-    map_id: u32,
+    pub player_coords: (f32, f32, f32),
+    pub map_id: [u8; 4],
     _0x11: [u8; 0x11],
-    player_coords2: (f32, f32, f32),
+    pub player_coords2: (f32, f32, f32),
     _0x10: [u8; 0x10],
 }
 
@@ -95,7 +95,7 @@ impl Read for PlayerCoords {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut player_coords = PlayerCoords::default();
         player_coords.player_coords = (br.read_f32()?, br.read_f32()?, br.read_f32()?);
-        player_coords.map_id = br.read_u32()?;
+        player_coords.map_id.copy_from_slice(br.read_bytes(4)?);
         let _0x11 = br.read_bytes(0x11)?;
         player_coords.player_coords2 = (br.read_f32()?, br.read_f32()?, br.read_f32()?);
         let _0x10: &[u8] = br.read_bytes(0x10)?;
@@ -109,7 +109,7 @@ impl Write for PlayerCoords {
         bytes.extend(self.player_coords.0.to_le_bytes());
         bytes.extend(self.player_coords.1.to_le_bytes());
         bytes.extend(self.player_coords.2.to_le_bytes());
-        bytes.extend(self.map_id.to_le_bytes());
+        bytes.extend(self.map_id);
         bytes.extend(self._0x11);
         bytes.extend(self.player_coords2.0.to_le_bytes());
         bytes.extend(self.player_coords2.1.to_le_bytes());
@@ -154,10 +154,10 @@ impl Write for UknownList {
 
 #[derive(Clone)]
 pub struct GaItem2 {
-    pub id: i32,
-    pub unk: i32,
-    pub reinforce_type: i32,
-    pub unk1: i32,
+    pub id: u32,
+    pub unk: u32,
+    pub reinforce_type: u32,
+    pub unk1: u32,
 }
 
 impl Default for GaItem2 {
@@ -174,10 +174,10 @@ impl Default for GaItem2 {
 impl Read for GaItem2 {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut ga_item = GaItem2::default();
-        ga_item.id = br.read_i32()?;
-        ga_item.unk = br.read_i32()?;
-        ga_item.reinforce_type = br.read_i32()?;
-        ga_item.unk1 = br.read_i32()?;
+        ga_item.id = br.read_u32()?;
+        ga_item.unk = br.read_u32()?;
+        ga_item.reinforce_type = br.read_u32()?;
+        ga_item.unk1 = br.read_u32()?;
         Ok(ga_item)
     }
 }
@@ -358,19 +358,15 @@ impl Write for Regions {
 
 #[derive(Clone)]
 pub struct EquipPhysicsData {
-    pub slot1: i16,
-    _0x2: i16,
-    pub slot2: i16,
-    _0x2_1: i16,
+    pub slot1: u32,
+    pub slot2: u32,
 }
 
 impl Default for EquipPhysicsData {
     fn default() -> Self {
         Self { 
             slot1: Default::default(), 
-            _0x2: Default::default(), 
             slot2: Default::default(), 
-            _0x2_1: Default::default() 
         }
     }
 }
@@ -380,12 +376,10 @@ impl Read for EquipPhysicsData {
         let mut equip_physics_data = EquipPhysicsData::default();
 
         // Slot 1
-        equip_physics_data.slot1 = br.read_i16()?;
-        equip_physics_data._0x2 = br.read_i16()?;
+        equip_physics_data.slot1 = br.read_u32()?;
 
         // Slot 2
-        equip_physics_data.slot2 = br.read_i16()?;
-        equip_physics_data._0x2_1 = br.read_i16()?;
+        equip_physics_data.slot2 = br.read_u32()?;
 
         Ok(equip_physics_data)
     }
@@ -395,9 +389,7 @@ impl Write for EquipPhysicsData {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
         bytes.extend(self.slot1.to_le_bytes());
-        bytes.extend(self._0x2.to_le_bytes());
         bytes.extend(self.slot2.to_le_bytes());
-        bytes.extend(self._0x2_1.to_le_bytes());
         Ok(bytes)
     }
 }
@@ -482,136 +474,64 @@ impl Write for EquipProjectileData {
 
 #[derive(Clone, Default)]
 pub struct EquippedItems {
-    pub left_hand_armament1: i32,
-    pub right_hand_armament1: i32,
-    pub left_hand_armament2: i32,
-    pub right_hand_armament2: i32,
-    pub left_hand_armament3: i32,
-    pub right_hand_armament3: i32,
-    pub arrows1: i32,
-    pub bolts1: i32,
-    pub arrows2: i32,
-    pub bolts2: i32,
-    _unk1: i32,
-    _unk2: i32,
-    pub head: i32,
-    pub chest: i32,
-    pub arms: i32,
-    pub legs: i32,
-    _unk3: i32,
-    pub talisman1: i32,
-    pub talisman2: i32,
-    pub talisman3: i32,
-    pub talisman4: i32,
-    _unk4: i32, //Most likely covenant.
-    pub quickitem1: i16,
-    _padding: i16,
-    pub quickitem2: i16,
-    _padding2: i16,
-    pub quickitem3: i16,
-    _padding3: i16,
-    pub quickitem4: i16,
-    _padding4: i16,
-    pub quickitem5: i16,
-    _padding5: i16,
-    pub quickitem6: i16,
-    _padding6: i16,
-    pub quickitem7: i16,
-    _padding7: i16,
-    pub quickitem8: i16,
-    _padding8: i16,
-    pub quickitem9: i16,
-    _padding9: i16,
-    pub quickitem10: i16,
-    _padding10: i16,
-    pub pouch1: i16,
-    _padding11: i16,
-    pub pouch2: i16,
-    _padding12: i16,
-    pub pouch3: i16,
-    _padding13: i16,
-    pub pouch4: i16,
-    _padding14: i16,
-    pub pouch5: i16,
-    _padding15: i16,
-    pub pouch6: i16,
-    _padding16: i16,
-    _padding17: i32,
+    pub left_hand_armaments: [u32; 3],
+    pub right_hand_armaments: [u32; 3],
+    pub arrows: [u32; 2],
+    pub bolts: [u32; 2],
+    _unk1: u32,
+    _unk2: u32,
+    pub head: u32,
+    pub chest: u32,
+    pub arms: u32,
+    pub legs: u32,
+    _unk3: u32,
+    pub talismans: [u32; 4],
+    _unk4: u32, //Most likely covenant.
+    pub quickitems: [u32; 0xA],
+    pub pouch: [u32; 6],
+    _padding17: u32,
 }
 impl Read for EquippedItems {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut equipped_items = EquippedItems::default();
-        equipped_items.left_hand_armament1 = br.read_i32()?;
-        equipped_items.right_hand_armament1 = br.read_i32()?;
-        equipped_items.left_hand_armament2 = br.read_i32()?;
-        equipped_items.right_hand_armament2 = br.read_i32()?;
-        equipped_items.left_hand_armament3 = br.read_i32()?;
-        equipped_items.right_hand_armament3 = br.read_i32()?;
-        equipped_items.arrows1 = br.read_i32()?;
-        equipped_items.bolts1 = br.read_i32()?;
-        equipped_items.arrows2 = br.read_i32()?;
-        equipped_items.bolts2 = br.read_i32()?;
-        equipped_items._unk1 = br.read_i32()?;
-        equipped_items._unk2 = br.read_i32()?;
-        equipped_items.head = br.read_i32()?;
-        equipped_items.chest = br.read_i32()?;
-        equipped_items.arms = br.read_i32()?;
-        equipped_items.legs = br.read_i32()?;
-        equipped_items._unk3 = br.read_i32()?;
-        equipped_items.talisman1 = br.read_i32()?;
-        equipped_items.talisman2 = br.read_i32()?;
-        equipped_items.talisman3 = br.read_i32()?;
-        equipped_items.talisman4 = br.read_i32()?;
-        equipped_items._unk4 = br.read_i32()?;
-        equipped_items.quickitem1 = br.read_i16()?;
-        equipped_items._padding = br.read_i16()?;
-        equipped_items.quickitem2 = br.read_i16()?;
-        equipped_items._padding2 = br.read_i16()?;
-        equipped_items.quickitem3 = br.read_i16()?;
-        equipped_items._padding3 = br.read_i16()?;
-        equipped_items.quickitem4 = br.read_i16()?;
-        equipped_items._padding4 = br.read_i16()?;
-        equipped_items.quickitem5 = br.read_i16()?;
-        equipped_items._padding5 = br.read_i16()?;
-        equipped_items.quickitem6 = br.read_i16()?;
-        equipped_items._padding6 = br.read_i16()?;
-        equipped_items.quickitem7 = br.read_i16()?;
-        equipped_items._padding7 = br.read_i16()?;
-        equipped_items.quickitem8 = br.read_i16()?;
-        equipped_items._padding8 = br.read_i16()?;
-        equipped_items.quickitem9 = br.read_i16()?;
-        equipped_items._padding9 = br.read_i16()?;
-        equipped_items.quickitem10 = br.read_i16()?;
-        equipped_items._padding10 = br.read_i16()?;
-        equipped_items.pouch1 = br.read_i16()?;
-        equipped_items._padding11 = br.read_i16()?;
-        equipped_items.pouch2 = br.read_i16()?;
-        equipped_items._padding12 = br.read_i16()?;
-        equipped_items.pouch3 = br.read_i16()?;
-        equipped_items._padding13 = br.read_i16()?;
-        equipped_items.pouch4 = br.read_i16()?;
-        equipped_items._padding14 = br.read_i16()?;
-        equipped_items.pouch5 = br.read_i16()?;
-        equipped_items._padding15 = br.read_i16()?;
-        equipped_items.pouch6 = br.read_i16()?;
-        equipped_items._padding16 = br.read_i16()?;
-        equipped_items._padding17 = br.read_i32()?;
+        equipped_items.left_hand_armaments[0] = br.read_u32()?;
+        equipped_items.right_hand_armaments[0] = br.read_u32()?;
+        equipped_items.left_hand_armaments[1] = br.read_u32()?;
+        equipped_items.right_hand_armaments[1] = br.read_u32()?;
+        equipped_items.left_hand_armaments[2] = br.read_u32()?;
+        equipped_items.right_hand_armaments[2] = br.read_u32()?;
+        equipped_items.arrows[0] = br.read_u32()?;
+        equipped_items.bolts[0] = br.read_u32()?;
+        equipped_items.arrows[1] = br.read_u32()?;
+        equipped_items.bolts[1] = br.read_u32()?;
+        equipped_items._unk1 = br.read_u32()?;
+        equipped_items._unk2 = br.read_u32()?;
+        equipped_items.head = br.read_u32()?;
+        equipped_items.chest = br.read_u32()?;
+        equipped_items.arms = br.read_u32()?;
+        equipped_items.legs = br.read_u32()?;
+        equipped_items._unk3 = br.read_u32()?;
+        for i in 0..4 { equipped_items.talismans[i] = br.read_u32()?; }
+        equipped_items._unk4 = br.read_u32()?;
+        for i in 0..0xA { equipped_items.quickitems[i] = br.read_u32()?; }
+        for i in 0..0x6 { equipped_items.pouch[i] = br.read_u32()?; }
+        equipped_items._padding17 = br.read_u32()?;
         Ok(equipped_items)
     }
 }
 impl Write for EquippedItems {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
-        bytes.extend(self.left_hand_armament1.to_le_bytes());
-        bytes.extend(self.right_hand_armament1.to_le_bytes());
-        bytes.extend(self.left_hand_armament2.to_le_bytes());
-        bytes.extend(self.right_hand_armament2.to_le_bytes());
-        bytes.extend(self.left_hand_armament3.to_le_bytes());
-        bytes.extend(self.right_hand_armament3.to_le_bytes());
-        bytes.extend(self.arrows1.to_le_bytes());
-        bytes.extend(self.bolts1.to_le_bytes());
-        bytes.extend(self.arrows2.to_le_bytes());
-        bytes.extend(self.bolts2.to_le_bytes());
+        bytes.extend(self.left_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.arrows[0].to_le_bytes());
+        bytes.extend(self.bolts[0].to_le_bytes());
+        bytes.extend(self.arrows[1].to_le_bytes());
+        bytes.extend(self.bolts[1].to_le_bytes());
         bytes.extend(self._unk1.to_le_bytes());
         bytes.extend(self._unk2.to_le_bytes());
         bytes.extend(self.head.to_le_bytes());
@@ -619,62 +539,27 @@ impl Write for EquippedItems {
         bytes.extend(self.arms.to_le_bytes());
         bytes.extend(self.legs.to_le_bytes());
         bytes.extend(self._unk3.to_le_bytes());
-        bytes.extend(self.talisman1.to_le_bytes());
-        bytes.extend(self.talisman2.to_le_bytes());
-        bytes.extend(self.talisman3.to_le_bytes());
-        bytes.extend(self.talisman4.to_le_bytes());
+        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
         bytes.extend(self._unk4.to_le_bytes());
-        bytes.extend(self.quickitem1.to_le_bytes());
-        bytes.extend(self._padding.to_le_bytes());
-        bytes.extend(self.quickitem2.to_le_bytes());
-        bytes.extend(self._padding2.to_le_bytes());
-        bytes.extend(self.quickitem3.to_le_bytes());
-        bytes.extend(self._padding3.to_le_bytes());
-        bytes.extend(self.quickitem4.to_le_bytes());
-        bytes.extend(self._padding4.to_le_bytes());
-        bytes.extend(self.quickitem5.to_le_bytes());
-        bytes.extend(self._padding5.to_le_bytes());
-        bytes.extend(self.quickitem6.to_le_bytes());
-        bytes.extend(self._padding6.to_le_bytes());
-        bytes.extend(self.quickitem7.to_le_bytes());
-        bytes.extend(self._padding7.to_le_bytes());
-        bytes.extend(self.quickitem8.to_le_bytes());
-        bytes.extend(self._padding8.to_le_bytes());
-        bytes.extend(self.quickitem9.to_le_bytes());
-        bytes.extend(self._padding9.to_le_bytes());
-        bytes.extend(self.quickitem10.to_le_bytes());
-        bytes.extend(self._padding10.to_le_bytes());
-        bytes.extend(self.pouch1.to_le_bytes());
-        bytes.extend(self._padding11.to_le_bytes());
-        bytes.extend(self.pouch2.to_le_bytes());
-        bytes.extend(self._padding12.to_le_bytes());
-        bytes.extend(self.pouch3.to_le_bytes());
-        bytes.extend(self._padding13.to_le_bytes());
-        bytes.extend(self.pouch4.to_le_bytes());
-        bytes.extend(self._padding14.to_le_bytes());
-        bytes.extend(self.pouch5.to_le_bytes());
-        bytes.extend(self._padding15.to_le_bytes());
-        bytes.extend(self.pouch6.to_le_bytes());
-        bytes.extend(self._padding16.to_le_bytes());
+        for i in 0..0xA { bytes.extend(self.quickitems[i].to_le_bytes()); }
+        for i in 0..0x6 { bytes.extend(self.pouch[i].to_le_bytes()); }
         bytes.extend(self._padding17.to_le_bytes());
         Ok(bytes)
     }
 }
 
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct EquipItem {
-    pub item_id: i16,
-    unk: i16,
-    unk2: i32,
+    pub item_id: u32,
+    pub equipment_index: u32,
 }
 
 impl Default for EquipItem {
     fn default() -> Self {
         Self { 
             item_id: Default::default(), 
-            unk: Default::default(),
-            unk2: Default::default()
+            equipment_index: Default::default()
         }
     }
 }
@@ -682,9 +567,8 @@ impl Default for EquipItem {
 impl Read for EquipItem {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut equip_item = EquipItem::default();
-        equip_item.item_id = br.read_i16()?;
-        equip_item.unk = br.read_i16()?;
-        equip_item.unk2 = br.read_i32()?;
+        equip_item.item_id = br.read_u32()?;
+        equip_item.equipment_index = br.read_u32()?;
         Ok(equip_item)
     }
 }
@@ -693,8 +577,7 @@ impl Write for EquipItem {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
         bytes.extend(self.item_id.to_le_bytes());
-        bytes.extend(self.unk.to_le_bytes());
-        bytes.extend(self.unk2.to_le_bytes());
+        bytes.extend(self.equipment_index.to_le_bytes());
         Ok(bytes)
     }
 }
@@ -845,8 +728,8 @@ impl Write for EquipMagicData {
 #[derive(Copy, Clone)]
 pub struct EquipInventoryItem {
     pub ga_item_handle: u32,
-    pub quantity: i32,
-    pub inventory_index: i32
+    pub quantity: u32,
+    pub inventory_index: u32
 }
 
 impl Default for EquipInventoryItem {
@@ -864,8 +747,8 @@ impl Read for EquipInventoryItem{
         let mut equip_inventory_item = EquipInventoryItem::default();
         
         equip_inventory_item.ga_item_handle = br.read_u32()?;
-        equip_inventory_item.quantity = br.read_i32()?;
-        equip_inventory_item.inventory_index = br.read_i32()?;
+        equip_inventory_item.quantity = br.read_u32()?;
+        equip_inventory_item.inventory_index = br.read_u32()?;
 
         Ok(equip_inventory_item)
     }
@@ -886,12 +769,12 @@ impl Write for EquipInventoryItem {
 
 #[derive(Clone)]
 pub struct EquipInventoryData {
-    pub common_inventory_items_distinct_count: i32,
+    pub common_inventory_items_distinct_count: u32,
     pub common_items: Vec<EquipInventoryItem>,
-    pub key_inventory_items_distinct_count: i32,
+    pub key_inventory_items_distinct_count: u32,
     pub key_items: Vec<EquipInventoryItem>,
-    pub _0x4: i32,
-    pub next_acquisition_sort_id: i32,
+    pub next_equip_index: u32,
+    pub next_acquisition_sort_id: u32,
 }
 
 impl Default for EquipInventoryData {
@@ -901,8 +784,8 @@ impl Default for EquipInventoryData {
             common_items: vec![],
             key_inventory_items_distinct_count: Default::default(),
             key_items: vec![],
-            _0x4: -1,
-            next_acquisition_sort_id: -1,
+            next_equip_index: 0,
+            next_acquisition_sort_id: 0,
         }
     }
 }
@@ -911,20 +794,20 @@ impl EquipInventoryData {
     fn read(br: &mut BinaryReader, length1: usize, length2: usize) -> Result<EquipInventoryData, io::Error> {
         let mut equip_inventory_data = EquipInventoryData::default();
 
-        equip_inventory_data.common_inventory_items_distinct_count = br.read_i32()?;
+        equip_inventory_data.common_inventory_items_distinct_count = br.read_u32()?;
         
         for _i in 0..length1 {
             equip_inventory_data.common_items.push(EquipInventoryItem::read(br)?);
         }
         
-        equip_inventory_data.key_inventory_items_distinct_count = br.read_i32()?;
+        equip_inventory_data.key_inventory_items_distinct_count = br.read_u32()?;
 
         for _i in 0..length2 {
             equip_inventory_data.key_items.push(EquipInventoryItem::read(br)?);
         }
 
-        equip_inventory_data._0x4 = br.read_i32()?;
-        equip_inventory_data.next_acquisition_sort_id = br.read_i32()?;
+        equip_inventory_data.next_equip_index = br.read_u32()?;
+        equip_inventory_data.next_acquisition_sort_id = br.read_u32()?;
 
         Ok(equip_inventory_data)
     }
@@ -944,120 +827,67 @@ impl EquipInventoryData {
             bytes.extend(self.key_items[i].write()?);
         }
 
-        bytes.extend(self._0x4.to_le_bytes());
+        bytes.extend(self.next_equip_index.to_le_bytes());
         bytes.extend(self.next_acquisition_sort_id.to_le_bytes());
 
         Ok(bytes)
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct ChrAsm {
-    pub arm_style: i32,
-    pub left_hand_active_slot: i32,
-    pub right_hand_active_slot: i32,
-    pub left_arrow_active_slot: i32,
-    pub right_arrow_active_slot: i32,
-    pub left_bolt_active_slot: i32,
-    pub right_bolt_active_slot: i32,
-    pub left_hand_armament1: i32,
-    pub right_hand_armament1: i32,
-    pub left_hand_armament2: i32,
-    pub right_hand_armament2: i32,
-    pub left_hand_armament3: i32,
-    pub right_hand_armament3: i32,
-    pub arrows1: i32,
-    pub bolts1: i32,
-    pub arrows2: i32,
-    pub bolts2: i32,
-    pub _0x4: i32,
-    pub _0x4_1: i32,
-    pub head: i32,
-    pub chest: i32,
-    pub arms: i32,
-    pub legs: i32,
-    pub _0x4_2: i32,
-    pub talisman1: i32,
-    pub talisman2: i32,
-    pub talisman3: i32,
-    pub talisman4: i32,
-    pub talisman5: i32
-}
-
-impl Default for ChrAsm {
-    fn default() -> Self {
-        Self { 
-            arm_style: Default::default(),
-            left_hand_active_slot: Default::default(),
-            right_hand_active_slot: Default::default(),
-            left_arrow_active_slot: Default::default(),
-            right_arrow_active_slot: Default::default(),
-            left_bolt_active_slot: Default::default(),
-            right_bolt_active_slot: Default::default(),
-            left_hand_armament1: Default::default(),
-            right_hand_armament1: Default::default(),
-            left_hand_armament2: Default::default(),
-            right_hand_armament2: Default::default(),
-            left_hand_armament3: Default::default(),
-            right_hand_armament3: Default::default(),
-            arrows1: Default::default(),
-            bolts1: Default::default(),
-            arrows2: Default::default(),
-            bolts2: Default::default(),
-            _0x4: Default::default(),
-            _0x4_1: Default::default(),
-            head: Default::default(),
-            chest: Default::default(),
-            arms: Default::default(),
-            legs: Default::default(),
-            _0x4_2: Default::default(),
-            talisman1: Default::default(),
-            talisman2: Default::default(),
-            talisman3: Default::default(),
-            talisman4: Default::default(),
-            talisman5: Default::default(),
-        }
-    }
+    pub arm_style: u32,
+    pub left_hand_active_slot: u32,
+    pub right_hand_active_slot: u32,
+    pub left_arrow_active_slot: u32,
+    pub right_arrow_active_slot: u32,
+    pub left_bolt_active_slot: u32,
+    pub right_bolt_active_slot: u32,
+    pub left_hand_armaments: [u32; 3],
+    pub right_hand_armaments: [u32; 3],
+    pub arrows: [u32; 2],
+    pub bolts: [u32; 2],
+    pub _0x4: u32,
+    pub _0x4_1: u32,
+    pub head: u32,
+    pub chest: u32,
+    pub arms: u32,
+    pub legs: u32,
+    pub _0x4_2: u32,
+    pub talismans: [u32; 4],
+    pub unk: u32
 }
 
 impl Read for ChrAsm {
     fn read(br: &mut BinaryReader) -> Result<ChrAsm, io::Error> {
         let mut chr_asm = ChrAsm::default();
 
-        chr_asm.arm_style = br.read_i32()?;
-        chr_asm.left_hand_active_slot = br.read_i32()?;
-        chr_asm.right_hand_active_slot = br.read_i32()?;
-        chr_asm.left_arrow_active_slot = br.read_i32()?;
-        chr_asm.right_arrow_active_slot = br.read_i32()?;
-        chr_asm.left_bolt_active_slot = br.read_i32()?;
-        chr_asm.right_bolt_active_slot = br.read_i32()?;
-
-        chr_asm.left_hand_armament1 = br.read_i32()?;
-        chr_asm.right_hand_armament1 = br.read_i32()?;
-        chr_asm.left_hand_armament2 = br.read_i32()?;
-        chr_asm.right_hand_armament2 = br.read_i32()?;
-        chr_asm.left_hand_armament3 = br.read_i32()?;
-        chr_asm.right_hand_armament3 = br.read_i32()?;
-        chr_asm.arrows1 = br.read_i32()?;
-        chr_asm.bolts1 = br.read_i32()?;
-        chr_asm.arrows2 = br.read_i32()?;
-        chr_asm.bolts2 = br.read_i32()?;
-
-        chr_asm._0x4 = br.read_i32()?;
-        chr_asm._0x4_1 = br.read_i32()?;
-
-        chr_asm.head = br.read_i32()?;
-        chr_asm.chest = br.read_i32()?;
-        chr_asm.arms = br.read_i32()?;
-        chr_asm.legs = br.read_i32()?;
-
-        chr_asm._0x4_2 = br.read_i32()?;
-
-        chr_asm.talisman1 = br.read_i32()?;
-        chr_asm.talisman2 = br.read_i32()?;
-        chr_asm.talisman3 = br.read_i32()?;
-        chr_asm.talisman4 = br.read_i32()?;
-        chr_asm.talisman5 = br.read_i32()?;
+        chr_asm.arm_style = br.read_u32()?;
+        chr_asm.left_hand_active_slot = br.read_u32()?;
+        chr_asm.right_hand_active_slot = br.read_u32()?;
+        chr_asm.left_arrow_active_slot = br.read_u32()?;
+        chr_asm.right_arrow_active_slot = br.read_u32()?;
+        chr_asm.left_bolt_active_slot = br.read_u32()?;
+        chr_asm.right_bolt_active_slot = br.read_u32()?;
+        chr_asm.left_hand_armaments[0] = br.read_u32()?;
+        chr_asm.right_hand_armaments[0] = br.read_u32()?;
+        chr_asm.left_hand_armaments[1] = br.read_u32()?;
+        chr_asm.right_hand_armaments[1] = br.read_u32()?;
+        chr_asm.left_hand_armaments[2] = br.read_u32()?;
+        chr_asm.right_hand_armaments[2] = br.read_u32()?;
+        chr_asm.arrows[0] = br.read_u32()?;
+        chr_asm.bolts[0] = br.read_u32()?;
+        chr_asm.arrows[1] = br.read_u32()?;
+        chr_asm.bolts[1] = br.read_u32()?;
+        chr_asm._0x4 = br.read_u32()?;
+        chr_asm._0x4_1 = br.read_u32()?;
+        chr_asm.head = br.read_u32()?;
+        chr_asm.chest = br.read_u32()?;
+        chr_asm.arms = br.read_u32()?;
+        chr_asm.legs = br.read_u32()?;
+        chr_asm._0x4_2 = br.read_u32()?;
+        for i in 0..4 { chr_asm.talismans[i] = br.read_u32()?; }
+        chr_asm.unk = br.read_u32()?;
 
         Ok(chr_asm)
     }
@@ -1073,121 +903,141 @@ impl Write for ChrAsm {
         bytes.extend(self.right_arrow_active_slot.to_le_bytes());
         bytes.extend(self.left_bolt_active_slot.to_le_bytes());
         bytes.extend(self.right_bolt_active_slot.to_le_bytes());
-
-        bytes.extend(self.left_hand_armament1.to_le_bytes());
-        bytes.extend(self.right_hand_armament1.to_le_bytes());
-        bytes.extend(self.left_hand_armament2.to_le_bytes());
-        bytes.extend(self.right_hand_armament2.to_le_bytes());
-        bytes.extend(self.left_hand_armament3.to_le_bytes());
-        bytes.extend(self.right_hand_armament3.to_le_bytes());
-        bytes.extend(self.arrows1.to_le_bytes());
-        bytes.extend(self.bolts1.to_le_bytes());
-        bytes.extend(self.arrows2.to_le_bytes());
-        bytes.extend(self.bolts2.to_le_bytes());
-
+        bytes.extend(self.left_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.arrows[0].to_le_bytes());
+        bytes.extend(self.bolts[0].to_le_bytes());
+        bytes.extend(self.arrows[1].to_le_bytes());
+        bytes.extend(self.bolts[1].to_le_bytes());
         bytes.extend(self._0x4.to_le_bytes());
         bytes.extend(self._0x4_1.to_le_bytes());
-
         bytes.extend(self.head.to_le_bytes());
         bytes.extend(self.chest.to_le_bytes());
         bytes.extend(self.arms.to_le_bytes());
         bytes.extend(self.legs.to_le_bytes());
-
         bytes.extend(self._0x4_2.to_le_bytes());
-
-        bytes.extend(self.talisman1.to_le_bytes());
-        bytes.extend(self.talisman2.to_le_bytes());
-        bytes.extend(self.talisman3.to_le_bytes());
-        bytes.extend(self.talisman4.to_le_bytes());
-        bytes.extend(self.talisman5.to_le_bytes());
+        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        bytes.extend(self.unk.to_le_bytes());
         Ok(bytes)
     }
 }
 
-#[derive(Clone)]
-pub struct EquipData {
-    left_hand_armament1: i32,
-    right_hand_armament1: i32,
-    left_hand_armament2: i32,
-    right_hand_armament2: i32,
-    left_hand_armament3: i32,
-    right_hand_armament3: i32,
-    arrows1: i32,
-    bolts1: i32,
-    arrows2: i32,
-    bolts2: i32,
-    _0x4: i32,
-    _0x4_1: i32,
-    head: i32,
-    chest: i32,
-    arms: i32,
-    legs: i32,
-    _0x4_2: i32,
-    talisman1: i32,
-    talisman2: i32,
-    talisman3: i32,
-    talisman4: i32,
-    talisman5: i32,
+#[derive(Clone, Default)]
+pub struct ChrAsm2 {
+    pub left_hand_armaments: [u32; 3],
+    pub right_hand_armaments: [u32; 3],
+    pub arrows: [u32; 2],
+    pub bolts: [u32; 2],
+    _unk0: u32,
+    _unk1: u32,
+    pub head: u32,
+    pub chest: u32,
+    pub arms: u32,
+    pub legs: u32,
+    _unk2: u32,
+    pub talismans: [u32; 4],
+    _unk3: u32,
 }
 
-impl Default for EquipData {
-    fn default() -> Self {
-        Self { 
-            left_hand_armament1: -1,
-            right_hand_armament1: -1,
-            left_hand_armament2: -1,
-            right_hand_armament2: -1,
-            left_hand_armament3: -1,
-            right_hand_armament3: -1,
-            arrows1: -1,
-            bolts1: -1,
-            arrows2: -1,
-            bolts2: -1,
-            _0x4: -1,
-            _0x4_1: -1,
-            head: -1,
-            chest: -1,
-            arms: -1,
-            legs: -1,
-            _0x4_2: -1,
-            talisman1: -1,
-            talisman2: -1,
-            talisman3: -1,
-            talisman4: -1,
-            talisman5: -1,
-        }
+impl Read for ChrAsm2 {
+    fn read(br: &mut BinaryReader) -> Result<ChrAsm2, io::Error> {
+        let mut chr_asm = ChrAsm2::default();
+        chr_asm.left_hand_armaments[0] = br.read_u32()?;
+        chr_asm.right_hand_armaments[0] = br.read_u32()?;
+        chr_asm.left_hand_armaments[1] = br.read_u32()?;
+        chr_asm.right_hand_armaments[1] = br.read_u32()?;
+        chr_asm.left_hand_armaments[2] = br.read_u32()?;
+        chr_asm.right_hand_armaments[2] = br.read_u32()?;
+        chr_asm.arrows[0] = br.read_u32()?;
+        chr_asm.bolts[0] = br.read_u32()?;
+        chr_asm.arrows[1] = br.read_u32()?;
+        chr_asm.bolts[1] = br.read_u32()?;
+        chr_asm._unk0 = br.read_u32()?;
+        chr_asm._unk1 = br.read_u32()?;
+        chr_asm.head = br.read_u32()?;
+        chr_asm.chest = br.read_u32()?;
+        chr_asm.arms = br.read_u32()?;
+        chr_asm.legs = br.read_u32()?;
+        chr_asm._unk2 = br.read_u32()?;
+        for i in 0..4 { chr_asm.talismans[i] = br.read_u32()?; }
+        chr_asm._unk3 = br.read_u32()?;
+        Ok(chr_asm)
     }
+}
+
+impl Write for ChrAsm2 {
+    fn write(&self) -> Result<Vec<u8>, io::Error> {
+        let mut bytes: Vec<u8> = Vec::new();
+        bytes.extend(self.left_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.arrows[0].to_le_bytes());
+        bytes.extend(self.bolts[0].to_le_bytes());
+        bytes.extend(self.arrows[1].to_le_bytes());
+        bytes.extend(self.bolts[1].to_le_bytes());
+        bytes.extend(self._unk0.to_le_bytes());
+        bytes.extend(self._unk1.to_le_bytes());
+        bytes.extend(self.head.to_le_bytes());
+        bytes.extend(self.chest.to_le_bytes());
+        bytes.extend(self.arms.to_le_bytes());
+        bytes.extend(self.legs.to_le_bytes());
+        bytes.extend(self._unk2.to_le_bytes());
+        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        bytes.extend(self._unk3.to_le_bytes());
+        Ok(bytes)
+    }
+}
+
+#[derive(Default, Clone)]
+pub struct EquipData {
+    pub left_hand_armaments: [u32; 3],
+    pub right_hand_armaments: [u32; 3],
+    pub arrows: [u32; 2],
+    pub bolts: [u32; 2],
+    _0x4: u32,
+    _0x4_1: u32,
+    pub head: u32,
+    pub chest: u32,
+    pub arms: u32,
+    pub legs: u32,
+    _0x4_2: u32,
+    pub talismans: [u32; 4],
+    unk: u32,
 }
 
 impl Read for EquipData {
     fn read(br: &mut BinaryReader) -> Result<EquipData, io::Error> {
         let mut equip_data = EquipData::default();
-        equip_data.left_hand_armament1 = br.read_i32()?;
-        equip_data.right_hand_armament1 = br.read_i32()?;
-        equip_data.left_hand_armament2 = br.read_i32()?;
-        equip_data.right_hand_armament2 = br.read_i32()?;
-        equip_data.left_hand_armament3 = br.read_i32()?;
-        equip_data.right_hand_armament3 = br.read_i32()?;
-        equip_data.arrows1 = br.read_i32()?;
-        equip_data.bolts1 = br.read_i32()?;
-        equip_data.arrows2 = br.read_i32()?;
-        equip_data.bolts2 = br.read_i32()?;
+        equip_data.left_hand_armaments[0] = br.read_u32()?;
+        equip_data.right_hand_armaments[0] = br.read_u32()?;
+        equip_data.left_hand_armaments[1] = br.read_u32()?;
+        equip_data.right_hand_armaments[1] = br.read_u32()?;
+        equip_data.left_hand_armaments[2] = br.read_u32()?;
+        equip_data.right_hand_armaments[2] = br.read_u32()?;
+        equip_data.arrows[0] = br.read_u32()?;
+        equip_data.bolts[0] = br.read_u32()?;
+        equip_data.arrows[1] = br.read_u32()?;
+        equip_data.bolts[1] = br.read_u32()?;
 
-        equip_data._0x4 = br.read_i32()?;
-        equip_data._0x4_1 = br.read_i32()?;
+        equip_data._0x4 = br.read_u32()?;
+        equip_data._0x4_1 = br.read_u32()?;
 
-        equip_data.head = br.read_i32()?;
-        equip_data.chest = br.read_i32()?;
-        equip_data.arms = br.read_i32()?;
-        equip_data.legs = br.read_i32()?;
+        equip_data.head = br.read_u32()?;
+        equip_data.chest = br.read_u32()?;
+        equip_data.arms = br.read_u32()?;
+        equip_data.legs = br.read_u32()?;
 
-        equip_data._0x4_2 = br.read_i32()?;
+        equip_data._0x4_2 = br.read_u32()?;
 
-        equip_data.talisman1 = br.read_i32()?;
-        equip_data.talisman2 = br.read_i32()?;
-        equip_data.talisman3 = br.read_i32()?;
-        equip_data.talisman4 = br.read_i32()?;
-        equip_data.talisman5 = br.read_i32()?;
+        for i in 0..4 { equip_data.talismans[i] = br.read_u32()?; }
+        equip_data.unk = br.read_u32()?;
         
         Ok(equip_data)
     }
@@ -1196,16 +1046,16 @@ impl Read for EquipData {
 impl Write for EquipData {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
-        bytes.extend(self.left_hand_armament1.to_le_bytes());
-        bytes.extend(self.right_hand_armament1.to_le_bytes());
-        bytes.extend(self.left_hand_armament2.to_le_bytes());
-        bytes.extend(self.right_hand_armament2.to_le_bytes());
-        bytes.extend(self.left_hand_armament3.to_le_bytes());
-        bytes.extend(self.right_hand_armament3.to_le_bytes());
-        bytes.extend(self.arrows1.to_le_bytes());
-        bytes.extend(self.bolts1.to_le_bytes());
-        bytes.extend(self.arrows2.to_le_bytes());
-        bytes.extend(self.bolts2.to_le_bytes());
+        bytes.extend(self.left_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.arrows[0].to_le_bytes());
+        bytes.extend(self.bolts[0].to_le_bytes());
+        bytes.extend(self.arrows[1].to_le_bytes());
+        bytes.extend(self.bolts[1].to_le_bytes());
 
         bytes.extend(self._0x4.to_le_bytes());
         bytes.extend(self._0x4_1.to_le_bytes());
@@ -1217,11 +1067,8 @@ impl Write for EquipData {
 
         bytes.extend(self._0x4_2.to_le_bytes());
 
-        bytes.extend(self.talisman1.to_le_bytes());
-        bytes.extend(self.talisman2.to_le_bytes());
-        bytes.extend(self.talisman3.to_le_bytes());
-        bytes.extend(self.talisman4.to_le_bytes());
-        bytes.extend(self.talisman5.to_le_bytes());
+        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        bytes.extend(self.unk.to_le_bytes());
         Ok(bytes)
     }
 }
@@ -1570,14 +1417,14 @@ impl Write for GaItem {
 #[derive(Clone)]
 pub struct SaveSlot {
     pub ver: u32,
-    pub map_id: u32,
+    pub map_id: [u8; 4],
     _0x18: [u8; 0x18],
     pub ga_items: Vec<GaItem>,
     pub player_game_data: PlayerGameData,
     _0xd0: [u8; 0xd0],
     pub equip_data: EquipData,
     pub chr_asm: ChrAsm,
-    _0x58: [u8; 0x58],
+    pub chr_asm2: ChrAsm2,
     pub equip_inventory_data: EquipInventoryData,
     pub equip_magic_data: EquipMagicData,
     pub equip_item_data: EquipItemData,
@@ -1622,14 +1469,14 @@ impl Default for SaveSlot {
     fn default() -> Self {
         Self {
             ver: 0,
-            map_id: 0,
+            map_id: [0x0; 4],
             _0x18: [0x0; 0x18],
             ga_items: vec![GaItem::default(); 0x1400],
             player_game_data: PlayerGameData::default(),
             _0xd0: [0x0;0xd0],
             equip_data: EquipData::default(),
             chr_asm: ChrAsm::default(),
-            _0x58: [0x0;0x58],
+            chr_asm2: ChrAsm2::default(),
             equip_inventory_data: EquipInventoryData::default(),
             equip_magic_data: EquipMagicData::default(),
             equip_item_data: EquipItemData::default(),
@@ -1683,7 +1530,7 @@ impl Read for SaveSlot {
         save_slot.ver = br.read_u32()?;
 
         // MapId
-        save_slot.map_id = br.read_u32()?;
+        save_slot.map_id.copy_from_slice(br.read_bytes(4)?);
 
         // Uknown
         save_slot._0x18.copy_from_slice(br.read_bytes(0x18)?);
@@ -1704,8 +1551,8 @@ impl Read for SaveSlot {
         // Chr Asm
         save_slot.chr_asm = ChrAsm::read(br)?;
 
-        // Something to do with Chr Asm
-        save_slot._0x58.copy_from_slice(br.read_bytes(0x58)?);
+        // Chr Asm2
+        save_slot.chr_asm2 = ChrAsm2::read(br)?;
 
         // Equip Inventory Data
         save_slot.equip_inventory_data = EquipInventoryData::read(br, 0xa80, 0x180)?;
@@ -1818,7 +1665,7 @@ impl Write for SaveSlot {
         bytes.extend(self.ver.to_le_bytes());
 
         // MapId
-        bytes.extend(self.map_id.to_le_bytes());
+        bytes.extend(self.map_id);
 
         bytes.extend(self._0x18);
 
@@ -1838,7 +1685,8 @@ impl Write for SaveSlot {
         // Chr Asm
         bytes.extend(self.chr_asm.write()?);
 
-        bytes.extend(self._0x58);
+        // Chr Asm2
+        bytes.extend(self.chr_asm2.write()?);
 
         // Equip Inventory Data
         bytes.extend(self.equip_inventory_data.write(0xa80, 0x180)?);

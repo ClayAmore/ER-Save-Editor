@@ -35,7 +35,6 @@ pub fn browse_inventory(ui: &mut Ui, vm:&mut ViewModel) {
 
         // Highlight active 
         match inventory_vm.current_type_route {
-            InventoryTypeRoute::None => {},
             InventoryTypeRoute::CommonItems => {common_items.highlight();},
             InventoryTypeRoute::KeyItems => {key_items.highlight();},
             InventoryTypeRoute::Weapons => {weapons.highlight();},
@@ -92,8 +91,7 @@ pub fn browse_inventory(ui: &mut Ui, vm:&mut ViewModel) {
     });
         
     let current_inventory_list = match inventory_vm.current_type_route {
-        InventoryTypeRoute::None => &empty,
-        InventoryTypeRoute::CommonItems => &inventory_vm.storage[inventory_vm.at_storage_box as usize].filtered_common_items,
+        InventoryTypeRoute::CommonItems => &inventory_vm.storage[inventory_vm.at_storage_box as usize].filtered_items,
         InventoryTypeRoute::KeyItems => &inventory_vm.storage[inventory_vm.at_storage_box as usize].filtered_key_items,
         InventoryTypeRoute::Weapons => &inventory_vm.storage[inventory_vm.at_storage_box as usize].filtered_weapons,
         InventoryTypeRoute::Armors => &inventory_vm.storage[inventory_vm.at_storage_box as usize].filtered_armors,

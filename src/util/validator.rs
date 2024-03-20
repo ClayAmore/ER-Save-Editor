@@ -1,43 +1,28 @@
 pub mod validator {
     use std::collections::{HashMap, HashSet};
-    use crate::{save::{common::save_slot::{EquipInventoryItem, GaItem}, save::save::Save}, util::{param_structs::{EQUIP_PARAM_GEM_ST, EQUIP_PARAM_GOODS_ST, EQUIP_PARAM_PROTECTOR_ST, EQUIP_PARAM_WEAPON_ST}, params::params::{Param, Row, PARAM}, regulation::Regulation}, vm::regulation::regulation_view_model::{ProtectorCategory, WepType}};
+    use crate::{save::{common::save_slot::{EquipInventoryItem, GaItem}, save::save::Save}, util::{param_structs::EQUIP_PARAM_GEM_ST, params::params::Row, regulation::Regulation}, vm::regulation::regulation_view_model::{ProtectorCategory, WepType}};
 
-    pub struct Validator<'a> {
-        save: &'a Save,
-        params: HashMap<Param, Vec<u8>>,
-    }
+    pub struct Validator;
 
-    impl<'a> Validator<'a> {
-        pub fn new(save: &'a Save) -> Self {
-            let regulation = save.save_type.get_regulation();
-            let params: HashMap<Param, Vec<u8>> = Regulation::params_from_regulation(regulation).unwrap();
-            
-            Self {
-                save,
-                params,
-            }
-        }
-
-        pub fn validate(&self) -> bool {
-            let goods = PARAM::<EQUIP_PARAM_GOODS_ST>::from_bytes(&self.params[&Param::EquipParamGoods]).unwrap();
-            
+    impl Validator {
+        pub fn validate(save: &Save) -> bool {
             // Get active characters
-            for (index, active) in self.save.save_type.active_slots().iter().enumerate() {
+            for (index, active) in save.save_type.active_slots().iter().enumerate() {
                 if *active {
-                    if !self.is_weapons_valid(index) { return false; }
-                    if !self.is_items_valid(index) { return false; }
-                    if !self.is_armor_valid(index) { return false; }
-                    if !self.is_physics_valid(index, &goods) { return false; }
-                    if !self.is_equipped_items_valid(index, &goods) { return false; }
+                    if !Self::is_weapons_valid(save, index) {println!("is_weapons_valid"); return false; }
+                    if !Self::is_items_valid(save, index) {println!("is_items_valid"); return false; }
+                    if !Self::is_armor_valid(save, index) {println!("is_armor_valid"); return false; }
+                    if !Self::is_physics_valid(save, index) {println!("is_physics_valid"); return false; }
+                    if !Self::is_equipped_items_valid(save, index) {println!("is_equipped_items_valid"); return false; }
                 }
             }
             true
         }
 
-        fn is_weapons_valid(&self, index: usize) -> bool {
-            let slot = self.save.save_type.get_slot(index);
-            let weapons = PARAM::<EQUIP_PARAM_WEAPON_ST>::from_bytes(&self.params[&Param::EquipParamWeapon]).unwrap();
-            let gems = PARAM::<EQUIP_PARAM_GEM_ST>::from_bytes(&self.params[&Param::EquipParamGem]).unwrap();
+        fn is_weapons_valid(save: &Save, index: usize) -> bool {
+            let slot = save.save_type.get_slot(index);
+            let weapons = Regulation::equip_weapon_params_map();
+            let gems = Regulation::equip_gem_param_map();
 
             // Map weapons
             let ga_item_weapons = &slot.ga_items.iter()
@@ -52,7 +37,7 @@ pub mod validator {
             .collect::<HashMap<u32,&GaItem>>();
 
             for weapon_ga_item in ga_item_weapons {
-                let res_weapon = weapons.rows.iter().find(|w| w.id == weapon_ga_item.item_id as i32);
+                let res_weapon = weapons.get(&weapon_ga_item.item_id);
 
                 if res_weapon.is_none() && weapon_ga_item.item_id != 0xFFFFFFFF {
                     return false;
@@ -68,7 +53,7 @@ pub mod validator {
 
                 // Look up the gem_param
                 let gem_ga_item = ga_item_gems[&current_weapon_gem];
-                let res_gem = gems.rows.iter().find(|g| g.id == gem_ga_item.item_id as i32);
+                let res_gem = gems.get(&gem_ga_item.item_id);
 
                 // Check if gem_param exists, fail if it doesn't
                 if res_gem.is_none() {
@@ -93,70 +78,69 @@ pub mod validator {
             true
         }
 
-        fn is_items_valid(&self, index: usize) -> bool {
-            let inventory_common_items = &self.save.save_type.get_slot(index).equip_inventory_data.common_items;
-            let storage_common_items = &self.save.save_type.get_slot(index).storage_inventory_data.common_items;
+        fn is_items_valid(save: &Save, index: usize) -> bool {
+            let inventory_common_items = &save.save_type.get_slot(index).equip_inventory_data.common_items;
+            let storage_common_items = &save.save_type.get_slot(index).storage_inventory_data.common_items;
             Self::check_for_duplicate_items(inventory_common_items) && Self::check_for_duplicate_items(storage_common_items)
         }
 
-        fn is_armor_valid(&self, index: usize) -> bool{
-            let protectors = PARAM::<EQUIP_PARAM_PROTECTOR_ST>::from_bytes(&self.params[&Param::EquipParamProtector]).unwrap();
+        fn is_armor_valid(save: &Save, index: usize) -> bool{
+            let head_protector_id = save.save_type.get_slot(index).chr_asm.head;
+            let body_protector_id = save.save_type.get_slot(index).chr_asm.chest;
+            let arms_protector_id = save.save_type.get_slot(index).chr_asm.arms;
+            let legs_protector_id = save.save_type.get_slot(index).chr_asm.legs;
 
-            let head_protector_id = self.save.save_type.get_slot(index).chr_asm.head;
-            let body_protector_id = self.save.save_type.get_slot(index).chr_asm.chest;
-            let arms_protector_id = self.save.save_type.get_slot(index).chr_asm.arms;
-            let legs_protector_id = self.save.save_type.get_slot(index).chr_asm.legs;
+            if !Self::validate_armor_piece(head_protector_id, ProtectorCategory::Head) {return false;}
+            if !Self::validate_armor_piece(body_protector_id, ProtectorCategory::Body) {return false;}
+            if !Self::validate_armor_piece(arms_protector_id, ProtectorCategory::Arms) {return false;}
+            if !Self::validate_armor_piece(legs_protector_id, ProtectorCategory::Legs) {return false;}
 
-            if !Self::validate_armor_piece(head_protector_id, &protectors, ProtectorCategory::Head) {return false;}
-            if !Self::validate_armor_piece(body_protector_id, &protectors, ProtectorCategory::Body) {return false;}
-            if !Self::validate_armor_piece(arms_protector_id, &protectors, ProtectorCategory::Arms) {return false;}
-            if !Self::validate_armor_piece(legs_protector_id, &protectors, ProtectorCategory::Legs) {return false;}
+            let head_protector_id = save.save_type.get_slot(index).equipped_items.head ^ 0x10000000;
+            let body_protector_id = save.save_type.get_slot(index).equipped_items.chest ^ 0x10000000;
+            let arms_protector_id = save.save_type.get_slot(index).equipped_items.arms ^ 0x10000000;
+            let legs_protector_id = save.save_type.get_slot(index).equipped_items.legs ^ 0x10000000;
 
-            let head_protector_id = self.save.save_type.get_slot(index).equipped_items.head ^ 0x10000000;
-            let body_protector_id = self.save.save_type.get_slot(index).equipped_items.chest ^ 0x10000000;
-            let arms_protector_id = self.save.save_type.get_slot(index).equipped_items.arms ^ 0x10000000;
-            let legs_protector_id = self.save.save_type.get_slot(index).equipped_items.legs ^ 0x10000000;
-
-            if !Self::validate_armor_piece(head_protector_id, &protectors, ProtectorCategory::Head) {return false;}
-            if !Self::validate_armor_piece(body_protector_id, &protectors, ProtectorCategory::Body) {return false;}
-            if !Self::validate_armor_piece(arms_protector_id, &protectors, ProtectorCategory::Arms) {return false;}
-            if !Self::validate_armor_piece(legs_protector_id, &protectors, ProtectorCategory::Legs) {return false;}
+            if !Self::validate_armor_piece(head_protector_id, ProtectorCategory::Head) {return false;}
+            if !Self::validate_armor_piece(body_protector_id, ProtectorCategory::Body) {return false;}
+            if !Self::validate_armor_piece(arms_protector_id, ProtectorCategory::Arms) {return false;}
+            if !Self::validate_armor_piece(legs_protector_id, ProtectorCategory::Legs) {return false;}
 
             true
         }
 
-        fn is_physics_valid(&self, index: usize, goods: &PARAM::<EQUIP_PARAM_GOODS_ST>) -> bool {
-            let physics_slot1 = self.save.save_type.get_slot(index).equip_physics_data.slot1;
-            let physics_slot2 = self.save.save_type.get_slot(index).equip_physics_data.slot2;
+        fn is_physics_valid(save: &Save, index: usize) -> bool {
+            let physics_slot1 = save.save_type.get_slot(index).equip_physics_data.slot1;
+            let physics_slot2 = save.save_type.get_slot(index).equip_physics_data.slot2;
 
             // Check if same tear is in the both slots
-            if physics_slot1 != -1 && physics_slot2 != -1 && physics_slot1 == physics_slot2 { return false; }
+            if physics_slot1 != u32::MAX && physics_slot2 != u32::MAX && physics_slot1 == physics_slot2 { return false; }
 
             // Check if physic slot 1 is of type wondrous physics
-            if physics_slot1 != -1 {
-                let res_physics1_good = goods.rows.iter().find(|p| p.id == physics_slot1 as i32);
+            if physics_slot1 != u32::MAX {
+                let res_physics1_good = Regulation::equip_goods_param_map().get(&(physics_slot1 ^ 0xb0000000));
                 if res_physics1_good.is_some_and(|p| p.data.goodsType != 10) { return false; }
             }
             
             // Check if physic slot 2 is of type wondrous physics
-            if physics_slot2 != -1 {
-                let res_physics2_good = goods.rows.iter().find(|p| p.id == physics_slot2 as i32);
+            if physics_slot2 != u32::MAX {
+                let res_physics2_good = Regulation::equip_goods_param_map().get(&(physics_slot2 ^ 0xb0000000));
                 if res_physics2_good.is_some_and(|p| p.data.goodsType != 10) { return false; }
             }
 
             true
         }
         
-        fn is_equipped_items_valid(&self, index: usize, goods: &PARAM::<EQUIP_PARAM_GOODS_ST>) -> bool {
-            let quick_slot_items = &self.save.save_type.get_slot(index).equip_item_data.quick_slot_items;
-            let pouch_items = &self.save.save_type.get_slot(index).equip_item_data.pouch_items;
+        fn is_equipped_items_valid(save: &Save, index: usize) -> bool {
+            let quick_slot_items = &save.save_type.get_slot(index).equip_item_data.quick_slot_items;
+            let pouch_items = &save.save_type.get_slot(index).equip_item_data.pouch_items;
 
             // Check for invalid or duplicate quickslot items
             let mut item_ids = HashSet::new();
             for item in quick_slot_items.iter() {
                 if item.item_id == 0 { continue; }
-                if goods.rows.iter().find(|i| i.id == item.item_id as i32).is_none() { return false; }
+                if Regulation::equip_goods_param_map().get(&(item.item_id ^ 0xb0000000)).is_none() { println!("Item {} not found", item.item_id); return false; }
                 if let Some(_existing_id) = item_ids.get(&item.item_id) {
+                    println!("Duplicate item found: {}", _existing_id);
                     return false;
                 } else {
                     item_ids.insert(item.item_id);
@@ -167,8 +151,9 @@ pub mod validator {
             let mut item_ids = HashSet::new();
             for item in pouch_items.iter() {
                 if item.item_id == 0 { continue; }
-                if goods.rows.iter().find(|i| i.id == item.item_id as i32).is_none() { return false; }
+                if Regulation::equip_goods_param_map().get(&(item.item_id ^ 0xb0000000)).is_none() { println!("Item {} not found", item.item_id); return false; }
                 if let Some(_existing_id) = item_ids.get(&item.item_id) {
+                    println!("Duplicate item found: {}", _existing_id);
                     return false;
                 } else {
                     item_ids.insert(item.item_id);
@@ -179,8 +164,8 @@ pub mod validator {
 
         // region: utils
 
-        fn validate_armor_piece(id: i32, protector_params: &PARAM::<EQUIP_PARAM_PROTECTOR_ST>, protector_category: ProtectorCategory) -> bool {
-            let res_armor_piece = protector_params.rows.iter().find(|p| p.id == id);
+        fn validate_armor_piece(id: u32, protector_category: ProtectorCategory) -> bool {
+            let res_armor_piece = Regulation::equip_protectors_param_map().get(&id);
             if  res_armor_piece.is_none() { return false; }
             let armor_piece = res_armor_piece.unwrap();
             let armor_piece_pc =  ProtectorCategory::try_from(armor_piece.data.protectorCategory);

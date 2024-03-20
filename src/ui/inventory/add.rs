@@ -1,5 +1,5 @@
 use eframe::{egui::{self, Layout, Ui}, epaint::Color32};
-use crate::vm::{inventory::inventory::InventoryTypeRoute, regulation::regulation_view_model::WepType, vm::vm::ViewModel};
+use crate::{util::regulation::Regulation, vm::{inventory::inventory::InventoryTypeRoute, regulation::regulation_view_model::WepType, vm::vm::ViewModel}};
 
 pub fn add_inventory(ui: &mut Ui, vm:&mut ViewModel) {
     let regulation_vm = &mut vm.regulation;
@@ -37,7 +37,6 @@ pub fn add_inventory(ui: &mut Ui, vm:&mut ViewModel) {
 
             // Highlight active 
             match inventory_vm.current_type_route {
-                InventoryTypeRoute::None => {},
                 InventoryTypeRoute::CommonItems => {common_items.highlight();},
                 InventoryTypeRoute::KeyItems => {},
                 InventoryTypeRoute::Weapons => {weapons.highlight();},
@@ -65,8 +64,6 @@ pub fn add_inventory(ui: &mut Ui, vm:&mut ViewModel) {
             
             let row_height = 10.;
             match inventory_vm.current_type_route {
-                InventoryTypeRoute::None =>  {
-                },
                 InventoryTypeRoute::CommonItems => {
                     egui::ScrollArea::vertical().max_height(ui.available_height()-8.).show_rows(ui, row_height, regulation_vm.filtered_goods.len(), |ui, row_range|{
                         for i in row_range {
@@ -166,13 +163,13 @@ pub fn add_inventory(ui: &mut Ui, vm:&mut ViewModel) {
                             ui.add_space(8.);
                         });
                         match inventory_vm.current_type_route {
-                            InventoryTypeRoute::None =>  {
-                            },
                             InventoryTypeRoute::CommonItems | InventoryTypeRoute::KeyItems => {
-                                let res = regulation_vm.full_goods.rows.iter().find(|p| p.id == regulation_vm.selected_item.id as i32);
+                                let res = Regulation::equip_goods_param_map().get(&regulation_vm.selected_item.id);
                                 if res.is_some() {
                                     let item = res.unwrap();
-                                    let field = egui::widgets::DragValue::new(regulation_vm.selected_item.quantity.as_mut().unwrap()).clamp_range(1..=item.data.maxRepositoryNum);
+                                    let key_item = 1;
+                                    let max_repository_num = if item.data.goodsType == key_item {item.data.maxNum} else {item.data.maxRepositoryNum};
+                                    let field = egui::widgets::DragValue::new(regulation_vm.selected_item.quantity.as_mut().unwrap()).clamp_range(1..=max_repository_num);
                                     ui.horizontal(|ui|{
                                         let label = ui.label("Quantity");
                                         ui.add(field).labelled_by(label.id);
@@ -181,7 +178,7 @@ pub fn add_inventory(ui: &mut Ui, vm:&mut ViewModel) {
                             }
                             InventoryTypeRoute::Weapons => {
                                 egui::Grid::new("grid").num_columns(2).spacing([8., 8.]).show(ui,|ui| {
-                                    let res = regulation_vm.full_weapons.rows.iter().find(|p| p.id == regulation_vm.selected_item.id as i32);
+                                    let res = Regulation::equip_weapon_params_map().get(&regulation_vm.selected_item.id);
                                     if res.is_some() {
                                         let item = res.unwrap();
                                         let wep_type = WepType::from(item.data.wepType);
@@ -240,9 +237,9 @@ pub fn add_inventory(ui: &mut Ui, vm:&mut ViewModel) {
                         
                         egui::TopBottomPanel::bottom("add_button").show(ui.ctx(), |ui|{
                             egui::Frame::none().inner_margin(8.).show(ui, |ui|{
-                                ui.add_enabled_ui(false, |ui| {
+                                ui.add_enabled_ui(true, |ui| {
                                     if ui.add_sized([ui.available_width(), 40.], egui::Button::new("Add")).clicked() {
-                                        inventory_vm.add_item(&regulation_vm.selected_item);
+                                        inventory_vm.add_to_inventory(&regulation_vm.selected_item);
                                     }
                                 })
                             });

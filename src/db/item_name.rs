@@ -4,7 +4,7 @@ pub mod item_name {
 
     pub static ITEM_NAME: Lazy<Mutex<HashMap<u32, &str>>> = Lazy::new(|| {
         Mutex::new(HashMap::from([
-            (0,""),
+            (0,"Empty"),
             (10,""),
             (11,""),
             (12,""),

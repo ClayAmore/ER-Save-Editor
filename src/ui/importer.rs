@@ -36,7 +36,7 @@ pub mod import {
                 });
             }
             else {
-                ui.label(egui::RichText::new("Save file has invalid data!").color(Color32::DARK_RED));
+                ui.label(egui::RichText::new("Save file has irregular data!").color(Color32::DARK_RED));
             }
         });
     }

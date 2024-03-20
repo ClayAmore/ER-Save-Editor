@@ -392,7 +392,7 @@ pub mod params {
     // region: Row
     #[derive(Default, Clone)]
     pub struct Row<T> where T: Default + Clone{
-        pub id: i32,
+        pub id: u32,
         pub name: String,
         pub data: T,
         pub data_offset: i64,
@@ -402,13 +402,13 @@ pub mod params {
             let mut row: Row<T> = Row::default();
             let name_offset: i64;
             if (param.format2d & FormatFlags1::LongDataOffset).as_u8() != 0 {
-                row.id = br.read_i32()?;
+                row.id = br.read_u32()?;
                 br.read_i32()?;
                 row.data_offset = br.read_i64()?;
                 name_offset = br.read_i64()?;
             }
             else {
-                row.id = br.read_i32()?;
+                row.id = br.read_u32()?;
                 row.data_offset = br.read_i32()? as i64;
                 name_offset = br.read_i32()? as i64;
             }

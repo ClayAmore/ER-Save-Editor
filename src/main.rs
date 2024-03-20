@@ -13,7 +13,7 @@ use std::{fs::File, io::Write, path::PathBuf};
 use eframe::{egui::{self, text::LayoutJob, Align, FontSelection, Id, LayerId, Layout, Order, RichText, Rounding, Style}, epaint::Color32};
 use rfd::FileDialog;
 use save::save::save::{Save, SaveType};
-use ui::{events::events::events, general::general::general, importer::import::character_importer, inventory::inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
+use ui::{equipment::equipment::equipment, events::events::events, general::general::general, importer::import::character_importer, inventory::inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
 use vm::{importer::general_view_model::ImporterViewModel, vm::vm::ViewModel};
 use crate::write::write::Write as w; 
 
@@ -226,6 +226,7 @@ impl eframe::App for App {
                     Route::None => none(ui),
                     Route::General => general(ui, &mut self.vm),
                     Route::Stats => stats(ui, &mut self.vm),
+                    Route::Equipment => equipment(ui, &mut self.vm),
                     Route::Inventory => inventory(ui, &mut self.vm),
                     Route::EventFlags => events(ui, &mut self.vm),
                     Route::Regions => regions(ui, &mut self.vm),
@@ -260,7 +261,7 @@ impl eframe::App for App {
                         let style = Style::default();
                         let mut layout_job = LayoutJob::default();
                         if self.vm.active.is_some_and(|valid| !valid) {
-                            RichText::new("Save file has invalid data!\n\n")
+                            RichText::new("Save file has irregular data!\n\n")
                             .color(Color32::DARK_RED)
                             .append_to(
                                 &mut layout_job,

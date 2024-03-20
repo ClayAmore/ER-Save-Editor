@@ -1,8 +1,7 @@
 pub mod regulation_view_model {
-    use std::{cmp::Ordering, collections::HashMap, sync::Mutex};
-    use once_cell::sync::Lazy;
+    use std::cmp::Ordering;
     use strsim::sorensen_dice;
-    use crate::{db::{accessory_name::accessory_name::ACCESSORY_NAME, aow_name::aow_name::AOW_NAME, armor_name::armor_name::ARMOR_NAME, item_name::item_name::ITEM_NAME, weapon_name::weapon_name::WEAPON_NAME}, util::{param_structs::{EQUIP_PARAM_ACCESSORY_ST, EQUIP_PARAM_GEM_ST, EQUIP_PARAM_GOODS_ST, EQUIP_PARAM_PROTECTOR_ST, EQUIP_PARAM_WEAPON_ST}, params::params::{Param, PARAM}, regulation::Regulation}, vm::inventory::inventory::{InventoryItemType, InventoryTypeRoute}};
+    use crate::{util::regulation::Regulation, vm::inventory::inventory::{InventoryItemType, InventoryTypeRoute}};
     
 
     #[derive(Clone, PartialEq)]
@@ -183,28 +182,22 @@ pub mod regulation_view_model {
     
     #[derive(Default, Clone)]
     pub struct RegulationItemViewModel {
-        pub id: i32,
+        pub id: u32,
         pub name: String,
         pub max_held: i16,
         pub max_storage: i16,
         pub infusable: bool,
+        pub is_key_item: bool,
         pub item_type: InventoryItemType,
         pub wep_type: Option<WepType>, 
         pub quantity: Option<i16>,
         pub upgrade: Option<i16>,
-        pub infusion: Option<i32>,
+        pub infusion: Option<u32>,
         pub affinity: Option<i16>,
     }
 
     #[derive(Clone)]
     pub struct RegulationViewModel  {
-        params: HashMap<Param, Vec<u8>>,
-        pub full_goods: PARAM<EQUIP_PARAM_GOODS_ST>,
-        pub full_weapons: PARAM<EQUIP_PARAM_WEAPON_ST>,
-        pub full_protectors: PARAM<EQUIP_PARAM_PROTECTOR_ST>,
-        pub full_gems: PARAM<EQUIP_PARAM_GEM_ST>,
-        pub full_accessories: PARAM<EQUIP_PARAM_ACCESSORY_ST>,
-
         pub filtered_goods: Vec<RegulationItemViewModel>,
         pub filtered_weapons: Vec<RegulationItemViewModel>,
         pub filtered_protectors: Vec<RegulationItemViewModel>,
@@ -223,13 +216,6 @@ pub mod regulation_view_model {
     impl Default for RegulationViewModel {
         fn default() -> Self {
             Self { 
-                params: Default::default(),
-                full_goods: Default::default(),
-                full_weapons: Default::default(),
-                full_protectors: Default::default(),
-                full_gems: Default::default(),
-                full_accessories: Default::default(),
-                
                 filtered_goods: Default::default(),
                 filtered_weapons: Default::default(),
                 filtered_protectors: Default::default(),
@@ -248,38 +234,11 @@ pub mod regulation_view_model {
     }
 
     impl RegulationViewModel {
-        pub fn from_save(regulation: &[u8]) -> Self {
-            let mut regulation_vm = RegulationViewModel::default();
-            regulation_vm.params = Regulation::params_from_regulation(regulation).unwrap();
-            regulation_vm.full_goods = PARAM::<EQUIP_PARAM_GOODS_ST>::from_bytes(&regulation_vm.params[&Param::EquipParamGoods]).unwrap();
-            regulation_vm.full_weapons = PARAM::<EQUIP_PARAM_WEAPON_ST>::from_bytes(&regulation_vm.params[&Param::EquipParamWeapon]).unwrap();
-            regulation_vm.full_protectors = PARAM::<EQUIP_PARAM_PROTECTOR_ST>::from_bytes(&regulation_vm.params[&Param::EquipParamProtector]).unwrap();
-            regulation_vm.full_gems = PARAM::<EQUIP_PARAM_GEM_ST>::from_bytes(&regulation_vm.params[&Param::EquipParamGem]).unwrap();
-            regulation_vm.full_accessories = PARAM::<EQUIP_PARAM_ACCESSORY_ST>::from_bytes(&regulation_vm.params[&Param::EquipParamAccessory]).unwrap();
-
-            Self::try_fill_names::<EQUIP_PARAM_GOODS_ST>(&mut regulation_vm.full_goods, &ITEM_NAME);
-            Self::try_fill_names::<EQUIP_PARAM_WEAPON_ST>(&mut regulation_vm.full_weapons, &WEAPON_NAME);
-            Self::try_fill_names::<EQUIP_PARAM_PROTECTOR_ST>(&mut regulation_vm.full_protectors, &ARMOR_NAME);
-            Self::try_fill_names::<EQUIP_PARAM_GEM_ST>(&mut regulation_vm.full_gems, &AOW_NAME);
-            Self::try_fill_names::<EQUIP_PARAM_ACCESSORY_ST>(&mut regulation_vm.full_accessories, &ACCESSORY_NAME);
-
-            regulation_vm
-        }
-
-        fn try_fill_names<T>(param: &mut PARAM::<T>, map: &Lazy<Mutex<HashMap<u32, &str>>>) where T: Default + Clone {
-            param.rows.iter_mut().for_each(|entry| {
-                entry.name = match map.lock().unwrap().get(&(entry.id as u32)) {
-                    Some(name) => if !name.is_empty() {name.to_string()} else {format!("[UNKOWN_{}]", entry.id)},
-                    None => format!("[UNKOWN_{}]", entry.id),
-                };
-            });
-        }
-
         pub fn update_available_infusions(&mut self){
             self.selected_infusion = 0;
             self.available_infusions.clear();
             self.available_infusions.push(RegulationItemViewModel{
-                id: -1,
+                id: u32::MAX,
                 name: "-".to_string(),
                 ..Default::default()
             });
@@ -288,9 +247,9 @@ pub mod regulation_view_model {
             }
 
             let wep_type = self.selected_item.wep_type.as_ref();
-            self.available_infusions.extend(self.full_gems.rows
+            self.available_infusions.extend(Regulation::equip_gem_param_map()
             .iter()
-            .filter(|gem|{
+            .filter(|(_, gem)|{
                 match wep_type.unwrap() {
                     WepType::Dagger => {
                         gem.data.canMountWep_Dagger()
@@ -404,9 +363,9 @@ pub mod regulation_view_model {
                     },
                 }
             })
-            .map(|e| RegulationItemViewModel{
-                id: e.id,
-                name: e.name.to_string(),
+            .map(|(_, gem)| RegulationItemViewModel{
+                id: gem.id,
+                name: gem.name.to_string(),
                 max_held: 1,
                 max_storage: 1,
                 ..Default::default()
@@ -421,7 +380,7 @@ pub mod regulation_view_model {
             if self.available_infusions.len() == 0 {
                 return;
             }
-            let res = self.full_gems.rows.iter().find(|p| p.id == self.available_infusions[self.selected_infusion].id);
+            let res = Regulation::equip_gem_param_map().get(&self.available_infusions[self.selected_infusion].id);
             if res.is_some() {
                 let gem = res.unwrap();
                 if gem.data.configurableWepAttr00() {self.available_affinities.push(Affinity::Standard);}
@@ -453,34 +412,36 @@ pub mod regulation_view_model {
 
         pub fn filter(&mut self, inventory_type: &InventoryTypeRoute, filter_text: &str) {
             match inventory_type {
-                InventoryTypeRoute::None =>{
-                    
-                },
+                InventoryTypeRoute::KeyItems |
                 InventoryTypeRoute::CommonItems => {
                     // Compiling a list of item replacement ids to avoid showing double items such as, tarnished furled finger + used tarnished furled finger.  
-                    let replacement_items = self.full_goods.rows
+                    let replacement_items = Regulation::equip_goods_param_map()
                     .iter()
-                    .filter(|p| p.data.appearanceReplaceItemId != -1)
-                    .map(|r| r.data.appearanceReplaceItemId)
-                    .collect::<Vec<i32>>();
+                    .filter(|(_, good)| good.data.appearanceReplaceItemId != -1)
+                    .map(|(_, good)| good.data.appearanceReplaceItemId as u32)
+                    .collect::<Vec<u32>>();
                     
-                    self.filtered_goods = self.full_goods.rows.iter()
-                    .filter(|p| p.data.goodsUseAnim != 254)
-                    .map(|e| RegulationItemViewModel{
-                        id: e.id,
-                        name: e.name.to_string(),
-                        max_held: e.data.maxNum,
-                        max_storage: e.data.maxRepositoryNum,
+                    self.filtered_goods = Regulation::equip_goods_param_map()
+                    .iter()
+                    .filter(|(_, good)| good.data.goodsUseAnim != 254)
+                    .filter(|(_, good)| good.id < 1001 || good.id > 1025)
+                    .filter(|(_, good)| good.id < 1051 || good.id > 1075)
+                    .map(|(_, good)| RegulationItemViewModel{
+                        id: good.id,
+                        name: good.name.to_string(),
+                        max_held: good.data.maxNum,
+                        max_storage: good.data.maxRepositoryNum,
                         wep_type: None,
-                        quantity: Some(e.data.maxRepositoryNum),
+                        quantity: Some(good.data.maxRepositoryNum),
+                        is_key_item: good.data.goodsType == 1,
                         item_type: InventoryItemType::ITEM,
                         ..Default::default()
-                    }).filter(|i|{
+                    }).filter(|reg_item_vm|{
                         if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&i.name.to_lowercase(), &filter_text.to_lowercase());
+                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
                         distance > 0.3 
-                    }).filter(|i|{
-                        !replacement_items.contains(&i.id)
+                    }).filter(|reg_item_vm|{
+                        !replacement_items.contains(&reg_item_vm.id)
                     })
                     .collect::<Vec<RegulationItemViewModel>>(); 
 
@@ -495,24 +456,23 @@ pub mod regulation_view_model {
                         return Ordering::Equal;
                     })
                 },
-                InventoryTypeRoute::KeyItems => {
-                },
                 InventoryTypeRoute::Weapons => {
-                    self.filtered_weapons = self.full_weapons.rows.iter()
-                    .map(|e| RegulationItemViewModel{
-                        id: e.id,
-                        name: e.name.to_string(),
+                    self.filtered_weapons = Regulation::equip_weapon_params_map()
+                    .iter()
+                    .map(|(_,weapon)| RegulationItemViewModel{
+                        id: weapon.id,
+                        name: weapon.name.to_string(),
                         max_held: 1,
                         max_storage: 1,
-                        infusable: e.data.gemMountType == 2,
+                        infusable: weapon.data.gemMountType == 2,
                         item_type: InventoryItemType::WEAPON,
                         upgrade: Some(0),
-                        wep_type: Some(WepType::from(e.data.wepType)),
-                        quantity: if WepType::from(e.data.wepType) == WepType::Arrow 
-                        || WepType::from(e.data.wepType) == WepType::Greatarrow
-                        || WepType::from(e.data.wepType) == WepType::Bolt
-                        || WepType::from(e.data.wepType) == WepType::BallistaBolt {
-                            Some(e.data.maxArrowQuantity as i16)
+                        wep_type: Some(WepType::from(weapon.data.wepType)),
+                        quantity: if WepType::from(weapon.data.wepType) == WepType::Arrow 
+                        || WepType::from(weapon.data.wepType) == WepType::Greatarrow
+                        || WepType::from(weapon.data.wepType) == WepType::Bolt
+                        || WepType::from(weapon.data.wepType) == WepType::BallistaBolt {
+                            Some(weapon.data.maxArrowQuantity as i16)
                         } else {None},
                         ..Default::default()
                     }).filter(|i|{
@@ -535,19 +495,21 @@ pub mod regulation_view_model {
                     })
                 },
                 InventoryTypeRoute::Armors => {
-                    self.filtered_protectors = self.full_protectors.rows.iter().map(|e| RegulationItemViewModel{
-                        id: e.id,
-                        name: e.name.to_string(),
+                    self.filtered_protectors = Regulation::equip_protectors_param_map()
+                    .iter()
+                    .map(|(_, protector)| RegulationItemViewModel{
+                        id: protector.id,
+                        name: protector.name.to_string(),
                         max_held: 1,
                         max_storage: 1,
                         item_type: InventoryItemType::ARMOR,
                         ..Default::default()
-                    }).filter(|i|{
+                    }).filter(|reg_item_vm|{
                         if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&i.name.to_lowercase(), &filter_text.to_lowercase());
+                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
                         distance > 0.3 
-                    }).filter(|i|{
-                        i.id > 40000
+                    }).filter(|reg_item_vm|{
+                        reg_item_vm.id > 40000
                     }).collect::<Vec<RegulationItemViewModel>>();
 
                     self.filtered_protectors.sort_by(|a,b| {
@@ -562,19 +524,21 @@ pub mod regulation_view_model {
                     })
                 },
                 InventoryTypeRoute::AshOfWar => {
-                    self.filtered_gems = self.full_gems.rows.iter().map(|e| RegulationItemViewModel{
-                        id: e.id,
-                        name: e.name.to_string(),
+                    self.filtered_gems = Regulation::equip_gem_param_map()
+                    .iter()
+                    .map(|(_, gem)| RegulationItemViewModel{
+                        id: gem.id,
+                        name: gem.name.to_string(),
                         max_held: 1,
                         max_storage: 1,
                         item_type: InventoryItemType::AOW,
                         ..Default::default()
-                    }).filter(|i|{
+                    }).filter(|reg_item_vm|{
                         if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&i.name.to_lowercase(), &filter_text.to_lowercase());
+                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
                         distance > 0.3 
-                    }).filter(|i|{
-                        i.id > 10000
+                    }).filter(|reg_item_vm|{
+                        reg_item_vm.id > 10000
                     }).collect::<Vec<RegulationItemViewModel>>();
 
                     self.filtered_gems.sort_by(|a,b| {
@@ -589,16 +553,18 @@ pub mod regulation_view_model {
                     })
                 },
                 InventoryTypeRoute::Talismans => {
-                    self.filtered_accessories = self.full_accessories.rows.iter().map(|e| RegulationItemViewModel{
-                        id: e.id,
-                        name: e.name.to_string(),
+                    self.filtered_accessories = Regulation::equip_accessory_param_map()
+                    .iter()
+                    .map(|(_, accessory)| RegulationItemViewModel{
+                        id: accessory.id,
+                        name: accessory.name.to_string(),
                         max_held: 1,
                         max_storage: 1,
                         item_type: InventoryItemType::ACCESSORY,
                         ..Default::default()
-                    }).filter(|i|{
+                    }).filter(|reg_item_vm|{
                         if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&i.name.to_lowercase(), &filter_text.to_lowercase());
+                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
                         distance > 0.3 
                     }).collect::<Vec<RegulationItemViewModel>>();
 
