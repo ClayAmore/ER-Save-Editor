@@ -1,5 +1,5 @@
 pub mod inventory {
-    use eframe::egui::{self, Ui};
+    use eframe::egui::{self, Color32, Ui};
     use crate::ui::inventory::{add::add_inventory, browse::browse_inventory};
     use crate::vm::{inventory::inventory::InventoryRoute, vm::vm::ViewModel};
 
@@ -9,12 +9,17 @@ pub mod inventory {
             .id_source("inventory_item_type_menu")
             .show(ui, |ui| {
                 ui.vertical(|ui| {
-                    let add_items = ui.add_sized([120., 60.], egui::Button::new("Add\n(WORK IN PROGRESS)"));
+                    let add_items = ui.add_sized([120., 60.], egui::Button::new("Add\n(WIP)"));
                     let browse_items = ui.add_sized([120., 40.], egui::Button::new("Browse"));
 
                     if add_items.clicked() {
                         vm.slots[vm.index].inventory_vm.filter();
                         vm.slots[vm.index].inventory_vm.current_route = InventoryRoute::Add
+                    }
+                    if add_items.hovered() {
+                        egui::popup::show_tooltip(ui.ctx(), add_items.id, |ui|{
+                            ui.label(egui::RichText::new("Warning: This is an experimental feature that is still being worked on. Use with catution. If you discover any bugs, report them to todo{add address or info about bug reports}.").size(8.0).color(Color32::PLACEHOLDER));
+                        });
                     }
                     if browse_items.clicked() {
                         vm.slots[vm.index].inventory_vm.filter();
