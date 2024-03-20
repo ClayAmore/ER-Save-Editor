@@ -2,7 +2,6 @@ use eframe::{egui::{self, Margin, TextFormat, Ui}, epaint::{text::LayoutJob, Col
 use crate::vm::{inventory::inventory::{InventoryItemViewModel, InventoryTypeRoute}, vm::vm::ViewModel};
 
 pub fn browse_inventory(ui: &mut Ui, vm:&mut ViewModel) {
-    let empty: Vec<InventoryItemViewModel> = vec![];
     let inventory_vm = &mut vm.slots[vm.index].inventory_vm;
     
     ui.columns(2, |uis| {
