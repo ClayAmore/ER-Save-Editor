@@ -37,7 +37,7 @@ pub mod inventory_view_model {
         Pouch
     }
 
-    #[derive(Clone, Default, Copy)]
+    #[derive(PartialEq, Clone, Default, Copy)]
     pub enum InventoryItemType {
         #[default] None = -1,
         WEAPON = 0x0,
@@ -110,8 +110,11 @@ pub mod inventory_view_model {
             let item_type_specific = match gaitem_type {
                 InventoryGaitemType::WEAPON => {
                     let id = (gaitem.item_id / 100)*100;
+                    let upgrade_level = gaitem.item_id % 100;
                     (gaitem.item_id, match WEAPON_NAME.lock().unwrap().get(&id) {
-                        Some(name) => if !name.is_empty() {name.to_string()} else {format!("[UNKOWN_{}]", id)},
+                        Some(name) => if !name.is_empty() {
+                            if upgrade_level > 0 {format!("{} +{}", name, upgrade_level)} else {name.to_string()}
+                        } else {format!("[UNKOWN_{}]", id)},
                         None => format!("[UNKOWN_{}]", id),
                     })
                 },
@@ -561,6 +564,9 @@ pub mod inventory_view_model {
         }
     
         pub fn add_to_inventory(&mut self, item: &RegulationItemViewModel) {
+            // Moved outside of the match scop in order to be used in the log at the end of the function
+            // (This needs a major rewrite)
+            let mut weapon_name = String::new();
             match item.item_type {
                 InventoryItemType::WEAPON => {
                     // If weapon has ash of war then handle adding the ash of war to the inventory
@@ -601,11 +607,17 @@ pub mod inventory_view_model {
                         None => 0,
                     };
                     
-
                     // Construct an item_id by combining the different configuration to the weapon
                     // Weapon Id + Affinty Id + Upgrade level
                     let item_id = item.id + upgrade_level + affinity_id;
                     let gaitem_handle = u32::from_be_bytes([0x80, self.part_gaitem_handle, self.next_gaitem_handle.to_be_bytes()[2], self.next_gaitem_handle.to_be_bytes()[3]]);
+
+                    // Try to fetch weapon name from WEAPON_NAME db in order to include infusion in the name,
+                    // fallback to weapon name from regulation
+                    weapon_name = match WEAPON_NAME.lock().unwrap().get(&((item_id/100)*100)) {
+                        Some(name) => if upgrade_level > 0 {format!("{} +{}", name, upgrade_level)} else {name.to_string()},
+                        None => if upgrade_level > 0 {format!("{} +{}", item.name, upgrade_level)} else {item.name.to_string()},
+                    };
 
                     // Add gaitem
                     self.gaitem_map[self.next_armament_or_armor_index] = GaItem {
@@ -627,7 +639,7 @@ pub mod inventory_view_model {
                         equip_index: items_next_equip_index as u32,
                         quantity: match item.quantity { Some(quantity) => quantity as u32, None => 1, },
                         inventory_index: items_next_acquisiton_sort_order_index,
-                        item_name: item.name.to_string(),
+                        item_name: weapon_name.to_string(),
                         r#type: InventoryGaitemType::WEAPON
                     };
                     
@@ -963,7 +975,10 @@ pub mod inventory_view_model {
 
                 },
             }
-            self.log.insert(0, format!("> Added {} {}", match item.quantity { Some(n) => n, None => 1 }, item.name))
+            
+            self.log.insert(0, format!("> Added {} {}", match item.quantity { Some(n) => n, None => 1 }, 
+                if item.item_type == InventoryItemType::WEAPON { &weapon_name } else { &item.name }
+            ))
         }
     }
 }

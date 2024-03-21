@@ -17,6 +17,8 @@ pub mod regions {
                 select_open_world_checkbox(ui, regions, "Open World");
                 ui.separator();
                 select_dungeon_checkbox(ui, regions, "Dungeon");
+                ui.separator();
+                select_bosses_checkbox(ui, regions, "Bosses");
             });
             ui.separator();
             
@@ -54,21 +56,21 @@ pub mod regions {
     }
 
     
-    fn select_all_checkbox<T>(ui: &mut Ui, map: &mut BTreeMap<T, (bool, bool, bool)>, label: &str) {
+    fn select_all_checkbox<T>(ui: &mut Ui, map: &mut BTreeMap<T, (bool, bool, bool, bool)>, label: &str) {
         let mut state = State::Off;
-        if map.values().all(|w|w.0) {
+        if map.values().all(|(on,_,_,_)| *on) {
             state = State::On;
         }
-        else if map.values().any(|w|w.0) {
+        else if map.values().any(|(on,_,_,_)| *on) {
             state = State::InBetween;
         }
 
         ui.horizontal(|ui| {
             if three_states_checkbox(ui, &state).clicked() {
                 match state {
-                    State::Off => map.values_mut().for_each(|w| w.0 = true),
-                    State::On => map.values_mut().for_each(|w| w.0 = false),
-                    State::InBetween => map.values_mut().for_each(|w| w.0 = true),
+                    State::Off => map.values_mut().for_each(|(on,_,_,_)| *on = true),
+                    State::On => map.values_mut().for_each(|(on,_,_,_)| *on = false),
+                    State::InBetween => map.values_mut().for_each(|(on,_,_,_)| *on = true),
                 }
             }
             ui.label(label);
@@ -76,43 +78,63 @@ pub mod regions {
     }
 
     
-    fn select_open_world_checkbox<T>(ui: &mut Ui, map: &mut BTreeMap<T, (bool, bool, bool)>, label: &str) {
+    fn select_open_world_checkbox<T>(ui: &mut Ui, map: &mut BTreeMap<T, (bool, bool, bool, bool)>, label: &str) {
         let mut state = State::Off;
-        if map.values().filter(|r| r.1).all(|w|w.0) {
+        if map.values().filter(|(_, is_open_world,_,_)|*is_open_world).all(|(on,_,_,_)| *on) {
             state = State::On;
         }
-        else if map.values().filter(|r| r.1).any(|w|w.0) {
+        else if map.values().filter(|(_, is_open_world,_,_)|*is_open_world).any(|(on,_,_,_)| *on) {
             state = State::InBetween;
         }
 
         ui.horizontal(|ui| {
             if three_states_checkbox(ui, &state).clicked() {
                 match state {
-                    State::Off => map.values_mut().filter(|r| r.1).for_each(|w| w.0 = true),
-                    State::On => map.values_mut().filter(|r| r.1).for_each(|w| w.0 = false),
-                    State::InBetween => map.values_mut().filter(|r| r.1).for_each(|w| w.0 = true),
+                    State::Off => map.values_mut().filter(|(_, is_open_world,_,_)|*is_open_world).for_each(|(on,_,_,_)| *on = true),
+                    State::On => map.values_mut().filter(|(_, is_open_world,_,_)|*is_open_world).for_each(|(on,_,_,_)| *on = false),
+                    State::InBetween => map.values_mut().filter(|(_, is_open_world,_,_)|*is_open_world).for_each(|(on,_,_,_)| *on = true),
                 }
             }
             ui.label(label);
         });
     }
-
     
-    fn select_dungeon_checkbox<T>(ui: &mut Ui, map: &mut BTreeMap<T, (bool, bool, bool)>, label: &str) {
+    fn select_dungeon_checkbox<T>(ui: &mut Ui, map: &mut BTreeMap<T, (bool, bool, bool, bool)>, label: &str) {
         let mut state = State::Off;
-        if map.values().filter(|r| r.2).all(|w|w.0) {
+        if map.values().filter(|(_,_, is_dungeon,_)| *is_dungeon).all(|(on,_,_,_)| *on) {
             state = State::On;
         }
-        else if map.values().filter(|r| r.2).any(|w|w.0) {
+        else if map.values().filter(|(_,_, is_dungeon,_)| *is_dungeon).any(|(on,_,_,_)| *on) {
             state = State::InBetween;
         }
 
         ui.horizontal(|ui| {
             if three_states_checkbox(ui, &state).clicked() {
                 match state {
-                    State::Off => map.values_mut().filter(|r| r.2).for_each(|w| w.0 = true),
-                    State::On => map.values_mut().filter(|r| r.2).for_each(|w| w.0 = false),
-                    State::InBetween => map.values_mut().filter(|r| r.2).for_each(|w| w.0 = true),
+                    State::Off => map.values_mut().filter(|(_,_, is_dungeon,_)| *is_dungeon).for_each(|(on,_,_,_)| *on = true),
+                    State::On => map.values_mut().filter(|(_,_, is_dungeon,_)| *is_dungeon).for_each(|(on,_,_,_)| *on = false),
+                    State::InBetween => map.values_mut().filter(|(_,_, is_dungeon,_)| *is_dungeon).for_each(|(on,_,_,_)| *on = true),
+                }
+            }
+            ui.label(label);
+        });
+    }
+    
+    fn select_bosses_checkbox<T>(ui: &mut Ui, map: &mut BTreeMap<T, (bool, bool, bool, bool)>, label: &str) {
+        let mut state = State::Off;
+        if map.values().filter(|(_,_,_, is_boss)| *is_boss).all(|(on,_,_,_)| *on) {
+            state = State::On;
+        }
+        else if map.values().filter(|(_,_,_, is_boss)| *is_boss).any(|(on,_,_,_)| *on) {
+            state = State::InBetween;
+        }
+
+        ui.horizontal(|ui| {
+            if three_states_checkbox(ui, &state).clicked() {
+                match state {
+                    State::Off => map.values_mut().filter(|(_,_,_, is_boss)| *is_boss).for_each(|(on,_,_,_)| *on = true),
+                    State::On => map.values_mut().filter(|(_,_,_, is_boss)| *is_boss).for_each(|(on,_,_,_)| *on = false),
+                    State::InBetween => map.values_mut().filter(|(_,_,_, is_boss)| *is_boss).for_each(|(on,_,_,_)| *on = true),
                 }
             }
             ui.label(label);

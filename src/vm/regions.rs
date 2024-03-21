@@ -6,18 +6,18 @@ pub mod regions_view_model {
     #[derive(Clone)]
     pub struct RegionsViewModel  {
         pub region_groups: BTreeMap<MapName, Vec<Region>>,
-        pub regions: BTreeMap<Region, (bool, bool, bool)>, // (on/off, is_open_world, is_dungeon)
+        pub regions: BTreeMap<Region, (bool, bool, bool, bool)>, // (on/off, is_open_world, is_dungeon, is_boss)
     }
 
     impl Default for RegionsViewModel {
         fn default() -> Self {
             let mut region_groups: BTreeMap<MapName, Vec<Region>> = REGIONS.lock().unwrap().iter().map(|r| (r.1.2, Vec::new())).collect();
-            let mut regions: BTreeMap<Region, (bool, bool, bool)> = BTreeMap::new();
+            let mut regions: BTreeMap<Region, (bool, bool, bool, bool)> = BTreeMap::new();
 
-            for (region, region_info) in REGIONS.lock().unwrap().iter() {
-                regions.insert(*region, (false, region_info.3, region_info.4));
-                region_groups.get_mut(&region_info.2).expect("").push(*region);
-                region_groups.get_mut(&region_info.2).expect("").sort();
+            for (region, (_,_, map, is_open_world, is_dungeon, is_boss)) in REGIONS.lock().unwrap().iter() {
+                regions.insert(*region, (false, *is_open_world, *is_dungeon, *is_boss));
+                region_groups.get_mut(&map).expect("").push(*region);
+                region_groups.get_mut(&map).expect("").sort();
             }
 
             Self { region_groups, regions }

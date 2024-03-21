@@ -246,7 +246,7 @@ pub mod vm {
         }
 
         fn update_regions(&self, save_type: &mut SaveType, index: usize) {
-            for (region, (activated, _, _)) in self.slots[index].regions_vm.regions.iter() {
+            for (region, (activated, _, _,_)) in self.slots[index].regions_vm.regions.iter() {
                 let region_id = REGIONS.lock().unwrap()[region].0;
                 if *activated {
                     save_type.add_region(index, region_id);
