@@ -1,5 +1,5 @@
 pub mod slot_view_model {
-    use crate::{save::common::save_slot::SaveSlot, vm::{equipment::equipment_view_model::EquipmentViewModel, events::events_view_model::EventsViewModel, general::general_view_model::GeneralViewModel, inventory::inventory::InventoryViewModel, regions::regions_view_model::RegionsViewModel, stats::stats_view_model::StatsViewModel}};
+    use crate::{save::common::save_slot::SaveSlot, vm::{equipment::equipment_view_model::EquipmentViewModel, events::events_view_model::EventsViewModel, general::general_view_model::GeneralViewModel, inventory::inventory_view_model::InventoryViewModel, regions::regions_view_model::RegionsViewModel, stats::stats_view_model::StatsViewModel}};
 
 
     #[derive(Default, Clone)]

@@ -1,7 +1,7 @@
 pub mod inventory {
     use eframe::egui::{self, Color32, Ui};
     use crate::ui::inventory::{add::add_inventory, browse::browse_inventory};
-    use crate::vm::{inventory::inventory::InventoryRoute, vm::vm::ViewModel};
+    use crate::vm::{inventory::inventory_view_model::InventoryRoute, vm::vm::ViewModel};
 
     pub fn inventory(ui: &mut Ui, vm:&mut ViewModel) {
         egui::SidePanel::left("inventory_menu").show(ui.ctx(), |ui|{

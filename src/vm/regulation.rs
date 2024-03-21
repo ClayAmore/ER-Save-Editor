@@ -1,7 +1,7 @@
 pub mod regulation_view_model {
     use std::cmp::Ordering;
     use strsim::sorensen_dice;
-    use crate::{util::regulation::Regulation, vm::inventory::inventory::{InventoryItemType, InventoryTypeRoute}};
+    use crate::{util::regulation::Regulation, vm::inventory::inventory_view_model::{InventoryItemType, InventoryTypeRoute}};
     
 
     #[derive(Clone, PartialEq)]

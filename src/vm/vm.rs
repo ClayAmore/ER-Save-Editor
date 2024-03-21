@@ -9,7 +9,7 @@ pub mod vm {
             regions::regions::REGIONS, 
             stats::stats::{FP, HP, SP}, 
             summoning_pools::summoning_pools::SUMMONING_POOLS, 
-            whetblades::whetblades::WHETBLADES}, save::{common::save_slot::{EquipInventoryData, EquipInventoryItem}, save::save::{Save, SaveType}}, util::{regulation::Regulation, validator::validator::Validator}, vm::{inventory::inventory::{InventoryGaitemType, InventoryItemType}, profile_summary::slot_view_model::ProfileSummaryViewModel, regulation::regulation_view_model::RegulationViewModel, slot::slot_view_model::SlotViewModel}};
+            whetblades::whetblades::WHETBLADES}, save::{common::save_slot::{EquipInventoryData, EquipInventoryItem}, save::save::{Save, SaveType}}, util::{regulation::Regulation, validator::validator::Validator}, vm::{inventory::inventory_view_model::{InventoryGaitemType, InventoryItemType}, profile_summary::slot_view_model::ProfileSummaryViewModel, regulation::regulation_view_model::RegulationViewModel, slot::slot_view_model::SlotViewModel}};
     
     
     #[derive(Clone)]
@@ -246,7 +246,7 @@ pub mod vm {
         }
 
         fn update_regions(&self, save_type: &mut SaveType, index: usize) {
-            for (region, activated) in self.slots[index].regions_vm.regions.iter() {
+            for (region, (activated, _, _)) in self.slots[index].regions_vm.regions.iter() {
                 let region_id = REGIONS.lock().unwrap()[region].0;
                 if *activated {
                     save_type.add_region(index, region_id);

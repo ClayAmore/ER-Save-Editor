@@ -1,5 +1,5 @@
 use eframe::{egui::{self, Layout, Ui}, epaint::Color32};
-use crate::{util::regulation::Regulation, vm::{inventory::inventory::InventoryTypeRoute, regulation::regulation_view_model::WepType, vm::vm::ViewModel}};
+use crate::{util::regulation::Regulation, vm::{inventory::inventory_view_model::InventoryTypeRoute, regulation::regulation_view_model::WepType, vm::vm::ViewModel}};
 
 pub fn add_inventory(ui: &mut Ui, vm:&mut ViewModel) {
     let regulation_vm = &mut vm.regulation;

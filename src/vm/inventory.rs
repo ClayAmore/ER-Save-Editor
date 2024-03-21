@@ -1,4 +1,4 @@
-pub mod inventory {
+pub mod inventory_view_model {
     use std::cmp::{min, Ordering};
     use strsim::sorensen_dice;
 
