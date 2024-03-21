@@ -443,6 +443,9 @@ pub mod regulation_view_model {
                     }).filter(|reg_item_vm|{
                         !replacement_items.contains(&reg_item_vm.id)
                     })
+                    .filter(|reg_item_vm|
+                        reg_item_vm.id > 9100 || reg_item_vm.id < 9000
+                    )
                     .collect::<Vec<RegulationItemViewModel>>(); 
 
                     self.filtered_goods.sort_by(|a,b| {

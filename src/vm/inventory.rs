@@ -963,7 +963,7 @@ pub mod inventory {
 
                 },
             }
-            self.log.push(format!("> Added {} {}", match item.quantity { Some(n) => n, None => 1 }, item.name))
+            self.log.insert(0, format!("> Added {} {}", match item.quantity { Some(n) => n, None => 1 }, item.name))
         }
     }
 }
