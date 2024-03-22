@@ -1,3 +1,5 @@
+// Region data such as classification of an area as open world area, dungeon area or near boss area 
+// are from TGA table https://github.com/The-Grand-Archives/Elden-Ring-CT-TGA
 pub mod regions {
     use std::{collections::HashMap, sync::Mutex};
     use once_cell::sync::Lazy;

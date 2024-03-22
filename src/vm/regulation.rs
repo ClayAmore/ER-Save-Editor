@@ -1,7 +1,7 @@
 pub mod regulation_view_model {
     use std::cmp::Ordering;
     use strsim::sorensen_dice;
-    use crate::{util::regulation::Regulation, vm::inventory::inventory_view_model::{InventoryItemType, InventoryTypeRoute}};
+    use crate::{util::regulation::Regulation, vm::inventory::{InventoryItemType, InventoryTypeRoute}};
     
 
     #[derive(Clone, PartialEq)]
@@ -179,6 +179,50 @@ pub mod regulation_view_model {
             }
         }
     }
+
+    #[derive(PartialEq, Copy, Clone)]
+    pub enum GoodsType {
+        NormalItem,
+        KeyItem,
+        CraftingMaterial,
+        Rememberance,
+        Sorcery = 5,
+        SpiritSummonLesser = 7,
+        SpiritSummonGreater,
+        WonderousPhysics,
+        WonderousPhysicsTears,
+        RegenerativeMaterial,
+        InfoItem,
+        ReinforcementMaterial = 14,
+        GreatRune,
+        Incantation,
+        SelfBuffSorcery,
+        SelfBuffIncanation,
+        Unknown
+    }
+    impl From<u8> for GoodsType {
+        fn from(value: u8) -> Self {
+            match value {
+                0 => GoodsType::NormalItem, 
+                1 => GoodsType::KeyItem, 
+                2 => GoodsType::CraftingMaterial, 
+                3 => GoodsType::Rememberance, 
+                5 => GoodsType::Sorcery, 
+                7 => GoodsType::SpiritSummonLesser, 
+                8 => GoodsType::SpiritSummonGreater, 
+                9 => GoodsType::WonderousPhysics, 
+                10 => GoodsType::WonderousPhysicsTears, 
+                11 => GoodsType::RegenerativeMaterial, 
+                12 => GoodsType::InfoItem, 
+                14 => GoodsType::ReinforcementMaterial, 
+                15 => GoodsType::GreatRune, 
+                16 => GoodsType::Incantation, 
+                17 => GoodsType::SelfBuffSorcery, 
+                18 => GoodsType::SelfBuffIncanation, 
+                _ => GoodsType::Unknown
+            }
+        }
+    }
     
     #[derive(Default, Clone)]
     pub struct RegulationItemViewModel {
@@ -196,7 +240,7 @@ pub mod regulation_view_model {
         pub affinity: Option<i16>,
     }
 
-    #[derive(Clone)]
+    #[derive(Default, Clone)]
     pub struct RegulationViewModel  {
         pub filtered_goods: Vec<RegulationItemViewModel>,
         pub filtered_weapons: Vec<RegulationItemViewModel>,
@@ -211,26 +255,6 @@ pub mod regulation_view_model {
 
         pub selected_affinity: usize,
         pub available_affinities: Vec<Affinity>,
-    }
-
-    impl Default for RegulationViewModel {
-        fn default() -> Self {
-            Self { 
-                filtered_goods: Default::default(),
-                filtered_weapons: Default::default(),
-                filtered_protectors: Default::default(),
-                filtered_gems: Default::default(),
-                filtered_accessories: Default::default(),
-
-                selected_item: Default::default(),
-
-                selected_infusion: 0,
-                available_infusions: Default::default(),
-
-                selected_affinity: 0,
-                available_affinities: Default::default(),
-            }
-        }
     }
 
     impl RegulationViewModel {
@@ -433,7 +457,7 @@ pub mod regulation_view_model {
                         max_storage: good.data.maxRepositoryNum,
                         wep_type: None,
                         quantity: Some(good.data.maxRepositoryNum),
-                        is_key_item: good.data.goodsType == 1,
+                        is_key_item: GoodsType::from(good.data.goodsType) == GoodsType::KeyItem,
                         item_type: InventoryItemType::ITEM,
                         ..Default::default()
                     }).filter(|reg_item_vm|{

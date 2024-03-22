@@ -3,7 +3,7 @@ pub mod equipment {
 
     use eframe::egui::{self, Color32, Layout, Ui, Vec2};
 
-    use crate::vm::{inventory::inventory_view_model::InventorySubTypeRoute, vm::vm::ViewModel};
+    use crate::vm::{inventory::InventorySubTypeRoute, vm::vm::ViewModel};
 
     const EQUIPMENT_BOX_WIDTH: f32 = 110.; 
 

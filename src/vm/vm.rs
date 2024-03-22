@@ -9,7 +9,26 @@ pub mod vm {
             regions::regions::REGIONS, 
             stats::stats::{FP, HP, SP}, 
             summoning_pools::summoning_pools::SUMMONING_POOLS, 
-            whetblades::whetblades::WHETBLADES}, save::{common::save_slot::{EquipInventoryData, EquipInventoryItem}, save::save::{Save, SaveType}}, util::{regulation::Regulation, validator::validator::Validator}, vm::{inventory::inventory_view_model::{InventoryGaitemType, InventoryItemType}, profile_summary::slot_view_model::ProfileSummaryViewModel, regulation::regulation_view_model::RegulationViewModel, slot::slot_view_model::SlotViewModel}};
+            whetblades::whetblades::WHETBLADES
+        }, 
+        save::{
+            common::save_slot::{
+                EquipInventoryData, 
+                EquipInventoryItem
+            }, 
+            save::save::{
+                Save, SaveType
+            }}, util::{
+                regulation::Regulation, 
+                validator::validator::Validator
+            }, vm::{
+                inventory::{
+                    InventoryGaitemType, InventoryItemType
+                }, 
+                profile_summary::slot_view_model::ProfileSummaryViewModel, 
+                regulation::regulation_view_model::RegulationViewModel, 
+                slot::slot_view_model::SlotViewModel
+            }};
     
     
     #[derive(Clone)]

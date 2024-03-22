@@ -15,3 +15,8 @@ pub mod colosseums;
 pub mod regions;
 pub mod classes;
 pub mod stats;
+pub mod weapons;
+pub mod armors;
+pub mod aows;
+pub mod talismans;
+pub mod items;

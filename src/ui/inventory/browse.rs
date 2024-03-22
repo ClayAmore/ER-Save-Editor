@@ -1,5 +1,5 @@
 use eframe::{egui::{self, Margin, TextFormat, Ui}, epaint::{text::LayoutJob, Color32}};
-use crate::vm::{inventory::inventory_view_model::InventoryTypeRoute, vm::vm::ViewModel};
+use crate::vm::{inventory::InventoryTypeRoute, vm::vm::ViewModel};
 
 pub fn browse_inventory(ui: &mut Ui, vm:&mut ViewModel) {
     let inventory_vm = &mut vm.slots[vm.index].inventory_vm;

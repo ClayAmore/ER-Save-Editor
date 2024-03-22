@@ -16,7 +16,7 @@ pub mod regions {
                 ui.separator();
                 select_open_world_checkbox(ui, regions, "Open World");
                 ui.separator();
-                select_dungeon_checkbox(ui, regions, "Dungeon");
+                select_dungeon_checkbox(ui, regions, "Dungeons");
                 ui.separator();
                 select_bosses_checkbox(ui, regions, "Bosses");
             });
