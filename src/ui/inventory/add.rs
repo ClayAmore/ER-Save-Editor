@@ -116,7 +116,7 @@ pub fn add_single(ui: &mut Ui, vm:&mut ViewModel) {
         }
         else {
             // Bulk items list view
-            bulk(ui, regulation_vm, inventory_vm);
+            bulk(ui, inventory_vm);
         }
     });
 
@@ -253,16 +253,8 @@ fn single(ui: &mut Ui, regulation_vm: &mut RegulationViewModel, inventory_vm: &m
     });
 }
 
-fn bulk(ui: &mut Ui, regulation_vm: &mut RegulationViewModel, inventory_vm: &mut InventoryViewModel) {
+fn bulk(ui: &mut Ui, inventory_vm: &mut InventoryViewModel) {
     ui.with_layout(Layout::top_down(egui::Align::Min), |ui| {
-        ui.add_space(8.);
-        ui.horizontal(|ui|{
-            let label = ui.label("Filter:");
-            if ui.add(egui::TextEdit::singleline(&mut inventory_vm.filter_text)).labelled_by(label.id).changed() {
-                regulation_vm.filter(&inventory_vm.current_type_route, &inventory_vm.filter_text);
-            };
-        });
-        ui.separator();
         ui.add_space(8.);
 
         ui.horizontal(|ui| {

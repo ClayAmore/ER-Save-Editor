@@ -67,7 +67,7 @@ impl InventoryViewModel {
                 // Add gaitem
                 self.gaitem_map[self.next_armament_or_armor_index] = GaItem {
                     gaitem_handle: gaitem_handle,
-                    item_id: item.id,
+                    item_id: item_id,
                     aow_gaitem_handle: gem_gaitem_handle,
                     ..Default::default()
                 };
@@ -80,7 +80,7 @@ impl InventoryViewModel {
                 let items_next_acquisiton_sort_order_index = storage.next_acquisition_sort_order_index;
                 items[items_next_index as usize] = InventoryItemViewModel{
                     ga_item_handle: gaitem_handle,
-                    item_id: item.id,
+                    item_id: item_id,
                     equip_index: items_next_equip_index as u32,
                     quantity: match item.quantity { Some(quantity) => quantity as u32, None => 1, },
                     inventory_index: items_next_acquisiton_sort_order_index,
