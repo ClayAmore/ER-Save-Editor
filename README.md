@@ -18,7 +18,7 @@ Tool for editing Elden Ring save files. Compatible with PC and Playstation Save 
 - Add items, weapons, armors, ashes of war, and talismans to inventory
 - Add items in bulk to speed up build making process.
 - Browse inventory
-- Customize player equipment
+- Change player equipment
 - Activate/deactivate Sites of Grace, summoning pools, colosseums, etc.
 - Revive or kill bosses
 - Activate/deactivate invasion regions
