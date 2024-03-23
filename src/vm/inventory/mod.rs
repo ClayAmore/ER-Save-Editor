@@ -10,11 +10,7 @@ use crate::{
         weapon_name::weapon_name::WEAPON_NAME, 
     }, 
     save::common::save_slot::{
-        EquipInventoryData, 
-        EquipInventoryItem, 
-        GaItem,
-        GaItemData, 
-        SaveSlot
+        EquipInventoryData, EquipInventoryItem, EquipProjectileData, GaItem, GaItemData, SaveSlot
     }, 
     util::regulation::Regulation, vm::regulation::regulation_view_model::WepType
 };
@@ -209,6 +205,7 @@ pub struct InventoryViewModel  {
     pub storage: Vec<InventoryStorage>,
     pub infusions: Vec<(i32, String)>,
     pub gaitem_map: Vec<GaItem>,
+    pub projectile_list: EquipProjectileData,
     pub gaitem_data: GaItemData,
     pub bulk_items_selected: Vec<HashMap<u32, bool>>,
     pub bulk_items_max_quantity: bool,
@@ -228,7 +225,7 @@ pub struct InventoryViewModel  {
     // Indexes for when adding items
     next_gaitem_handle: u32,
     part_gaitem_handle: u8,
-    next_ash_of_war_gaitem_index: usize,
+    next_aow_index: usize,
     next_armament_or_armor_index: usize,
 }
 
@@ -245,10 +242,13 @@ impl InventoryViewModel {
         // Gaitem_data
         inventory_vm.gaitem_data = slot.ga_item_data.clone();
 
+        // Projectile list
+        inventory_vm.projectile_list = slot.equip_projectile_data.clone();
+
         // Find the next gaitem_handle used when adding new weapon, armors or ashes of war
         inventory_vm.gaitem_map.iter().enumerate().for_each(| (index, gaitem)| {
             if (gaitem.gaitem_handle & 0xF0000000) == InventoryGaitemType::AOW as u32 {
-                inventory_vm.next_ash_of_war_gaitem_index = index;
+                inventory_vm.next_aow_index = index;
             }
             if (gaitem.gaitem_handle & 0xFFFF) > (inventory_vm.next_gaitem_handle) {
                 inventory_vm.next_gaitem_handle = gaitem.gaitem_handle & 0xFFFF;
@@ -259,7 +259,7 @@ impl InventoryViewModel {
         
         
         inventory_vm.next_gaitem_handle = inventory_vm.next_gaitem_handle + 1;
-        inventory_vm.next_ash_of_war_gaitem_index = inventory_vm.next_ash_of_war_gaitem_index + 1;
+        inventory_vm.next_aow_index = inventory_vm.next_aow_index + 1;
         inventory_vm.next_armament_or_armor_index = inventory_vm.next_armament_or_armor_index + 1;
 
         inventory_vm.fill_stroage_type(&slot.equip_inventory_data, slot.equip_inventory_data.next_acquisition_sort_id, slot.equip_inventory_data.next_equip_index,0);

@@ -3,7 +3,7 @@ pub mod save {
     use binary_reader::BinaryReader;
     use crate::{
         read::read::Read, save::{
-            common::{ save_slot::{EquipInventoryData, GaItem, GaItemData, SaveSlot}, user_data_10::ProfileSummary, user_data_11::UserData11 },
+            common::{ save_slot::{EquipInventoryData, EquipProjectileData, GaItem, GaItemData, SaveSlot}, user_data_10::ProfileSummary, user_data_11::UserData11 },
             pc::pc_save::PCSave, 
             playstation::ps_save::PSSave, 
         }, util::bit::bit::set_bit, write::write::Write
@@ -550,7 +550,7 @@ pub mod save {
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
                     slot.equip_data.arrows[weapon_slot_index] = equip_index;
-                    slot.chr_asm.arrows[weapon_slot_index] = item_id;
+                    slot.chr_asm.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.arrows[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.arrows[weapon_slot_index] = item_id;
                 },
@@ -563,14 +563,14 @@ pub mod save {
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
                     slot.equip_data.bolts[weapon_slot_index] = equip_index;
-                    slot.chr_asm.bolts[weapon_slot_index] = item_id;
+                    slot.chr_asm.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.bolts[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.bolts[weapon_slot_index] = item_id;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
                     slot.equip_data.bolts[weapon_slot_index] = equip_index;
-                    slot.chr_asm.bolts[weapon_slot_index] = item_id;
+                    slot.chr_asm.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.bolts[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.bolts[weapon_slot_index] = item_id;
                 },
@@ -674,6 +674,18 @@ pub mod save {
                     slot.chr_asm2.legs = gaitem_handle;
                     slot.equipped_items.legs = item_id | 0x10000000;
                 },
+            }
+        }
+
+        pub fn set_equip_projectile_data(&mut self, index: usize, projectile_list: EquipProjectileData) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    pc_save.save_slots[index].save_slot.equip_projectile_data = projectile_list.clone();
+                }
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].equip_projectile_data = projectile_list.clone();
+                }
             }
         }
     }

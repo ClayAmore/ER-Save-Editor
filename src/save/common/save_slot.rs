@@ -396,8 +396,8 @@ impl Write for EquipPhysicsData {
 
 #[derive(Clone)]
 pub struct EquipProjectile {
-    projectile_id: i32,
-    unk: i32,
+    pub projectile_id: u32,
+    pub unk: i32,
 }
 
 impl Default for EquipProjectile {
@@ -412,7 +412,7 @@ impl Default for EquipProjectile {
 impl Read for EquipProjectile {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut equip_projectile = EquipProjectile::default();
-        equip_projectile.projectile_id = br.read_i32()?;
+        equip_projectile.projectile_id = br.read_u32()?;
         equip_projectile.unk = br.read_i32()?;
         Ok(equip_projectile)
     }
@@ -429,8 +429,8 @@ impl Write for EquipProjectile {
 
 #[derive(Clone)]
 pub struct EquipProjectileData {
-    projectile_count: i32,
-    projectiles: Vec<EquipProjectile>
+    pub projectile_count: i32,
+    pub projectiles: Vec<EquipProjectile>
 }
 
 impl Default for EquipProjectileData {

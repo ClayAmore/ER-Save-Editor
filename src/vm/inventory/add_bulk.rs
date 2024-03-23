@@ -115,7 +115,7 @@ impl InventoryViewModel {
                             }
                             else {None};
 
-                            let is_somber = weapon_param.data.materialSetId % 2200 == 0;
+                            let is_somber = weapon_param.data.reinforceTypeId % 2200 == 0;
                             let upgrade_level = if !is_projectile {
                                 if is_somber {
                                     Some(((self.bulk_items_weapon_level as f32 + 0.5)/2.5) as i16)

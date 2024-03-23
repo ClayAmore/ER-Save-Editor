@@ -284,6 +284,10 @@ pub mod vm {
             // Update gaitem map
             save_type.set_gaitem_map(index, inventory_vm.gaitem_map.clone());
 
+
+            // Update projectile list
+            save_type.set_equip_projectile_data(index, inventory_vm.projectile_list.clone());
+
             let mut counter = 0;
             // Update held inventory;
             let held_inventory = EquipInventoryData{
