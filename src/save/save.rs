@@ -545,14 +545,14 @@ pub mod save {
                     slot.equip_data.arrows[weapon_slot_index] = equip_index;
                     slot.chr_asm.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.arrows[weapon_slot_index] = gaitem_handle;
-                    slot.equipped_items.arrows[weapon_slot_index] = item_id;
+                    slot.equipped_items.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
                     slot.equip_data.arrows[weapon_slot_index] = equip_index;
                     slot.chr_asm.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.arrows[weapon_slot_index] = gaitem_handle;
-                    slot.equipped_items.arrows[weapon_slot_index] = item_id;
+                    slot.equipped_items.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                 },
             }
         }
@@ -565,14 +565,14 @@ pub mod save {
                     slot.equip_data.bolts[weapon_slot_index] = equip_index;
                     slot.chr_asm.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.bolts[weapon_slot_index] = gaitem_handle;
-                    slot.equipped_items.bolts[weapon_slot_index] = item_id;
+                    slot.equipped_items.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
                     slot.equip_data.bolts[weapon_slot_index] = equip_index;
                     slot.chr_asm.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.bolts[weapon_slot_index] = gaitem_handle;
-                    slot.equipped_items.bolts[weapon_slot_index] = item_id;
+                    slot.equipped_items.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                 },
             }
         }
