@@ -47,7 +47,7 @@ impl InventoryViewModel {
     }
 
     pub fn add_all_to_inventory(&mut self) {
-        let items = match self.current_type_route {
+        let items = match self.current_bulk_type_route {
             InventoryTypeRoute::KeyItems |
             InventoryTypeRoute::CommonItems => {
                 let mut items: Vec<RegulationItemViewModel> = Vec::new();
@@ -57,34 +57,14 @@ impl InventoryViewModel {
                             let item_param = Regulation::equip_goods_param_map().get(&(item_id^0x40000000)).unwrap();
 
                             let goods_type = GoodsType::from(item_param.data.goodsType);
-                            let quantity = Some(
-                                match goods_type {
-                                    GoodsType::GreatRune |
-                                    GoodsType::ReinforcementMaterial |
-                                    GoodsType::RegenerativeMaterial |
-                                    GoodsType::Rememberance |
-                                    GoodsType::CraftingMaterial | 
-                                    GoodsType::KeyItem |
-                                    GoodsType::NormalItem => {
-                                        if self.bulk_items_max_quantity  {
-                                            (item_param.data.maxRepositoryNum) as i16
-                                        }
-                                        else {
-                                            1 as i16
-                                        }
-                                    },
-                                    GoodsType::SelfBuffIncanation |
-                                    GoodsType::SelfBuffSorcery |
-                                    GoodsType::Incantation |
-                                    GoodsType::InfoItem |
-                                    GoodsType::WonderousPhysicsTears |
-                                    GoodsType::WonderousPhysics |
-                                    GoodsType::Sorcery |
-                                    GoodsType::SpiritSummonLesser |
-                                    GoodsType::SpiritSummonGreater => 1 as i16,
-                                    GoodsType::Unknown => panic!("Uknown item type")
+                            let quantity = Some({
+                                if self.bulk_items_max_quantity  {
+                                    (item_param.data.maxRepositoryNum) as i16
                                 }
-                            );
+                                else {
+                                    1 as i16
+                                }
+                            });
 
                             items.push(RegulationItemViewModel {
                                 id: item_param.id,

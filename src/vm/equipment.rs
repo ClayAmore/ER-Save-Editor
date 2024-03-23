@@ -2,7 +2,7 @@
 pub mod equipment_view_model {
     use std::collections::HashMap;
 
-    use crate::{save::common::save_slot::{GaItem, SaveSlot}, util::{params::params::Row, regulation::Regulation}};
+    use crate::{save::common::save_slot::{GaItem, SaveSlot}, util::{params::params::Row, regulation::Regulation}, vm::inventory::InventoryGaitemType};
 
     #[derive(Default, Clone)]
     pub struct EquipmentItemViewModel {
@@ -44,7 +44,7 @@ pub mod equipment_view_model {
             equipment_vm.talisman_count = 1; 
             for i in 0..slot.equip_inventory_data.key_inventory_items_distinct_count as usize {
                 let key_item = slot.equip_inventory_data.key_items[i];
-                if (key_item.ga_item_handle ^ 0xB0000000) == 10040 {
+                if (key_item.ga_item_handle ^ InventoryGaitemType::ITEM as u32) == 10040 {
                     equipment_vm.talisman_count = u32::min(1+key_item.quantity as u32, 4);
                 } 
             }
@@ -152,7 +152,7 @@ pub mod equipment_view_model {
 
         fn item(slot:& SaveSlot, item: &mut EquipmentItemViewModel, gaitem_handle: u32) {
             item.gaitem_handle = gaitem_handle;
-            item.id = if gaitem_handle != 0 {gaitem_handle ^ 0xb0000000} else {0};
+            item.id = if gaitem_handle != 0 {gaitem_handle ^ InventoryGaitemType::ITEM as u32} else {0};
             item.equip_index = Self::equip_index(slot, gaitem_handle);
             item.name = Self::name_or_empty(Regulation::equip_goods_param_map(), item.id);
         }

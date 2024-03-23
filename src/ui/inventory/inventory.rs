@@ -1,6 +1,6 @@
 pub mod inventory {
     use eframe::egui::{self, Color32, Ui};
-    use crate::ui::inventory::{add::add_single, browse::browse_inventory};
+    use crate::ui::inventory::{add::add, browse::browse_inventory};
     use crate::vm::{inventory::InventoryRoute, vm::vm::ViewModel};
 
     pub fn inventory(ui: &mut Ui, vm:&mut ViewModel) {
@@ -40,7 +40,7 @@ pub mod inventory {
         egui::CentralPanel::default().show(ui.ctx(), |ui|{
             match vm.slots[vm.index].inventory_vm.current_route {
                 InventoryRoute::None => {ui.label("Empty");},
-                InventoryRoute::Add => {add_single(ui, vm);},
+                InventoryRoute::Add => {add(ui, vm);},
                 InventoryRoute::Browse => {browse_inventory(ui, vm);},
             }
         });

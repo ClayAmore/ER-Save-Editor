@@ -15,6 +15,8 @@ use crate::{
     util::regulation::Regulation, vm::regulation::regulation_view_model::WepType
 };
 
+use super::regulation::regulation_view_model::GoodsType;
+
 #[derive(Default, Clone)]
 pub enum InventoryRoute {
     #[default] None,
@@ -198,6 +200,7 @@ pub struct InventoryViewModel  {
     pub at_single_items: bool,
     pub current_route: InventoryRoute,
     pub current_type_route: InventoryTypeRoute,
+    pub current_bulk_type_route: InventoryTypeRoute,
     pub current_subtype_route: InventorySubTypeRoute,
 
     // Data
@@ -537,7 +540,7 @@ impl InventoryViewModel {
                 .iter()
                 .filter(|g| 
                     Regulation::equip_goods_param_map().get(&g.item_id)
-                    .is_some_and(|g| g.data.goodsType == 0)
+                    .is_some_and(|g| GoodsType::from(g.data.goodsType) == GoodsType::NormalItem)
                 )
                 .map(|i| i.clone())
                 .collect();

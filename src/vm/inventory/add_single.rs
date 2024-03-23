@@ -142,8 +142,8 @@ impl InventoryViewModel {
             max_in_storage = 600;
         }
         else {
-            self.log.insert(0, format!("Failed to find name for item with id {}|{:#x}", id, id));
-            println!("Failed to determine storage limits for item {}|{:#x}. Add item failed!", id, id);
+            self.log.insert(0, format!("Failed to fetch weapon param for {}|{:#x}. Add item failed!", id, id));
+            println!("Failed to fetch weapon param for {}|{:#x}. Add item failed!", id, id);
             return;
         }
 
@@ -151,8 +151,8 @@ impl InventoryViewModel {
         let name = match WEAPON_NAME.lock().unwrap().get(&id) {
             Some(name) => format!("{}",name),            
             None => {
-                self.log.insert(0, format!("Failed to find name for item with id {}|{:#x}", id, id));
-                format!("Failed to find name for item with id {}|{:#x}", id, id)
+                self.log.insert(0, format!("Failed to find name for item projectile id {}|{:#x}", id, id));
+                format!("Failed to find name for projectile with id {}|{:#x}", id, id)
             },
         };
 
@@ -283,8 +283,8 @@ impl InventoryViewModel {
             max_in_storage = item_params.data.maxRepositoryNum as u32;
         }
         else {
-            self.log.insert(0, format!("Failed to find name for item with id {}|{:#x}", item_id, item_id));
-            println!("Failed to determine storage limits for item {}|{:#x}. Add item failed!", id, id);
+            self.log.insert(0, format!("Failed to fetch goods param for item {}|{:#x}. Add item failed!", id, id));
+            println!("Failed to fetch goods param for item {}|{:#x}. Add item failed!", id, id);
             return;
         }
 
@@ -323,7 +323,7 @@ impl InventoryViewModel {
                         // Update Log
                         self.log.insert(0, format!("> Added {} {} to held inventory", amount, name));
                     }
-
+                    
                     free_space
                 } else {
                     // If quantity exceedes the maximum held amount then use max_held instead 
@@ -404,7 +404,8 @@ impl InventoryViewModel {
             max_in_storage = item_params.data.maxRepositoryNum as u32;
         }
         else {
-            println!("Failed to determine storage limits for item {}|{:#x}. Add item failed!", id, id);
+            self.log.insert(0, format!("Failed to fetch goods param for key item {}|{:#x}. Add item failed!", id, id));
+            println!("Failed to fetch goods param for key item {}|{:#x}. Add item failed!", id, id);
             return;
         }
 

@@ -39,6 +39,5 @@ pub mod menu {
             Route::EventFlags => {event_flags.highlight();},
             Route::Regions => {regions.highlight();},
         }
-
     }
 }

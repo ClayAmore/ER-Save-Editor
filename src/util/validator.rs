@@ -1,6 +1,6 @@
 pub mod validator {
     use std::collections::{HashMap, HashSet};
-    use crate::{save::{common::save_slot::{EquipInventoryItem, GaItem}, save::save::Save}, util::{param_structs::EQUIP_PARAM_GEM_ST, params::params::Row, regulation::Regulation}, vm::regulation::regulation_view_model::{ProtectorCategory, WepType}};
+    use crate::{save::{common::save_slot::{EquipInventoryItem, GaItem}, save::save::Save}, util::{param_structs::EQUIP_PARAM_GEM_ST, params::params::Row, regulation::Regulation}, vm::{inventory::{InventoryGaitemType, InventoryItemType}, regulation::regulation_view_model::{GoodsType, ProtectorCategory, WepType}}};
 
     pub struct Validator;
 
@@ -95,10 +95,10 @@ pub mod validator {
             if !Self::validate_armor_piece(arms_protector_id, ProtectorCategory::Arms) {return false;}
             if !Self::validate_armor_piece(legs_protector_id, ProtectorCategory::Legs) {return false;}
 
-            let head_protector_id = save.save_type.get_slot(index).equipped_items.head ^ 0x10000000;
-            let body_protector_id = save.save_type.get_slot(index).equipped_items.chest ^ 0x10000000;
-            let arms_protector_id = save.save_type.get_slot(index).equipped_items.arms ^ 0x10000000;
-            let legs_protector_id = save.save_type.get_slot(index).equipped_items.legs ^ 0x10000000;
+            let head_protector_id = save.save_type.get_slot(index).equipped_items.head ^ InventoryItemType::ARMOR as u32;
+            let body_protector_id = save.save_type.get_slot(index).equipped_items.chest ^ InventoryItemType::ARMOR as u32;
+            let arms_protector_id = save.save_type.get_slot(index).equipped_items.arms ^ InventoryItemType::ARMOR as u32;
+            let legs_protector_id = save.save_type.get_slot(index).equipped_items.legs ^ InventoryItemType::ARMOR as u32;
 
             if !Self::validate_armor_piece(head_protector_id, ProtectorCategory::Head) {return false;}
             if !Self::validate_armor_piece(body_protector_id, ProtectorCategory::Body) {return false;}
@@ -117,14 +117,14 @@ pub mod validator {
 
             // Check if physic slot 1 is of type wondrous physics
             if physics_slot1 != u32::MAX {
-                let res_physics1_good = Regulation::equip_goods_param_map().get(&(physics_slot1 ^ 0xb0000000));
-                if res_physics1_good.is_some_and(|p| p.data.goodsType != 10) { return false; }
+                let res_physics1_good = Regulation::equip_goods_param_map().get(&(physics_slot1 ^ InventoryGaitemType::ITEM as u32));
+                if res_physics1_good.is_some_and(|p| GoodsType::from(p.data.goodsType) != GoodsType::WonderousPhysicsTears) { return false; }
             }
             
             // Check if physic slot 2 is of type wondrous physics
             if physics_slot2 != u32::MAX {
-                let res_physics2_good = Regulation::equip_goods_param_map().get(&(physics_slot2 ^ 0xb0000000));
-                if res_physics2_good.is_some_and(|p| p.data.goodsType != 10) { return false; }
+                let res_physics2_good = Regulation::equip_goods_param_map().get(&(physics_slot2 ^ InventoryGaitemType::ITEM as u32));
+                if res_physics2_good.is_some_and(|p| GoodsType::from(p.data.goodsType) != GoodsType::WonderousPhysicsTears) { return false; }
             }
 
             true
@@ -138,7 +138,7 @@ pub mod validator {
             let mut item_ids = HashSet::new();
             for item in quick_slot_items.iter() {
                 if item.item_id == 0 { continue; }
-                if Regulation::equip_goods_param_map().get(&(item.item_id ^ 0xb0000000)).is_none() { println!("Item {} not found", item.item_id); return false; }
+                if Regulation::equip_goods_param_map().get(&(item.item_id ^ InventoryGaitemType::ITEM as u32)).is_none() { println!("Item {} not found", item.item_id); return false; }
                 if let Some(_existing_id) = item_ids.get(&item.item_id) {
                     println!("Duplicate item found: {}", _existing_id);
                     return false;
@@ -151,7 +151,7 @@ pub mod validator {
             let mut item_ids = HashSet::new();
             for item in pouch_items.iter() {
                 if item.item_id == 0 { continue; }
-                if Regulation::equip_goods_param_map().get(&(item.item_id ^ 0xb0000000)).is_none() { println!("Item {} not found", item.item_id); return false; }
+                if Regulation::equip_goods_param_map().get(&(item.item_id ^ InventoryGaitemType::ITEM as u32)).is_none() { println!("Item {} not found", item.item_id); return false; }
                 if let Some(_existing_id) = item_ids.get(&item.item_id) {
                     println!("Duplicate item found: {}", _existing_id);
                     return false;

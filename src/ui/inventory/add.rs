@@ -12,12 +12,13 @@ use crate::{db::{
             InventoryTypeRoute, InventoryViewModel
         }, 
         regulation::regulation_view_model::{
-            GoodsType, RegulationViewModel, WepType}, 
+            GoodsType, RegulationViewModel, WepType
+        }, 
             vm::vm::ViewModel
         }
     };
 
-pub fn add_single(ui: &mut Ui, vm:&mut ViewModel) {
+pub fn add(ui: &mut Ui, vm:&mut ViewModel) {
     let regulation_vm = &mut vm.regulation;
     let inventory_vm = &mut vm.slots[vm.index].inventory_vm;
 
@@ -43,9 +44,12 @@ pub fn add_single(ui: &mut Ui, vm:&mut ViewModel) {
             let talismans = uis[4].add_sized([uis[4].available_width(), 40.], egui::Button::new("Talismans"));
 
             if common_items.clicked() {
-                // Update lists for single item add
+                // Update route for single item add
                 inventory_vm.current_type_route = InventoryTypeRoute::CommonItems; regulation_vm.selected_item = Default::default();
                 
+                // Update route for bulk item add
+                inventory_vm.current_bulk_type_route = InventoryTypeRoute::CommonItems;
+
                 // Update lists for bulk items use
                 inventory_vm.replace_bulk_items_selected_map(InventoryTypeRoute::CommonItems);
 
@@ -53,9 +57,12 @@ pub fn add_single(ui: &mut Ui, vm:&mut ViewModel) {
                 regulation_vm.filter(&inventory_vm.current_type_route, &inventory_vm.filter_text);
             }
             if weapons.clicked() {
-                // Update lists for single item add
+                // Update route for single item add
                 inventory_vm.current_type_route = InventoryTypeRoute::Weapons; regulation_vm.selected_item = Default::default();
                 
+                // Update route for bulk item add
+                inventory_vm.current_bulk_type_route = InventoryTypeRoute::Weapons;
+
                 // Update lists for bulk items use
                 inventory_vm.replace_bulk_items_selected_map(InventoryTypeRoute::Weapons);
 
@@ -63,9 +70,12 @@ pub fn add_single(ui: &mut Ui, vm:&mut ViewModel) {
                 regulation_vm.filter(&inventory_vm.current_type_route, &inventory_vm.filter_text);
             }
             if armors.clicked() {
-                // Update lists for single item add
+                // Update route for single item add
                 inventory_vm.current_type_route = InventoryTypeRoute::Armors; regulation_vm.selected_item = Default::default();
                 
+                // Update route for bulk item add
+                inventory_vm.current_bulk_type_route = InventoryTypeRoute::Armors;
+
                 // Update lists for bulk items use
                 inventory_vm.replace_bulk_items_selected_map(InventoryTypeRoute::Armors);
                 
@@ -73,9 +83,12 @@ pub fn add_single(ui: &mut Ui, vm:&mut ViewModel) {
                 regulation_vm.filter(&inventory_vm.current_type_route, &inventory_vm.filter_text);
             }
             if ashofwar.clicked() {
-                // Update lists for single item add
+                // Update route for single item add
                 inventory_vm.current_type_route = InventoryTypeRoute::AshOfWar; regulation_vm.selected_item = Default::default();
                 
+                // Update route for bulk item add
+                inventory_vm.current_bulk_type_route = InventoryTypeRoute::AshOfWar;
+
                 // Update lists for bulk items use
                 inventory_vm.replace_bulk_items_selected_map(InventoryTypeRoute::AshOfWar);
                 
@@ -83,9 +96,12 @@ pub fn add_single(ui: &mut Ui, vm:&mut ViewModel) {
                 regulation_vm.filter(&inventory_vm.current_type_route, &inventory_vm.filter_text);
             }
             if talismans.clicked() {
-                // Update lists for single item add
+                // Update route for single item add
                 inventory_vm.current_type_route = InventoryTypeRoute::Talismans; regulation_vm.selected_item = Default::default();
                 
+                // Update route for bulk item add
+                inventory_vm.current_bulk_type_route = InventoryTypeRoute::Talismans;
+
                 // Update lists for bulk items use
                 inventory_vm.replace_bulk_items_selected_map(InventoryTypeRoute::Talismans);
                 
@@ -93,14 +109,28 @@ pub fn add_single(ui: &mut Ui, vm:&mut ViewModel) {
                 regulation_vm.filter(&inventory_vm.current_type_route, &inventory_vm.filter_text);
             }
 
-            // Highlight active 
-            match inventory_vm.current_type_route {
-                InventoryTypeRoute::CommonItems => {common_items.highlight();},
-                InventoryTypeRoute::KeyItems => {},
-                InventoryTypeRoute::Weapons => {weapons.highlight();},
-                InventoryTypeRoute::Armors => {armors.highlight();},
-                InventoryTypeRoute::AshOfWar => {ashofwar.highlight();},
-                InventoryTypeRoute::Talismans => {talismans.highlight();},
+            // Highlight active
+            match inventory_vm.at_single_items {
+                true => {
+                    match inventory_vm.current_type_route {
+                        InventoryTypeRoute::CommonItems => {common_items.highlight();},
+                        InventoryTypeRoute::KeyItems => {},
+                        InventoryTypeRoute::Weapons => {weapons.highlight();},
+                        InventoryTypeRoute::Armors => {armors.highlight();},
+                        InventoryTypeRoute::AshOfWar => {ashofwar.highlight();},
+                        InventoryTypeRoute::Talismans => {talismans.highlight();},
+                    }
+                },
+                false => {
+                    match inventory_vm.current_bulk_type_route {
+                        InventoryTypeRoute::CommonItems => {common_items.highlight();},
+                        InventoryTypeRoute::KeyItems => {},
+                        InventoryTypeRoute::Weapons => {weapons.highlight();},
+                        InventoryTypeRoute::Armors => {armors.highlight();},
+                        InventoryTypeRoute::AshOfWar => {ashofwar.highlight();},
+                        InventoryTypeRoute::Talismans => {talismans.highlight();},
+                    }
+                },
             }
         });
 
@@ -275,7 +305,7 @@ fn bulk(ui: &mut Ui, inventory_vm: &mut InventoryViewModel) {
             .auto_shrink(false)
             .max_height(ui.available_height()-8.)
             .show(ui, |ui|{
-            match inventory_vm.current_type_route {
+            match inventory_vm.current_bulk_type_route {
                 InventoryTypeRoute::KeyItems |
                 InventoryTypeRoute::CommonItems => {
                     for (index, (group_name, items)) in items().iter().enumerate() {
@@ -334,20 +364,6 @@ fn bulk(ui: &mut Ui, inventory_vm: &mut InventoryViewModel) {
             };
         });
     });
-}
-
-fn select_all_sub_group_checkbox(ui:&mut Ui, inventory_vm: &mut InventoryViewModel, index: usize) {
-    if inventory_vm.bulk_items_selected.is_empty() {return;}
-    let is_all_selected = inventory_vm.bulk_items_selected[index].values().all(|on|*on);
-    let is_any_selected = inventory_vm.bulk_items_selected[index].values().any(|on|*on);
-    let state = if is_all_selected {State::On} else if is_any_selected {State::InBetween} else {State::Off};
-    if three_states_checkbox(ui, &state).clicked(){
-        match state {
-            State::On => inventory_vm.bulk_items_selected[index].values_mut().for_each(|selected| *selected = false),
-            State::Off => inventory_vm.bulk_items_selected[index].values_mut().for_each(|selected| *selected = true),
-            State::InBetween => inventory_vm.bulk_items_selected[index].values_mut().for_each(|selected| *selected = true),
-        }
-    };
 }
 
 fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel, regulation_vm: &mut RegulationViewModel) {
@@ -441,14 +457,9 @@ fn bulk_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel) {
     egui::Frame::none().inner_margin(8.).show(ui, |ui|{
         ui.label(egui::RichText::new("Customize").strong().heading().size(24.));
         ui.add_space(6.);
-        match inventory_vm.current_type_route {
+        match inventory_vm.current_bulk_type_route {
             InventoryTypeRoute::CommonItems | InventoryTypeRoute::KeyItems => {
-                let checkbox = ui.add(egui::Checkbox::new(&mut inventory_vm.bulk_items_max_quantity, "Max Quantity"));
-                if checkbox.hovered() {
-                    egui::popup::show_tooltip(ui.ctx(), checkbox.id, |ui|{
-                        ui.label(egui::RichText::new("Some items will remain limited to 1 to avoid filling the storage with unneccesary items. Example: Key items, incantations, sorcercies, etc...").size(8.0).color(Color32::PLACEHOLDER));
-                    });
-                };
+                ui.add(egui::Checkbox::new(&mut inventory_vm.bulk_items_max_quantity, "Max Quantity"));
             }
             InventoryTypeRoute::Weapons => {
                 egui::Grid::new("bulk_items_customization").spacing(Vec2::new(6., 6.)).show(ui,|ui| {
@@ -478,4 +489,18 @@ fn bulk_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel) {
             }
         })
     });
+}
+
+fn select_all_sub_group_checkbox(ui:&mut Ui, inventory_vm: &mut InventoryViewModel, index: usize) {
+    if inventory_vm.bulk_items_selected.is_empty() {return;}
+    let is_all_selected = inventory_vm.bulk_items_selected[index].values().all(|on|*on);
+    let is_any_selected = inventory_vm.bulk_items_selected[index].values().any(|on|*on);
+    let state = if is_all_selected {State::On} else if is_any_selected {State::InBetween} else {State::Off};
+    if three_states_checkbox(ui, &state).clicked(){
+        match state {
+            State::On => inventory_vm.bulk_items_selected[index].values_mut().for_each(|selected| *selected = false),
+            State::Off => inventory_vm.bulk_items_selected[index].values_mut().for_each(|selected| *selected = true),
+            State::InBetween => inventory_vm.bulk_items_selected[index].values_mut().for_each(|selected| *selected = true),
+        }
+    };
 }
