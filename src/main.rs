@@ -1,5 +1,4 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
-//use std::env;
 mod vm;
 mod save;
 mod util;
@@ -16,15 +15,29 @@ use save::save::save::{Save, SaveType};
 use ui::{equipment::equipment::equipment, events::events::events, general::general::general, importer::import::character_importer, inventory::inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
 use vm::{importer::general_view_model::ImporterViewModel, vm::vm::ViewModel};
 use crate::write::write::Write as w; 
+use rust_embed::RustEmbed;
+
+#[derive(RustEmbed)]
+#[folder = "icon/"]
+struct Asset;
 
 const WINDOW_WIDTH: f32 = 1920.;
 const WINDOW_HEIGHT: f32 = 960.;
 
 fn main() -> Result<(), eframe::Error> {
-    env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
+    // App Icon
+    let mut app_icon = egui::IconData::default();
+    
+    let image = Asset::get("icon.png").expect("Failed to get image data").data;
+    let icon = image::load_from_memory(&image).expect("Failed to open icon path").to_rgba8();
+    let (icon_width, icon_height) = icon.dimensions();
+    app_icon.rgba = icon.into_raw();
+    app_icon.width = icon_width;
+    app_icon.height = icon_height;
 
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT]),
+        viewport: egui::ViewportBuilder::default().with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT])
+        .with_icon(app_icon),
         ..Default::default()
     };
 
