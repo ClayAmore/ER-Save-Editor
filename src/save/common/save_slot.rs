@@ -1109,7 +1109,9 @@ pub struct PlayerGameData {
     pub arche_type: u8,
     _0x3_1: [u8; 0x3],
     pub gift: u8,
-    _0x54: [u8; 0x54],
+    _0x1e: [u8; 0x1e],
+    pub match_making_wpn_lvl: u8,
+    _0x35: [u8; 0x35],
     pub password: [u8; 0x12],
     pub group_password1: [u8; 0x12],
     pub group_password2: [u8; 0x12],
@@ -1156,7 +1158,9 @@ impl Default for PlayerGameData {
             arche_type: 0,
             _0x3_1: [0;0x3],
             gift:0,
-            _0x54: [0; 0x54],
+            _0x1e: [0; 0x1e],
+            match_making_wpn_lvl: 0,
+            _0x35: [0; 0x35],
             password: Default::default(),
             group_password1: Default::default(),
             group_password2: Default::default(),
@@ -1236,7 +1240,12 @@ impl Read for PlayerGameData {
         // Gift
         player_game_data.gift = br.read_u8()?;
 
-        player_game_data._0x54.copy_from_slice(br.read_bytes(0x54)?);
+        player_game_data._0x1e.copy_from_slice(br.read_bytes(0x1e)?);
+
+        // Weapon Match Making Level
+        player_game_data.match_making_wpn_lvl  = br.read_u8()?;
+
+        player_game_data._0x35.copy_from_slice(br.read_bytes(0x35)?);
 
         // Passwords
         let password = br.read_bytes(0x12)?;
@@ -1330,7 +1339,12 @@ impl Write for PlayerGameData {
         // Gift
         bytes.push(self.gift);
 
-        bytes.extend(self._0x54);
+        bytes.extend(self._0x1e);
+
+        // Weapon Match Making Level
+        bytes.push(self.match_making_wpn_lvl);
+
+        bytes.extend(self._0x35);
 
         // Passwords
         bytes.extend(self.password);

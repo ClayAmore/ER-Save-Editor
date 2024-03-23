@@ -14,6 +14,25 @@ use super::{InventoryGaitemType, InventoryItemType, InventoryItemViewModel, Inve
 
 impl InventoryViewModel {
     pub fn add_to_inventory(&mut self, item: &RegulationItemViewModel) {
+        // Check if inventory is full
+        let held_inventory_full = self.storage[0].common_item_count == 2688;
+        let storage_box_full = self.storage[0].common_item_count == 1920;
+
+        // Check if held inventory is full
+        if item.item_type == InventoryItemType::ITEM {
+            if held_inventory_full && storage_box_full {
+                self.log.insert(0, format!("Inventory is full."));
+                return;
+            }
+        }
+        else {
+            if held_inventory_full {
+                self.log.insert(0, format!("Inventory is full."));
+                return;
+            }
+        }
+
+        // Handle item add
         match item.item_type {
             InventoryItemType::WEAPON => {
                 // Fetch weapon param to look up weapon type
@@ -68,7 +87,7 @@ impl InventoryViewModel {
         }
     }
 
-    fn add_weapon(&mut self, id: u32, gem: Option<u32>, upgrade: Option<i16>, affinity: Option<i16>) -> String {
+    fn add_weapon(&mut self, id: u32, gem: Option<u32>, upgrade: Option<i16>, affinity: Option<i16>) {
         // If weapon has ash of war then handle adding the ash of war to the inventory
         let mut gem_gaitem_handle = u32::MAX;
         if gem.is_some() {
@@ -119,12 +138,12 @@ impl InventoryViewModel {
         };
 
         // Add item to storage
-        self.add_to_storage_common_items(gaitem_handle, id, 1, 0, weapon_name.to_string(), InventoryGaitemType::WEAPON);
+        self.add_to_storage_common_items(gaitem_handle, item_id, 1, 0, weapon_name.to_string(), InventoryGaitemType::WEAPON);
 
         // Add to gaitem data list if not presenet
         self.upsert_gaitem_data_list(item_id);
 
-        format!("> Added 1 {}", weapon_name)
+        self.log.insert(0, format!("> Added 1 {} to held inventory", weapon_name));
 
     }
 
@@ -166,7 +185,7 @@ impl InventoryViewModel {
         // rest of the quantity is transferred over to storage quantity
         quantity - ( if is_already_held {
             // Calculate allowed remaining quantity in held inventory
-            let free_space = match self.get_free_space_for_item_quantity_in_storage(id,  0, true) {
+            let free_space = match self.get_free_space_for_item_quantity_in_storage(id,  0, true, false) {
                 Ok(val) => val,
                 Err(err) => {
                     println!("{err}");
@@ -185,7 +204,7 @@ impl InventoryViewModel {
                 self.log.insert(0, format!("> Added {} {} to held inventory.", amount, name));
             }
 
-            free_space
+            amount
         } else {
             // Add gaitem
             self.add_gaitem(GaItem {
@@ -216,7 +235,7 @@ impl InventoryViewModel {
             // If quantity exceedes the maximum storage amount then use max_in_storage instead 
             if is_already_in_box {
                 // Calculate allowed remaining quantity in held inventory
-                let free_space = match self.get_free_space_for_item_quantity_in_storage(id,  1, true) {
+                let free_space = match self.get_free_space_for_item_quantity_in_storage(id,  1, true, false) {
                     Ok(val) => val,
                     Err(err) => {
                         println!("{err}");
@@ -304,7 +323,7 @@ impl InventoryViewModel {
             // rest of the quantity is transferred over to storage quantity
                 quantity - ( if is_already_held {
                     // Calculate allowed remaining quantity in held inventory
-                    let free_space = match self.get_free_space_for_item_quantity_in_storage(id, 0, false) {
+                    let free_space = match self.get_free_space_for_item_quantity_in_storage(id, 0, false, false) {
                         Ok(val) => val,
                         Err(err) => {
                             println!("{err}");
@@ -324,7 +343,7 @@ impl InventoryViewModel {
                         self.log.insert(0, format!("> Added {} {} to held inventory", amount, name));
                     }
                     
-                    free_space
+                    amount
                 } else {
                     // If quantity exceedes the maximum held amount then use max_held instead 
                     let amount = min(quantity, max_held);
@@ -349,7 +368,7 @@ impl InventoryViewModel {
 
             if is_already_in_box {
                 // Calculate allowed remaining quantity in held inventory
-                let free_space = match self.get_free_space_for_item_quantity_in_storage(id, 1, false) {
+                let free_space = match self.get_free_space_for_item_quantity_in_storage(id, 1, false, false) {
                     Ok(val) => val,
                     Err(err) => {
                         println!("{err}");
@@ -419,7 +438,7 @@ impl InventoryViewModel {
         // rest of the quantity is transferred over to storage quantity
             quantity - ( if is_already_held {
                 // Calculate allowed remaining quantity in held inventory
-                let free_space = match self.get_free_space_for_item_quantity_in_storage(id, 0, false) {
+                let free_space = match self.get_free_space_for_item_quantity_in_storage(id, 0, false, true) {
                     Ok(val) => val,
                     Err(err) => {
                         println!("{err}");
@@ -438,7 +457,7 @@ impl InventoryViewModel {
                     self.log.insert(0, format!("> Added {} {} to held inventory", amount, name));
                 }
 
-                free_space
+                amount
             } else {
                 // If quantity exceedes the maximum held amount then use max_held instead 
                 let amount = min(quantity, max_held);
@@ -462,7 +481,7 @@ impl InventoryViewModel {
             // If quantity exceedes the maximum storage amount then use max_in_storage instead 
             if is_already_in_box {
                 // Calculate allowed remaining quantity in held inventory
-                let free_space = match self.get_free_space_for_item_quantity_in_storage(id, 1, false) {
+                let free_space = match self.get_free_space_for_item_quantity_in_storage(id, 1, false, true) {
                     Ok(val) => val,
                     Err(err) => {
                         println!("{err}");
@@ -524,7 +543,7 @@ impl InventoryViewModel {
         self.upsert_gaitem_data_list(item_id);
 
         // Update log
-        self.log.insert(0, format!("> Added {} {}", 1, name));
+        self.log.insert(0, format!("> Added {} {} to held inventory", 1, name));
 
         gaitem_handle
     }
@@ -551,7 +570,7 @@ impl InventoryViewModel {
         self.add_to_storage_common_items(gaitem_handle, id, 1, 0, name.to_string(), InventoryGaitemType::ARMOR);
         
         // Update log
-        self.log.insert(0, format!("> Added {} {}", 1, name));
+        self.log.insert(0, format!("> Added {} {} to held inventory", 1, name));
     }
 
     fn add_talisman(&mut self, id: u32) {
@@ -570,7 +589,7 @@ impl InventoryViewModel {
         self.add_to_storage_common_items(gaitem_handle, id, 1, 0, name.to_string(), InventoryGaitemType::ACCESSORY);
 
         // Update log
-        self.log.insert(0, format!("> Added {} {}", 1, name));
+        self.log.insert(0, format!("> Added {} {} to held inventory", 1, name));
     }
 
     fn add_gaitem(&mut self, gaitem: GaItem, is_aow: bool) {
@@ -689,7 +708,7 @@ impl InventoryViewModel {
         gaitem_handle
     }
 
-    fn get_free_space_for_item_quantity_in_storage(&mut self, id: u32, storage_index: usize, is_projectile: bool) -> Result<u32, String>{
+    fn get_free_space_for_item_quantity_in_storage(&mut self, id: u32, storage_index: usize, is_projectile: bool, is_key_item: bool) -> Result<u32, String>{
         // Gaitem handle for items created from item id, projectile must be looked up
         let gaitem_handle = if !is_projectile {
             id | InventoryGaitemType::ITEM as u32
@@ -736,7 +755,11 @@ impl InventoryViewModel {
         }
 
         // Look up item in storage box
-        let item_res = self.storage[storage_index].common_items.iter().find(|i| i.ga_item_handle == gaitem_handle );
+        let item_res = match is_key_item {
+            true => self.storage[storage_index].key_items.iter().find(|i| i.ga_item_handle == gaitem_handle),
+            false => self.storage[storage_index].common_items.iter().find(|i| i.ga_item_handle == gaitem_handle),
+        };
+
         if item_res.is_some() {
             // Fetch item from item list 
             let item = item_res.unwrap();
@@ -747,6 +770,7 @@ impl InventoryViewModel {
 
             return Ok(free_space);
         }
+
 
         Err(format!("Failed to determine storage limits for item {}|{:#x}. Add item failed!", id, id))
     }

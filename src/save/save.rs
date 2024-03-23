@@ -688,6 +688,18 @@ pub mod save {
                 }
             }
         }
+
+        pub fn set_match_making_wpn_lvl(&mut self, index: usize, weapon_level: u8) {
+            match self {
+                SaveType::Unknown => panic!("Why are we here?"),
+                SaveType::PC(pc_save) => {
+                    pc_save.save_slots[index].save_slot.player_game_data.match_making_wpn_lvl = weapon_level;
+                }
+                SaveType::PlayStation(ps_save) => {
+                    ps_save.save_slots[index].player_game_data.match_making_wpn_lvl = weapon_level;
+                }
+            }
+        }
     }
 
     pub struct Save {

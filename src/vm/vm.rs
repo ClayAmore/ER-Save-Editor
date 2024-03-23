@@ -1,4 +1,6 @@
 pub mod vm {
+    use std::collections::HashMap;
+
     use crate::{
         db::{
             bosses::bosses::BOSSES, 
@@ -100,6 +102,9 @@ pub mod vm {
                     // Update Gender
                     save_type.set_character_gender(i, self.slots[i].general_vm.gender as u8);
 
+                    // Update Character Weapon Match Making Level
+                    self.update_weapon_match_making_level(save_type, i);
+
                     // Update Inventory (Held + Storage Box)
                     self.update_inventory(save_type, i);
 
@@ -152,6 +157,79 @@ pub mod vm {
             save_type.set_character_arcane(index, stats_vm.arcane);
 
             save_type.set_character_souls(index, stats_vm.souls);
+        }
+
+        fn update_weapon_match_making_level(&self, save_type: &mut SaveType, index: usize) {
+            let general_vm = &self.slots[index].general_vm;
+            let inventory_vm = &self.slots[index].inventory_vm;
+
+            // Map somber to normal weapon upgrade
+            let somber_to_normal: HashMap<u8, u8> = HashMap::from([
+                (0, 0), (1, 4),(2, 6), (3, 9), (4, 11), (5, 14), 
+                (6, 16), (7, 19), (8, 21), (9, 24), (10, 25), 
+            ]);
+
+            // Find the highest weapon upgrade in player inventory
+            let mut max_level: u8 = 0;
+            for (held_item, storage_item) in inventory_vm.storage[0].common_items.iter().zip(&inventory_vm.storage[1].common_items) {
+                let held_weapon_res = Regulation::equip_weapon_params_map().get(&((&held_item.item_id/100)*100));
+                let storage_weapon_res = Regulation::equip_weapon_params_map().get(&((&storage_item.item_id/100)*100));
+                // Check held inventory item
+                if held_item.r#type == InventoryGaitemType::WEAPON {
+                    match held_weapon_res {
+                        Some(weapon_param) => {
+                            // Check if weapon is somber
+                            let is_somber = weapon_param.data.reinforceTypeId % 2200 == 0;
+                            
+                            // Extract weapon level based on wether weapon is somber or not
+                            let weapon_level = if is_somber{
+                                somber_to_normal[&((held_item.item_id % 100) as u8)]
+                            }
+                            else {
+                                (held_item.item_id % 100) as u8
+                            };
+
+                            // Update max weapon level if inventory weapon is higher 
+                            if weapon_level > max_level {
+                                max_level = weapon_level;
+                            }
+                        },
+                        None => {
+                            println!("Couldn't find param info for weapon {}|{:#x}", held_item.item_id, held_item.item_id);
+                        },
+                    }
+                }
+
+                // Check storage box item
+                if storage_item.r#type == InventoryGaitemType::WEAPON {
+                    match storage_weapon_res {
+                        Some(weapon_param) => {
+                            // Check if weapon is somber
+                            let is_somber = weapon_param.data.reinforceTypeId % 2200 == 0;
+                            
+                            // Extract weapon level based on wether weapon is somber or not
+                            let weapon_level = if is_somber{
+                                somber_to_normal[&((storage_item.item_id % 100) as u8)]
+                            }
+                            else {
+                                (storage_item.item_id % 100) as u8
+                            };
+
+                            // Update max weapon level if inventory weapon is higher 
+                            if weapon_level > max_level {
+                                max_level = weapon_level;
+                            }
+                        },
+                        None => {
+                            println!("Couldn't find param info for weapon {}|{:#x}", held_item.item_id, held_item.item_id);
+                        },
+                    }
+                }
+            }
+            // Update player match making level highest weapon upgrade is higher
+            if max_level > general_vm.weapon_level {
+                save_type.set_match_making_wpn_lvl(index, max_level);
+            }
         }
 
         fn update_equipment(&self, save_type: &mut SaveType, index: usize) {

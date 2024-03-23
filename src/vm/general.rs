@@ -37,7 +37,7 @@ pub mod general_view_model {
         pub steam_id: String,
         pub character_name: String,
         pub gender: Gender,
-        pub map_id: String,
+        pub weapon_level: u8,
     }
 
     impl GeneralViewModel {
@@ -55,21 +55,17 @@ pub mod general_view_model {
             }
             let character_name = String::from_utf16(&character_name_trimmed).expect("");
 
+            // Gender
             let gender = Gender::try_from(slot.player_game_data.gender).expect("");
-             
-            let map_id = MapID{ 
-                area_id: slot.map_id[3],  
-                block_id: slot.map_id[2],  
-                region_id: slot.map_id[1],  
-                index_id: slot.map_id[0],
-            }.to_string();
-            
+
+            // Weapon Level
+            let weapon_level = slot.player_game_data.match_making_wpn_lvl;
 
             Self {
                 steam_id,
                 character_name,
                 gender,
-                map_id,
+                weapon_level,
             }
         }
     }

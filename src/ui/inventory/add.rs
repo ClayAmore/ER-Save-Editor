@@ -1,6 +1,4 @@
 
-use std::cmp::max;
-
 use eframe::{egui::{self, Layout, Ui, Vec2}, epaint::Color32};
 use crate::{db::{
     accessory_name::accessory_name::ACCESSORY_NAME, aow_name::aow_name::AOW_NAME, aows::aows, armor_name::armor_name::ARMOR_NAME, armors::armor_sets, item_name::item_name::ITEM_NAME, items::items, talismans::talismans, weapon_name::weapon_name::WEAPON_NAME, weapons::weapons}, ui::custom::checkbox::checkbox::{
@@ -469,9 +467,9 @@ fn bulk_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel) {
                     ui.end_row();
 
                     let label = ui.label("Weapon Level:");
-                    ui.add(egui::DragValue::new(&mut inventory_vm.bulk_items_weapon_level).clamp_range(1..=25).custom_formatter(|val, _| {
+                    ui.add(egui::DragValue::new(&mut inventory_vm.bulk_items_weapon_level).clamp_range(0..=25).custom_formatter(|val, _| {
                         let somber_upgrade_level: f64 = (val + 0.5)/2.5;
-                        format!("Normal: +{}\t Somber: +{}", val as u32, max(somber_upgrade_level as u32, 1))
+                        format!("Normal: +{}\t Somber: +{}", val as u32, somber_upgrade_level as u32)
                     })).labelled_by(label.id);
                     ui.end_row();
                 });

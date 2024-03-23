@@ -54,7 +54,7 @@ impl InventoryViewModel {
                 for (index, _) in db::items::items().iter().enumerate() {
                     for (item_id, selected) in self.bulk_items_selected[index].iter_mut() {
                         if *selected {
-                            let item_param = Regulation::equip_goods_param_map().get(&(item_id^0x40000000)).unwrap();
+                            let item_param = Regulation::equip_goods_param_map().get(&(item_id^InventoryItemType::ITEM as u32)).unwrap();
 
                             let goods_type = GoodsType::from(item_param.data.goodsType);
                             let quantity = Some({
