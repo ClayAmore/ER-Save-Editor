@@ -47,6 +47,10 @@ impl InventoryViewModel {
     }
 
     pub fn add_all_to_inventory(&mut self) {
+        // Mark this section as changed so when the file is 
+        // saved then it will write this section to the file
+        self.changed = true;
+
         let items = match self.current_bulk_type_route {
             InventoryTypeRoute::KeyItems |
             InventoryTypeRoute::CommonItems => {

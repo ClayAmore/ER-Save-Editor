@@ -169,7 +169,7 @@ impl InventoryItemViewModel {
             quantity: item_info.quantity,
             inventory_index: item_info.inventory_index,
             equip_index: equip_index,
-            r#type: gaitem_type
+            r#type: gaitem_type,
         }
     }
 }
@@ -222,6 +222,9 @@ pub struct InventoryViewModel  {
     pub naked_arms: InventoryItemViewModel,
     pub naked_legs: InventoryItemViewModel,
     
+    // Changed indicator
+    pub changed: bool,
+
     // Log
     pub log: Vec<String>,
 

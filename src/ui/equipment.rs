@@ -327,6 +327,11 @@ pub mod equipment {
                                 ui.label("Equipped");
                             }
                             else if ui.add_sized([100., 24.], egui::Button::new("Unequip").fill(Color32::LIGHT_RED)).clicked() {
+
+                                // Mark this section as changed so when the file is 
+                                // saved then it will write this section to the file
+                                equipment_vm.changed = true;
+
                                 match &inventory_vm.current_subtype_route {
                                     InventorySubTypeRoute::None => {},
                                     InventorySubTypeRoute::WeaponLeft => {
@@ -429,6 +434,11 @@ pub mod equipment {
                         }
                         else {
                             if ui.add_sized([100., 24.], egui::Button::new("Equip")).clicked() {
+                                
+                                // Mark this section as changed so when the file is 
+                                // saved then it will write this section to the file
+                                equipment_vm.changed = true;
+                        
                                 match &inventory_vm.current_subtype_route {
                                     InventorySubTypeRoute::None => {},
                                     InventorySubTypeRoute::WeaponLeft => {

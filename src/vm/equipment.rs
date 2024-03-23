@@ -30,6 +30,8 @@ pub mod equipment_view_model {
 
         pub current_equipped_items: Vec<u32>,
         pub current_index: usize,
+
+        pub changed: bool,
     }
 
     impl EquipmentViewModel {

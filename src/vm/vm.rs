@@ -85,7 +85,6 @@ pub mod vm {
         }
 
         pub fn update_save(&self,  save_type: &mut SaveType) {
-
             let steam_id = self.steam_id.parse::<u64>().expect("");
             // Update SteamID for UserData10
             save_type.set_global_steam_id(steam_id);
@@ -163,6 +162,11 @@ pub mod vm {
             let general_vm = &self.slots[index].general_vm;
             let inventory_vm = &self.slots[index].inventory_vm;
 
+            // Don't update savefile equipment if it has not been changed
+            if !inventory_vm.changed {
+                return;
+            }
+
             // Map somber to normal weapon upgrade
             let somber_to_normal: HashMap<u8, u8> = HashMap::from([
                 (0, 0), (1, 0),(2, 5), (3, 7), (4, 10), (5, 12), 
@@ -234,6 +238,11 @@ pub mod vm {
 
         fn update_equipment(&self, save_type: &mut SaveType, index: usize) {
             let equipment_vm = &self.slots[index].equipment_vm;
+
+            // Don't update savefile equipment if it has not been changed
+            if !equipment_vm.changed {
+                return;
+            }
 
             // (gaitem_handle, item_id, equipment_index)
             let mut quickslots = [(0, u32::MAX, u32::MAX); 10]; 
@@ -358,6 +367,11 @@ pub mod vm {
             let inventory_vm = &self.slots[index].inventory_vm;
             let inventory_held = &inventory_vm.storage[0];
             let inventory_storage_box = &inventory_vm.storage[1];
+
+            // Don't update savefile equipment if it has not been changed
+            if !inventory_vm.changed {
+                return;
+            }
 
             // Update gaitem map
             save_type.set_gaitem_map(index, inventory_vm.gaitem_map.clone());

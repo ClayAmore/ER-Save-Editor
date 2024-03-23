@@ -23,6 +23,10 @@ impl InventoryViewModel {
             return;
         }
 
+        // Mark this section as changed so when the file is 
+        // saved then it will write this section to the file
+        self.changed = true;
+
         // Handle item add
         match item.item_type {
             InventoryItemType::WEAPON => {
