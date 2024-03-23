@@ -18,7 +18,7 @@ pub mod inventory {
                     }
                     if add_items.hovered() {
                         egui::popup::show_tooltip(ui.ctx(), add_items.id, |ui|{
-                            ui.label(egui::RichText::new("Warning: This is an experimental feature that is still being worked on. Use with catution. If you discover any bugs, report them to todo{add address or info about bug reports}.").size(8.0).color(Color32::PLACEHOLDER));
+                            ui.label(egui::RichText::new("Warning: This is an experimental feature that is still being worked on. Use with catution.").size(8.0).color(Color32::PLACEHOLDER));
                         });
                     }
                     if browse_items.clicked() {
