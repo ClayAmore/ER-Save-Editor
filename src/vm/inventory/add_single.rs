@@ -16,20 +16,11 @@ impl InventoryViewModel {
     pub fn add_to_inventory(&mut self, item: &RegulationItemViewModel) {
         // Check if inventory is full
         let held_inventory_full = self.storage[0].common_item_count == 2688;
-        let storage_box_full = self.storage[0].common_item_count == 1920;
 
         // Check if held inventory is full
-        if item.item_type == InventoryItemType::ITEM {
-            if held_inventory_full && storage_box_full {
-                self.log.insert(0, format!("Inventory is full."));
-                return;
-            }
-        }
-        else {
-            if held_inventory_full {
-                self.log.insert(0, format!("Inventory is full."));
-                return;
-            }
+        if held_inventory_full {
+            self.log.insert(0, format!("Inventory is full."));
+            return;
         }
 
         // Handle item add
