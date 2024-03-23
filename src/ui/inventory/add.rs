@@ -399,7 +399,7 @@ fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel,
                                 });
                             }
                             else {
-                                let max_upgrade = if item.data.materialSetId != 0 && item.data.materialSetId % 2200 == 0 {10} else {25};
+                                let max_upgrade = if item.data.reinforceTypeId != 0 && item.data.reinforceTypeId % 2200 == 0 {10} else {25};
                                 let field = egui::DragValue::new(regulation_vm.selected_item.upgrade.as_mut().unwrap())
                                 .clamp_range(0..=max_upgrade)
                                 .custom_formatter(|n, _| {

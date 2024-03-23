@@ -165,10 +165,10 @@ pub mod vm {
 
             // Map somber to normal weapon upgrade
             let somber_to_normal: HashMap<u8, u8> = HashMap::from([
-                (0, 0), (1, 4),(2, 6), (3, 9), (4, 11), (5, 14), 
-                (6, 16), (7, 19), (8, 21), (9, 24), (10, 25), 
+                (0, 0), (1, 0),(2, 5), (3, 7), (4, 10), (5, 12), 
+                (6, 15), (7, 17), (8, 20), (9, 24), (10, 25), 
             ]);
-
+            
             // Find the highest weapon upgrade in player inventory
             let mut max_level: u8 = 0;
             for (held_item, storage_item) in inventory_vm.storage[0].common_items.iter().zip(&inventory_vm.storage[1].common_items) {
@@ -179,7 +179,7 @@ pub mod vm {
                     match held_weapon_res {
                         Some(weapon_param) => {
                             // Check if weapon is somber
-                            let is_somber = weapon_param.data.reinforceTypeId % 2200 == 0;
+                            let is_somber = weapon_param.data.reinforceTypeId != 0 && weapon_param.data.reinforceTypeId % 2200 == 0;
                             
                             // Extract weapon level based on wether weapon is somber or not
                             let weapon_level = if is_somber{
