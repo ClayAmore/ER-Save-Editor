@@ -25,7 +25,7 @@ Tool for editing Elden Ring save files. Compatible with PC and Playstation Save 
 - More features will be added in future updates
 
 ## Permissions
-Feel free to use this save editor for learning or development purposes. However, I do not authorize its use for creating tools or modifications that enable actions outside the bounds of what the game allows.
+Feel free to use this save editor for learning or development purposes. However, I do not authorize its use for creating tools or modifications that enable actions online outside the bounds of what the game allows.
 
 ## FAQ
 Q: Will this ban me?<br/>
