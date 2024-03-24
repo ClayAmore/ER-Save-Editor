@@ -209,7 +209,7 @@ pub mod vm {
                     match storage_weapon_res {
                         Some(weapon_param) => {
                             // Check if weapon is somber
-                            let is_somber = weapon_param.data.reinforceTypeId % 2200 == 0;
+                            let is_somber = weapon_param.data.reinforceTypeId != 0 && weapon_param.data.reinforceTypeId % 2200 == 0;
                             
                             // Extract weapon level based on wether weapon is somber or not
                             let weapon_level = if is_somber{
