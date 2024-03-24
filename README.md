@@ -1,4 +1,4 @@
-# Elden Ring Save Editor
+# ER Save Editor
 
 <p align="center">
   <a href="https://github.com/ClayAmore/ER-Save-Editor/blob/master/icon/readme.md"><img src="https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/e1d40274-066a-4b72-b010-de9170090b60" /></a>
@@ -18,14 +18,14 @@ Tool for editing Elden Ring save files. Compatible with PC and Playstation Save 
 - Add items, weapons, armors, ashes of war, and talismans to inventory
 - Add items in bulk to speed up build making process.
 - Browse inventory
-- Customize player equipment
+- Change player equipment
 - Activate/deactivate Sites of Grace, summoning pools, colosseums, etc.
 - Revive or kill bosses
 - Activate/deactivate invasion regions
 - More features will be added in future updates
 
 ## Permissions
-Feel free to use this save editor for learning or development purposes. However, I do not authorize its use for creating tools or modifications that enable actions outside the bounds of what the game allows.
+Feel free to use this save editor for learning or development purposes. However, I do not authorize its use for creating tools or modifications that enable actions online outside the bounds of what the game allows.
 
 ## FAQ
 Q: Will this ban me?<br/>
