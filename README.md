@@ -1,4 +1,4 @@
-# Elden Ring Save Editor
+# ER Save Editor
 
 <p align="center">
   <a href="https://github.com/ClayAmore/ER-Save-Editor/blob/master/icon/readme.md"><img src="https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/e1d40274-066a-4b72-b010-de9170090b60" /></a>
