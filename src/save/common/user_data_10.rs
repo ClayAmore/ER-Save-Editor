@@ -35,6 +35,169 @@ impl Write for CSMenuSystemSaveLoad {
     }
 }
 
+#[derive(Default, Copy, Clone)]
+pub struct ProfileSummaryEquipmentGaitem {
+    unk: u32,
+    unk1: u32,
+    pub arm_style: u32,
+    pub left_hand_active_slot: u32,
+    pub right_hand_active_slot: u32,
+    pub left_arrow_active_slot: u32,
+    pub right_arrow_active_slot: u32,
+    pub left_bolt_active_slot: u32,
+    pub right_bolt_active_slot: u32,
+    pub left_hand_armaments: [u32; 3],
+    pub right_hand_armaments: [u32; 3],
+    pub arrows: [u32; 2],
+    pub bolts: [u32; 2],
+    pub _0x4: u32,
+    pub head: u32,
+    pub chest: u32,
+    pub arms: u32,
+    pub legs: u32,
+    pub _0x4_2: u32,
+    pub talismans: [u32; 4],
+    pub _0x4_3: u32
+}
+impl Read for ProfileSummaryEquipmentGaitem {
+    fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
+        let mut equipment = ProfileSummaryEquipmentGaitem::default();
+
+        equipment.unk = br.read_u32()?;
+        equipment.unk1 = br.read_u32()?;
+
+        equipment.arm_style = br.read_u32()?;
+        equipment.left_hand_active_slot = br.read_u32()?;
+        equipment.right_hand_active_slot = br.read_u32()?;
+        equipment.left_arrow_active_slot = br.read_u32()?;
+        equipment.right_arrow_active_slot = br.read_u32()?;
+        equipment.left_bolt_active_slot = br.read_u32()?;
+        equipment.right_bolt_active_slot = br.read_u32()?;
+        equipment.left_hand_armaments[0] = br.read_u32()?;
+        equipment.right_hand_armaments[0] = br.read_u32()?;
+        equipment.left_hand_armaments[1] = br.read_u32()?;
+        equipment.right_hand_armaments[1] = br.read_u32()?;
+        equipment.left_hand_armaments[2] = br.read_u32()?;
+        equipment.right_hand_armaments[2] = br.read_u32()?;
+        equipment.arrows[0] = br.read_u32()?;
+        equipment.bolts[0] = br.read_u32()?;
+        equipment.arrows[1] = br.read_u32()?;
+        equipment.bolts[1] = br.read_u32()?;
+        equipment._0x4 = br.read_u32()?;
+        equipment.head = br.read_u32()?;
+        equipment.chest = br.read_u32()?;
+        equipment.arms = br.read_u32()?;
+        equipment.legs = br.read_u32()?;
+        equipment._0x4_2 = br.read_u32()?;
+        for i in 0..4 { equipment.talismans[i] = br.read_u32()?; }
+        equipment._0x4_3 = br.read_u32()?;
+
+        Ok(equipment)
+    }
+}
+impl Write for ProfileSummaryEquipmentGaitem {
+    fn write(&self) -> Result<Vec<u8>, io::Error> {
+        let mut bytes: Vec<u8> = Vec::new();
+
+        bytes.extend(self.unk.to_le_bytes());
+        bytes.extend(self.unk1.to_le_bytes());
+
+        bytes.extend(self.arm_style.to_le_bytes());
+        bytes.extend(self.left_hand_active_slot.to_le_bytes());
+        bytes.extend(self.right_hand_active_slot.to_le_bytes());
+        bytes.extend(self.left_arrow_active_slot.to_le_bytes());
+        bytes.extend(self.right_arrow_active_slot.to_le_bytes());
+        bytes.extend(self.left_bolt_active_slot.to_le_bytes());
+        bytes.extend(self.right_bolt_active_slot.to_le_bytes());
+        bytes.extend(self.left_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.arrows[0].to_le_bytes());
+        bytes.extend(self.bolts[0].to_le_bytes());
+        bytes.extend(self.arrows[1].to_le_bytes());
+        bytes.extend(self.bolts[1].to_le_bytes());
+        bytes.extend(self._0x4.to_le_bytes());
+        bytes.extend(self.head.to_le_bytes());
+        bytes.extend(self.chest.to_le_bytes());
+        bytes.extend(self.arms.to_le_bytes());
+        bytes.extend(self.legs.to_le_bytes());
+        bytes.extend(self._0x4_2.to_le_bytes());
+        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        bytes.extend(self._0x4_3.to_le_bytes());
+        Ok(bytes)
+    }
+}
+
+#[derive(Default, Copy, Clone)]
+pub struct ProfileSummaryEquipmentItem {
+    pub left_hand_armaments: [u32; 3],
+    pub right_hand_armaments: [u32; 3],
+    pub arrows: [u32; 2],
+    pub bolts: [u32; 2],
+    pub _0x4: u32,
+    pub head: u32,
+    pub chest: u32,
+    pub arms: u32,
+    pub legs: u32,
+    pub _0x4_2: u32,
+    pub talismans: [u32; 4],
+    pub _0x4_3: [u32; 6]
+}
+impl Read for ProfileSummaryEquipmentItem {
+    fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
+        let mut equipment = ProfileSummaryEquipmentItem::default();
+
+        equipment.left_hand_armaments[0] = br.read_u32()?;
+        equipment.right_hand_armaments[0] = br.read_u32()?;
+        equipment.left_hand_armaments[1] = br.read_u32()?;
+        equipment.right_hand_armaments[1] = br.read_u32()?;
+        equipment.left_hand_armaments[2] = br.read_u32()?;
+        equipment.right_hand_armaments[2] = br.read_u32()?;
+        equipment.arrows[0] = br.read_u32()?;
+        equipment.bolts[0] = br.read_u32()?;
+        equipment.arrows[1] = br.read_u32()?;
+        equipment.bolts[1] = br.read_u32()?;
+        equipment._0x4 = br.read_u32()?;
+        equipment.head = br.read_u32()?;
+        equipment.chest = br.read_u32()?;
+        equipment.arms = br.read_u32()?;
+        equipment.legs = br.read_u32()?;
+        equipment._0x4_2 = br.read_u32()?;
+        for i in 0..4 { equipment.talismans[i] = br.read_u32()?; }
+        for i in 0..6 { equipment._0x4_3[i] = br.read_u32()?; }
+
+        Ok(equipment)
+    }
+}
+impl Write for ProfileSummaryEquipmentItem {
+    fn write(&self) -> Result<Vec<u8>, io::Error> {
+        let mut bytes: Vec<u8> = Vec::new();
+
+        bytes.extend(self.left_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[0].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[1].to_le_bytes());
+        bytes.extend(self.left_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.right_hand_armaments[2].to_le_bytes());
+        bytes.extend(self.arrows[0].to_le_bytes());
+        bytes.extend(self.bolts[0].to_le_bytes());
+        bytes.extend(self.arrows[1].to_le_bytes());
+        bytes.extend(self.bolts[1].to_le_bytes());
+        bytes.extend(self._0x4.to_le_bytes());
+        bytes.extend(self.head.to_le_bytes());
+        bytes.extend(self.chest.to_le_bytes());
+        bytes.extend(self.arms.to_le_bytes());
+        bytes.extend(self.legs.to_le_bytes());
+        bytes.extend(self._0x4_2.to_le_bytes());
+        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        for i in 0..6 { bytes.extend(self._0x4_3[i].to_le_bytes()); }
+        Ok(bytes)
+    }
+}
+
 #[derive(Copy, Clone)]
 pub struct ProfileSummary{
     pub character_name: [u16; 0x11],
@@ -45,7 +208,8 @@ pub struct ProfileSummary{
     _0x34: u32 ,
     _0x38_0x150: u32 ,
     _0x38_0x8: [u8;0x120] ,
-    _0x1a0: [u8;0xe8] ,
+    pub equipment_gaitem: ProfileSummaryEquipmentGaitem,
+    pub equipment_item: ProfileSummaryEquipmentItem,
     _0x290: u8 ,
     _0x291: u8 ,
     _0x292: u8 ,
@@ -66,7 +230,8 @@ impl Default for ProfileSummary {
             _0x34: 0,
             _0x38_0x150: 0,
             _0x38_0x8: [0x0; 0x120],
-            _0x1a0: [0x0; 0xe8],
+            equipment_gaitem: Default::default(),
+            equipment_item: Default::default(),
             _0x290: 0,
             _0x291: 0,
             _0x292: 0,
@@ -89,7 +254,8 @@ impl Read for ProfileSummary {
         profile_summary._0x34 = br.read_u32()?;
         profile_summary._0x38_0x150 = br.read_u32()?;
         profile_summary._0x38_0x8.copy_from_slice(br.read_bytes(0x120)?);
-        profile_summary._0x1a0.copy_from_slice(br.read_bytes(0xe8)?);
+        profile_summary.equipment_gaitem = ProfileSummaryEquipmentGaitem::read(br)?;
+        profile_summary.equipment_item = ProfileSummaryEquipmentItem::read(br)?;
         profile_summary._0x290 = br.read_u8()?;
         profile_summary._0x291 = br.read_u8()?;
         profile_summary._0x292 = br.read_u8()?;
@@ -112,7 +278,8 @@ impl Write for ProfileSummary{
         bytes.extend(self._0x34.to_le_bytes());
         bytes.extend(self._0x38_0x150.to_le_bytes());
         bytes.extend(self._0x38_0x8);
-        bytes.extend(self._0x1a0);
+        bytes.extend(self.equipment_gaitem.write()?);
+        bytes.extend(self.equipment_item.write()?);
         bytes.push(self._0x290);
         bytes.push(self._0x291);
         bytes.push(self._0x292);

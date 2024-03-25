@@ -502,17 +502,23 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    let profile_summary = &mut pc_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.left_hand_armaments[weapon_slot_index] = equip_index;
                     slot.chr_asm.left_hand_armaments[weapon_slot_index] = item_id;
                     slot.chr_asm2.left_hand_armaments[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.left_hand_armaments[weapon_slot_index] = item_id;
+                    profile_summary.equipment_gaitem.left_hand_armaments[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.left_hand_armaments[weapon_slot_index] = item_id;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
+                    let profile_summary = &mut ps_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.left_hand_armaments[weapon_slot_index] = equip_index;
                     slot.chr_asm.left_hand_armaments[weapon_slot_index] = item_id;
                     slot.chr_asm2.left_hand_armaments[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.left_hand_armaments[weapon_slot_index] = item_id;
+                    profile_summary.equipment_gaitem.left_hand_armaments[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.left_hand_armaments[weapon_slot_index] = item_id;
                 },
             }
         }
@@ -522,17 +528,23 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    let profile_summary = &mut pc_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.right_hand_armaments[weapon_slot_index] = equip_index;
                     slot.chr_asm.right_hand_armaments[weapon_slot_index] = item_id;
                     slot.chr_asm2.right_hand_armaments[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.right_hand_armaments[weapon_slot_index] = item_id;
+                    profile_summary.equipment_gaitem.right_hand_armaments[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.right_hand_armaments[weapon_slot_index] = item_id;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
+                    let profile_summary = &mut ps_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.right_hand_armaments[weapon_slot_index] = equip_index;
                     slot.chr_asm.right_hand_armaments[weapon_slot_index] = item_id;
                     slot.chr_asm2.right_hand_armaments[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.right_hand_armaments[weapon_slot_index] = item_id;
+                    profile_summary.equipment_gaitem.right_hand_armaments[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.right_hand_armaments[weapon_slot_index] = item_id;
                 },
             }
         }
@@ -542,17 +554,23 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    let profile_summary = &mut pc_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.arrows[weapon_slot_index] = equip_index;
                     slot.chr_asm.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.arrows[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
+                    profile_summary.equipment_gaitem.arrows[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.arrows[weapon_slot_index] = item_id;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
+                    let profile_summary = &mut ps_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.arrows[weapon_slot_index] = equip_index;
                     slot.chr_asm.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.arrows[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.arrows[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
+                    profile_summary.equipment_gaitem.arrows[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.arrows[weapon_slot_index] = item_id;
                 },
             }
         }
@@ -562,17 +580,23 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    let profile_summary = &mut pc_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.bolts[weapon_slot_index] = equip_index;
                     slot.chr_asm.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.bolts[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
+                    profile_summary.equipment_gaitem.bolts[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.bolts[weapon_slot_index] = item_id;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
+                    let profile_summary = &mut ps_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.bolts[weapon_slot_index] = equip_index;
                     slot.chr_asm.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
                     slot.chr_asm2.bolts[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.bolts[weapon_slot_index] = if item_id == 0 {u32::MAX} else {item_id};
+                    profile_summary.equipment_gaitem.bolts[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.bolts[weapon_slot_index] = item_id;
                 },
             }
         }
@@ -582,17 +606,23 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    let profile_summary = &mut pc_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.talismans[weapon_slot_index] = equip_index;
                     slot.chr_asm.talismans[weapon_slot_index] = item_id;
                     slot.chr_asm2.talismans[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.talismans[weapon_slot_index] = item_id | 0x20000000;
+                    profile_summary.equipment_gaitem.talismans[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.talismans[weapon_slot_index] = item_id | 0x20000000;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
+                    let profile_summary = &mut ps_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.talismans[weapon_slot_index] = equip_index;
                     slot.chr_asm.talismans[weapon_slot_index] = item_id;
                     slot.chr_asm2.talismans[weapon_slot_index] = gaitem_handle;
                     slot.equipped_items.talismans[weapon_slot_index] = item_id | 0x20000000;
+                    profile_summary.equipment_gaitem.talismans[weapon_slot_index] = gaitem_handle;
+                    profile_summary.equipment_item.talismans[weapon_slot_index] = item_id | 0x20000000;
                 },
             }
         }
@@ -602,17 +632,23 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    let profile_summary = &mut pc_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.head = equip_index;
                     slot.chr_asm.head = item_id;
                     slot.chr_asm2.head = gaitem_handle;
                     slot.equipped_items.head = item_id | 0x10000000;
+                    profile_summary.equipment_gaitem.head = gaitem_handle;
+                    profile_summary.equipment_item.head = item_id | 0x10000000;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
+                    let profile_summary = &mut ps_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.head = equip_index;
                     slot.chr_asm.head = item_id;
                     slot.chr_asm2.head = gaitem_handle;
                     slot.equipped_items.head = item_id | 0x10000000;
+                    profile_summary.equipment_gaitem.head = gaitem_handle;
+                    profile_summary.equipment_item.head = item_id | 0x10000000;
                 },
             }
         }
@@ -622,17 +658,23 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    let profile_summary = &mut pc_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.chest = equip_index;
                     slot.chr_asm.chest = item_id;
                     slot.chr_asm2.chest = gaitem_handle;
                     slot.equipped_items.chest = item_id | 0x10000000;
+                    profile_summary.equipment_gaitem.chest = gaitem_handle;
+                    profile_summary.equipment_item.chest = item_id | 0x10000000;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
+                    let profile_summary = &mut ps_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.chest = equip_index;
                     slot.chr_asm.chest = item_id;
                     slot.chr_asm2.chest = gaitem_handle;
                     slot.equipped_items.chest = item_id | 0x10000000;
+                    profile_summary.equipment_gaitem.chest = gaitem_handle;
+                    profile_summary.equipment_item.chest = item_id | 0x10000000;
                 },
             }
         }
@@ -642,17 +684,23 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    let profile_summary = &mut pc_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.arms = equip_index;
                     slot.chr_asm.arms = item_id;
                     slot.chr_asm2.arms = gaitem_handle;
                     slot.equipped_items.arms = item_id | 0x10000000;
+                    profile_summary.equipment_gaitem.arms = gaitem_handle;
+                    profile_summary.equipment_item.arms = item_id | 0x10000000;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
+                    let profile_summary = &mut ps_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.arms = equip_index;
                     slot.chr_asm.arms = item_id;
                     slot.chr_asm2.arms = gaitem_handle;
                     slot.equipped_items.arms = item_id | 0x10000000;
+                    profile_summary.equipment_gaitem.arms = gaitem_handle;
+                    profile_summary.equipment_item.arms = item_id | 0x10000000;
                 },
             }
         }
@@ -662,17 +710,23 @@ pub mod save {
                 SaveType::Unknown => panic!("Why are we here?"),
                 SaveType::PC(pc_save) => {
                     let slot = &mut pc_save.save_slots[slot_index].save_slot;
+                    let profile_summary = &mut pc_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.legs = equip_index;
                     slot.chr_asm.legs = item_id;
                     slot.chr_asm2.legs = gaitem_handle;
                     slot.equipped_items.legs = item_id | 0x10000000;
+                    profile_summary.equipment_gaitem.legs = gaitem_handle;
+                    profile_summary.equipment_item.legs = item_id | 0x10000000;
                 },
                 SaveType::PlayStation(ps_save) => {
                     let slot = &mut ps_save.save_slots[slot_index];
+                    let profile_summary = &mut ps_save.user_data_10.profile_summary[slot_index];
                     slot.equip_data.legs = equip_index;
                     slot.chr_asm.legs = item_id;
                     slot.chr_asm2.legs = gaitem_handle;
                     slot.equipped_items.legs = item_id | 0x10000000;
+                    profile_summary.equipment_gaitem.legs = gaitem_handle;
+                    profile_summary.equipment_item.legs = item_id | 0x10000000;
                 },
             }
         }
