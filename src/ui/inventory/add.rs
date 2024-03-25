@@ -399,7 +399,13 @@ fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel,
                                 });
                             }
                             else {
-                                let max_upgrade = if item.data.reinforceTypeId != 0 && item.data.reinforceTypeId % 2200 == 0 {10} else {25};
+                                let max_upgrade = if item.data.reinforceTypeId != 0 &&(
+                                    item.data.reinforceTypeId % 2200 == 0 ||
+                                    item.data.reinforceTypeId % 2400 == 0 ||
+                                    item.data.reinforceTypeId % 3200 == 0 ||
+                                    item.data.reinforceTypeId % 3300 == 0 ||
+                                    item.data.reinforceTypeId % 8300 == 0 ||
+                                    item.data.reinforceTypeId % 8500 == 0) {10} else {25};
                                 let field = egui::DragValue::new(regulation_vm.selected_item.upgrade.as_mut().unwrap())
                                 .clamp_range(0..=max_upgrade)
                                 .custom_formatter(|n, _| {

@@ -62,7 +62,6 @@ pub struct ProfileSummaryEquipmentGaitem {
 impl Read for ProfileSummaryEquipmentGaitem {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut equipment = ProfileSummaryEquipmentGaitem::default();
-
         equipment.unk = br.read_u32()?;
         equipment.unk1 = br.read_u32()?;
 
@@ -91,7 +90,6 @@ impl Read for ProfileSummaryEquipmentGaitem {
         equipment._0x4_2 = br.read_u32()?;
         for i in 0..4 { equipment.talismans[i] = br.read_u32()?; }
         equipment._0x4_3 = br.read_u32()?;
-
         Ok(equipment)
     }
 }
@@ -135,16 +133,17 @@ impl Write for ProfileSummaryEquipmentGaitem {
 pub struct ProfileSummaryEquipmentItem {
     pub left_hand_armaments: [u32; 3],
     pub right_hand_armaments: [u32; 3],
+    _0x4: u32,
     pub arrows: [u32; 2],
     pub bolts: [u32; 2],
-    pub _0x4: u32,
+    _0x8: u64,
     pub head: u32,
     pub chest: u32,
     pub arms: u32,
     pub legs: u32,
-    pub _0x4_2: u32,
+    _0x4_2: u32,
     pub talismans: [u32; 4],
-    pub _0x4_3: [u32; 6]
+    _0x4_3: [u32; 6]
 }
 impl Read for ProfileSummaryEquipmentItem {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
@@ -156,16 +155,18 @@ impl Read for ProfileSummaryEquipmentItem {
         equipment.right_hand_armaments[1] = br.read_u32()?;
         equipment.left_hand_armaments[2] = br.read_u32()?;
         equipment.right_hand_armaments[2] = br.read_u32()?;
+        equipment._0x4 = br.read_u32()?;
         equipment.arrows[0] = br.read_u32()?;
         equipment.bolts[0] = br.read_u32()?;
         equipment.arrows[1] = br.read_u32()?;
         equipment.bolts[1] = br.read_u32()?;
-        equipment._0x4 = br.read_u32()?;
+        equipment._0x8 = br.read_u64()?;
         equipment.head = br.read_u32()?;
         equipment.chest = br.read_u32()?;
         equipment.arms = br.read_u32()?;
         equipment.legs = br.read_u32()?;
         equipment._0x4_2 = br.read_u32()?;
+
         for i in 0..4 { equipment.talismans[i] = br.read_u32()?; }
         for i in 0..6 { equipment._0x4_3[i] = br.read_u32()?; }
 
@@ -182,11 +183,12 @@ impl Write for ProfileSummaryEquipmentItem {
         bytes.extend(self.right_hand_armaments[1].to_le_bytes());
         bytes.extend(self.left_hand_armaments[2].to_le_bytes());
         bytes.extend(self.right_hand_armaments[2].to_le_bytes());
+        bytes.extend(self._0x4.to_le_bytes());
         bytes.extend(self.arrows[0].to_le_bytes());
         bytes.extend(self.bolts[0].to_le_bytes());
         bytes.extend(self.arrows[1].to_le_bytes());
         bytes.extend(self.bolts[1].to_le_bytes());
-        bytes.extend(self._0x4.to_le_bytes());
+        bytes.extend(self._0x8.to_le_bytes());
         bytes.extend(self.head.to_le_bytes());
         bytes.extend(self.chest.to_le_bytes());
         bytes.extend(self.arms.to_le_bytes());

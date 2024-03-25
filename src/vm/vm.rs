@@ -183,7 +183,14 @@ pub mod vm {
                     match held_weapon_res {
                         Some(weapon_param) => {
                             // Check if weapon is somber
-                            let is_somber = weapon_param.data.reinforceTypeId != 0 && weapon_param.data.reinforceTypeId % 2200 == 0;
+                            let is_somber = weapon_param.data.reinforceTypeId != 0 && (
+                                weapon_param.data.reinforceTypeId % 2200 == 0 ||
+                                weapon_param.data.reinforceTypeId % 2400 == 0 ||
+                                weapon_param.data.reinforceTypeId % 3200 == 0 ||
+                                weapon_param.data.reinforceTypeId % 3300 == 0 ||
+                                weapon_param.data.reinforceTypeId % 8300 == 0 ||
+                                weapon_param.data.reinforceTypeId % 8500 == 0
+                            );
                             
                             // Extract weapon level based on wether weapon is somber or not
                             let weapon_level = if is_somber{
@@ -209,7 +216,14 @@ pub mod vm {
                     match storage_weapon_res {
                         Some(weapon_param) => {
                             // Check if weapon is somber
-                            let is_somber = weapon_param.data.reinforceTypeId != 0 && weapon_param.data.reinforceTypeId % 2200 == 0;
+                            let is_somber = weapon_param.data.reinforceTypeId != 0 && (
+                                weapon_param.data.reinforceTypeId % 2200 == 0 ||
+                                weapon_param.data.reinforceTypeId % 2400 == 0 ||
+                                weapon_param.data.reinforceTypeId % 3200 == 0 ||
+                                weapon_param.data.reinforceTypeId % 3300 == 0 ||
+                                weapon_param.data.reinforceTypeId % 8300 == 0 ||
+                                weapon_param.data.reinforceTypeId % 8500 == 0
+                            );
                             
                             // Extract weapon level based on wether weapon is somber or not
                             let weapon_level = if is_somber{
