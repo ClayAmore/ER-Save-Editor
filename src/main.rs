@@ -41,7 +41,7 @@ fn main() -> Result<(), eframe::Error> {
         ..Default::default()
     };
 
-    eframe::run_native("ER Save Editor 0.0.2", options, Box::new(|creation_context| {
+    eframe::run_native("ER Save Editor 0.0.21", options, Box::new(|creation_context| {
         let mut fonts = egui::FontDefinitions::default();
         egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
         egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Fill);
