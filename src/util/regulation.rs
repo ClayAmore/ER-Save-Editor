@@ -87,7 +87,7 @@ impl Regulation {
         let mut params: HashMap<Param, Vec<u8>> = HashMap::new();
 
         for file in &res.files {
-            let file_name = path.file_stem().unwrap().to_str().unwrap().split("\\").last().expect("Could not find content at end of path");
+            let file_name = &file.name.split("\\").last().expect("Could not locate file name").split(".").nth(0).expect("Could not locate file name without extension");
             let param_type = Param::from_str(file_name)?;
             params.insert(param_type, file.bytes.to_vec());
         }
