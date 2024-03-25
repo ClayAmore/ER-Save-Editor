@@ -570,7 +570,7 @@ impl InventoryViewModel {
 
     fn add_talisman(&mut self, id: u32) {
         let item_id = id | InventoryItemType::ACCESSORY as u32;
-        let gaitem_handle = self.generate_gaitem_handle_for_armament(InventoryGaitemType::ACCESSORY);
+        let gaitem_handle = id | InventoryGaitemType::ACCESSORY as u32;
 
         // Fetch name
         let name = match ACCESSORY_NAME.lock().unwrap().get(&id) {
