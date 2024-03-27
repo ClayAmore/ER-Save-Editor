@@ -35,4 +35,4 @@ A: There's no guarantee that you won't be banned. None of these features have be
 If you encounter any bugs or issues while using the save editor, please report them. When reporting bugs, try to provide reproducible steps so I can debug effectively.
 
 ## Credits
-![image](https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/710c9ee6-c3df-4665-be6b-d96bce1ebf46)
+<a href="https://github.com/nordgaren/"><img src="https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/710c9ee6-c3df-4665-be6b-d96bce1ebf46"/></a>
