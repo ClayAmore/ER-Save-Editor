@@ -56,5 +56,20 @@ pub mod regions_view_model {
 
             regions_vm
         }
+
+        pub fn to_string(&self) -> String {
+            let mut text = String::from("");
+
+            for (region, (activated, _, _,_)) in self.regions.iter() {
+                if *activated {
+                    // Matches the format provided by a CE table for Elden Ring
+                    let (region_id, _,_,_,_,_) = &REGIONS.lock().unwrap()[region];
+                    text.push_str(&region_id.to_string());
+                    text.push('\n');
+                }
+            }
+
+            return text;
+        }
     }
 }

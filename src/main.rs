@@ -9,7 +9,6 @@ mod db;
 
 use std::{fs::{self, File}, io::Write, path::PathBuf};
 
-use db::regions::regions::REGIONS;
 use eframe::{egui::{self, text::LayoutJob, Align, FontSelection, Id, LayerId, Layout, Order, RichText, Rounding, Style}, epaint::Color32};
 use rfd::FileDialog;
 use save::save::save::{Save, SaveType};
@@ -97,21 +96,9 @@ impl App {
 
     fn save_regions(&mut self, path: PathBuf) {
         let mut f = File::create(path).expect("");
-        let regions_vm = &self.vm.slots[self.vm.index].regions_vm;
-        let mut text = String::from("");
-        for (region, (activated, _, _,_)) in regions_vm.regions.iter() {
-            if *activated {
-                // Matches the format provided by a CE table for Elden Ring
-                text.push_str(&REGIONS.lock().unwrap()[region].0.to_string());
-                text.push_str(&String::from("\n"));
-            }
-        }
-        let res = f.write_all(&text.as_bytes());
-
-        match res {
-            Ok(_) => {},
-            Err(_) => todo!(),
-        }
+        let region_string =  &self.vm.slots[self.vm.index].regions_vm.to_string();
+        
+        f.write_all(&region_string.as_bytes()).expect("Failed to write file");
     }
 
     fn open_file_dialog() -> Option<PathBuf> {
@@ -306,13 +293,8 @@ impl eframe::App for App {
                                 )
                             );
                             if ui.add_enabled(!self.vm.steam_id.is_empty(), export_button).clicked() {
-                                let files = Self::save_region_file_dialog();
-                                match files {
-                                    Some(path) => {
-                                        self.save_regions(path)
-                                    },
-                                    None => {},
-                                }
+                                let path = Self::save_region_file_dialog().expect("Should provide a path to a new or existing file");
+                                self.save_regions(path);
                             }
                         });
                         ui.separator();
