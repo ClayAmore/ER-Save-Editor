@@ -22,7 +22,7 @@ pub mod slot_view_model {
             let equipment_vm = EquipmentViewModel::from_save(slot);
             let inventory_vm = InventoryViewModel::from_save(slot);
             let events_vm = EventsViewModel::from_save(slot);
-            let regions_vm = RegionsViewModel::from_save(slot);
+            let regions_vm = RegionsViewModel::from_save(slot, None);
              
             Self {
                 active,

@@ -83,9 +83,9 @@ pub mod regions {
                         Ok(contents) => {
                             let region_ids: Vec<u32> = ids_from_string(contents);
 
-                            app.vm.slots[app.vm.index].regions_vm = RegionsViewModel::from_enabled_ids(
+                            app.vm.slots[app.vm.index].regions_vm = RegionsViewModel::from_save(
                                 &save_slot,
-                                &region_ids
+                                Some(&region_ids)
                             );
                         },
                         Err(e) => eprintln!("Failed to read the file: {}", e)
