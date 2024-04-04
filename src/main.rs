@@ -7,14 +7,14 @@ mod write;
 mod ui;
 mod db;
 
-use std::{fs::{self, File}, io::Write, path::PathBuf};
+use std::{fs::File, io::Write, path::PathBuf};
 
 use eframe::{egui::{self, text::LayoutJob, Align, FontSelection, Id, LayerId, Layout, Order, RichText, Rounding, Style}, epaint::Color32};
 use rfd::FileDialog;
 use save::save::save::{Save, SaveType};
 use ui::{equipment::equipment::equipment, events::events::events, general::general::general, importer::import::character_importer, inventory::inventory::inventory::inventory, menu::menu::{menu, Route}, none::none::none, regions::regions::regions, stats::stats::stats};
 use vm::{importer::general_view_model::ImporterViewModel, vm::vm::ViewModel};
-use crate::{vm::regions::regions_view_model::RegionsViewModel, write::write::Write as w}; 
+use crate::write::write::Write as w; 
 use rust_embed::RustEmbed;
 
 #[derive(RustEmbed)]
@@ -267,39 +267,7 @@ impl eframe::App for App {
                     Route::Equipment => equipment(ui, &mut self.vm),
                     Route::Inventory => inventory(ui, &mut self.vm),
                     Route::EventFlags => events(ui, &mut self.vm),
-                    Route::Regions => {
-                        ui.horizontal(|ui| {
-                            let import_button = egui::widgets::Button::new(egui::RichText::new(format!("{} Import Regions", egui_phosphor::regular::DOWNLOAD_SIMPLE)));
-                            if ui.add_enabled(!self.vm.steam_id.is_empty(), import_button).clicked() {
-                                let files = Self::open_region_file_dialog();
-                                match files {
-                                    Some(path) => {
-                                        let contents = fs::read_to_string(path).expect("Should have been able to read the file");
-                                        let region_ids: Vec<u32> = contents
-                                            .split_whitespace() // Split the content by whitespace (newlines, spaces, etc.)
-                                            .filter_map(|s| s.parse::<u32>().ok()) // Parse each piece as an i32, filtering out any errors
-                                            .collect();
-
-                                        let save_slot = self.save.save_type.get_slot(self.vm.index);
-                                        let new_regions_view_model = RegionsViewModel::from_enabled_ids(&save_slot, &region_ids);
-                                        self.vm.slots[self.vm.index].regions_vm = new_regions_view_model;
-                                    },
-                                    None => {},
-                                }
-                            }
-                            let export_button = egui::widgets::Button::new(
-                                egui::RichText::new(
-                                    format!("{} Export Regions", egui_phosphor::regular::DOWNLOAD_SIMPLE)
-                                )
-                            );
-                            if ui.add_enabled(!self.vm.steam_id.is_empty(), export_button).clicked() {
-                                let path = Self::save_region_file_dialog().expect("Should provide a path to a new or existing file");
-                                self.save_regions(path);
-                            }
-                        });
-                        ui.separator();
-                        regions(ui, &mut self.vm)
-                    },
+                    Route::Regions => regions(ui, self),
                 }
             });
         }
