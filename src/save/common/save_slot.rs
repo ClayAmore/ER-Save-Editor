@@ -335,8 +335,7 @@ impl Read for Regions {
         regions.unlocked_regions_count = br.read_u32()?;
 
         for _i in 0..regions.unlocked_regions_count as usize {
-            let region = br.read_u32();
-            regions.unlocked_regions.push(region?);
+            regions.unlocked_regions.push(br.read_u32()?);
         }
 
         Ok(regions)
