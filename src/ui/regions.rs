@@ -76,7 +76,7 @@ pub mod regions {
         );
 
         if ui.add_enabled(steam_id_presence, import_button).clicked() {
-            let files = App::open_region_file_dialog();
+            let files = RegionsViewModel::open_region_file_dialog();
             match files {
                 Some(path) => {
                     match fs::read_to_string(path) {
@@ -120,7 +120,7 @@ pub mod regions {
         );
 
         if ui.add_enabled(steam_id_presence, export_button).clicked() {
-            let path = App::save_region_file_dialog().expect("Should provide a path to a new or existing file");
+            let path = RegionsViewModel::save_region_file_dialog().expect("Should provide a path to a new or existing file");
             app.save_regions(path);
         }
     }

@@ -110,22 +110,6 @@ impl App {
         .pick_file()
     } 
 
-    fn open_region_file_dialog() -> Option<PathBuf> {
-        FileDialog::new()
-            .add_filter("TXT", &["txt", "Cheat Engine Exported Region File"])
-            .add_filter("*", &["*", "All files"])
-            .set_directory("./")
-            .pick_file()
-    }
-
-    fn save_region_file_dialog() -> Option<PathBuf> {
-        FileDialog::new()
-            .add_filter("TXT", &["txt", "Cheat Engine Exported Region File"])
-            .add_filter("*", &["*", "All files"])
-            .set_directory("./")
-            .save_file()
-    }
-
     fn save_file_dialog() -> Option<PathBuf> {
         FileDialog::new()
         .add_filter("SL2", &["sl2", "Regular Save File"])

@@ -1,5 +1,7 @@
 pub mod regions_view_model {
-    use std::collections::BTreeMap;
+    use std::{collections::BTreeMap, path::PathBuf};
+
+    use rfd::FileDialog;
 
     use crate::{db::{map_name::map_name::MapName, regions::regions::{Region, ID_TO_REGION, REGIONS}}, save::common::save_slot::SaveSlot};
 
@@ -25,6 +27,23 @@ pub mod regions_view_model {
     }
 
     impl RegionsViewModel {
+        fn region_file_dialog() -> FileDialog {
+            FileDialog::new()
+                .add_filter("TXT", &["txt", "Cheat Engine Exported Region File"])
+                .add_filter("*", &["*", "All files"])
+                .set_directory("./")
+        }
+
+        pub fn open_region_file_dialog() -> Option<PathBuf> {
+            Self::region_file_dialog()
+                .pick_file()
+        }
+    
+        pub fn save_region_file_dialog() -> Option<PathBuf> {
+            Self::region_file_dialog()
+                .save_file()
+        }
+
         pub fn from_save(slot:& SaveSlot) -> Self {
             let mut regions_vm = RegionsViewModel::default();
 
