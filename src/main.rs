@@ -94,13 +94,6 @@ impl App {
         }
     }
 
-    fn save_regions(&mut self, path: PathBuf) {
-        let mut f = File::create(path).expect("");
-        let region_string =  &self.vm.slots[self.vm.index].regions_vm.to_string();
-        
-        f.write_all(&region_string.as_bytes()).expect("Failed to write file");
-    }
-
     fn open_file_dialog() -> Option<PathBuf> {
         FileDialog::new()
         .add_filter("SL2", &["sl2", "Regular Save File"])

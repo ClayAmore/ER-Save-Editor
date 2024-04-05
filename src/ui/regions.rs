@@ -64,8 +64,6 @@ pub mod regions {
     }
 
     fn import_file(ui: &mut Ui, steam_id_presence: bool, app: &mut App) {
-        let save_slot = app.save.save_type.get_slot(app.vm.index);
-        // let regions_vm: &mut RegionsViewModel = &mut app.vm.slots[app.vm.index].regions_vm;
         let import_button = egui::widgets::Button::new(
             egui::RichText::new(
                 format!(
@@ -83,9 +81,8 @@ pub mod regions {
                         Ok(contents) => {
                             let region_ids: Vec<u32> = ids_from_string(contents);
 
-                            app.vm.slots[app.vm.index].regions_vm = RegionsViewModel::from_save(
-                                &save_slot,
-                                Some(&region_ids)
+                            app.vm.slots[app.vm.index].regions_vm.set_active_regions(
+                                &region_ids
                             );
                         },
                         Err(e) => eprintln!("Failed to read the file: {}", e)
@@ -121,7 +118,7 @@ pub mod regions {
 
         if ui.add_enabled(steam_id_presence, export_button).clicked() {
             let path = RegionsViewModel::save_region_file_dialog().expect("Should provide a path to a new or existing file");
-            app.save_regions(path);
+            app.vm.slots[app.vm.index].regions_vm.write_regions(path);
         }
     }
     
