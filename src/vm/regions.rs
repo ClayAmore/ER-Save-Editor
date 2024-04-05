@@ -91,7 +91,12 @@ pub mod regions_view_model {
         }
 
         pub fn set_active_regions(&mut self, active_region_ids: &Vec<u32>){
+            let active_invasion_region_count = active_region_ids.len();
+            *self = Self::default();
 
+            if active_invasion_region_count == 0 {
+                return;
+            }
             for i in 0..active_region_ids.len() {
                 let key = &active_region_ids[i as usize];
                 
@@ -138,6 +143,8 @@ mod tests {
         regions_vm.set_active_regions(&vec![key]);
         assert!(regions_vm.regions.get_mut(&region).expect("").0, "Region 6101000 should be unlocked");
         assert_eq!(regions_vm.regions.values().filter(|&&(is_active, _, _, _)| is_active).count(), 1, "Only one region should be unlocked");
+        regions_vm.set_active_regions(&vec![]);
+        assert!(!regions_vm.regions.get_mut(&region).expect("").0, "Region 6101000 should be locked");
     }
 }
         
