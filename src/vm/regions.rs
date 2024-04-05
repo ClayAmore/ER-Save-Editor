@@ -44,20 +44,11 @@ pub mod regions_view_model {
                 .save_file()
         }
 
-        pub fn from_save(slot:& SaveSlot, enabled_ids: Option<&Vec<u32>>) -> Self {
+        pub fn from_save(slot:& SaveSlot) -> Self {
             let mut regions_vm = RegionsViewModel::default();
-            // Allows an override to unlocked_regions
-            let unlocked_regions: (usize, &Vec<u32>) = match enabled_ids {
-                Some(ids) => {
-                    (ids.len(), ids)
-                },
-                None => {
-                    (slot.regions.unlocked_regions_count.try_into().unwrap(), &slot.regions.unlocked_regions)
 
-                }
-            };
-            for i in 0..unlocked_regions.0 {
-                let key = &unlocked_regions.1[i as usize];
+            for i in 0..slot.regions.unlocked_regions_count {
+                let key = &slot.regions.unlocked_regions[i as usize];
                 let is_invadeable_region = ID_TO_REGION.lock().unwrap().contains_key(key);
                 
                 if is_invadeable_region {
