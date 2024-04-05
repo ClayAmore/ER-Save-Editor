@@ -74,37 +74,21 @@ pub mod regions {
         );
 
         if ui.add_enabled(steam_id_presence, import_button).clicked() {
-            let files = RegionsViewModel::open_region_file_dialog();
-            match files {
-                Some(path) => {
-                    match fs::read_to_string(path) {
-                        Ok(contents) => {
-                            let region_ids: Vec<u32> = ids_from_string(contents);
+            let files = RegionsViewModel::open_region_file_dialog().expect("File dialog didn't produce any files");
+            let region_text = fs::read_to_string(files).expect("Could not read string from file");
+            let region_ids: Vec<u32> = get_ids(region_text);
 
-                            app.vm.slots[app.vm.index].regions_vm.set_active_regions(
-                                &region_ids
-                            );
-                        },
-                        Err(e) => eprintln!("Failed to read the file: {}", e)
-                    }
-                },
-                None => {},
-            }
+            app.vm.slots[app.vm.index].regions_vm.set_active_regions(
+                &region_ids
+            );
         }
 
     }
 
-    fn ids_from_string(contents: String) -> Vec<u32> {
-        contents
+    fn get_ids(region_text: String) -> Vec<u32> {
+        region_text
         .split_whitespace() // Split the content by whitespace (newlines, spaces, etc.)
-        .filter_map(|s| match s.parse::<u32>() {
-            Ok(num) => Some(num),
-            Err(_) => {
-                // Here you can log the parse error, return None to skip, or even panic if needed
-                eprintln!("Warning: '{}' could not be parsed as u32.", s);
-                None
-            }
-        }) // Parse each piece as an i32, filtering out any errors
+        .filter_map(|s| s.parse::<u32>().ok()) // Parse each piece as an i32, filtering out any errors
         .collect()
     }
 
