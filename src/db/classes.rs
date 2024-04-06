@@ -36,6 +36,15 @@ pub mod classes {
         }
     }
 
+    impl TryFrom<String> for ArcheType {
+        type Error = ();
+        fn try_from(v: String) -> Result<Self, Self::Error> {
+            ArcheType::try_from(
+                (0..9).find(|enum_value| ArcheType::try_from(*enum_value).expect("").to_string() == v).expect("")
+            )
+        }
+    }
+
     impl ToString for ArcheType {
         fn to_string(&self) -> String {
             match self {
