@@ -6,6 +6,7 @@ mod read;
 mod write;
 mod ui;
 mod db;
+pub mod updater;
 
 use std::{fs::File, io::Write, path::PathBuf};
 
@@ -16,6 +17,7 @@ use ui::{equipment::equipment::equipment, events::events::events, general::gener
 use vm::{importer::general_view_model::ImporterViewModel, vm::vm::ViewModel};
 use crate::write::write::Write as w; 
 use rust_embed::RustEmbed;
+use crate::updater::updater::UpdaterApp;
 
 #[derive(RustEmbed)]
 #[folder = "icon/"]
@@ -27,6 +29,14 @@ const WINDOW_HEIGHT: f32 = 960.;
 fn main() -> Result<(), eframe::Error> {
     // App Icon
     let mut app_icon = egui::IconData::default();
+    match UpdaterApp::check_for_updates() {
+        Ok(_result) => {
+            println!("Update check completed")
+        },
+        Err(_e) => {
+            println!("Unable to check for an update")
+        }
+    };
     
     let image = Asset::get("icon.png").expect("Failed to get image data").data;
     let icon = image::load_from_memory(&image).expect("Failed to open icon path").to_rgba8();
