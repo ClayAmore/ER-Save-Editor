@@ -1381,6 +1381,7 @@ dependencies = [
  "rfd",
  "rust-embed",
  "strsim",
+ "tempfile",
  "winres",
 ]
 

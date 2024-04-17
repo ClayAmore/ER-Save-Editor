@@ -244,7 +244,7 @@ impl eframe::App for App {
                     Route::Equipment => equipment(ui, &mut self.vm),
                     Route::Inventory => inventory(ui, &mut self.vm),
                     Route::EventFlags => events(ui, &mut self.vm),
-                    Route::Regions => regions(ui, &mut self.vm),
+                    Route::Regions => regions(ui, self),
                 }
             });
         }
