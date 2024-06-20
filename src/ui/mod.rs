@@ -1,10 +1,10 @@
 mod custom;
+pub mod equipment;
+pub mod events;
+pub mod general;
+pub mod importer;
+pub mod inventory;
 pub mod menu;
 pub mod none;
-pub mod general;
-pub mod stats;
-pub mod inventory;
-pub mod events;
 pub mod regions;
-pub mod importer;
-pub mod equipment;
+pub mod stats;

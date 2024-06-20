@@ -1,7 +1,11 @@
-use std::io;
 use binary_reader::BinaryReader;
+use std::io;
 
-use crate::{read::read::Read, save::common::user_data_10::{CSKeyConfigSaveLoad, CSMenuSystemSaveLoad, ProfileSummary}, write::write::Write};
+use crate::{
+    read::read::Read,
+    save::common::user_data_10::{CSKeyConfigSaveLoad, CSMenuSystemSaveLoad, ProfileSummary},
+    write::write::Write,
+};
 
 pub struct UserData10 {
     _0x19003b4: i32,
@@ -14,7 +18,7 @@ pub struct UserData10 {
     _0x190340a: u8,
     _cs_key_config_save_load: CSKeyConfigSaveLoad,
     _0x8: u64,
-    _rest: Vec<u8>
+    _rest: Vec<u8>,
 }
 
 impl Default for UserData10 {
@@ -40,13 +44,15 @@ impl Read for UserData10 {
         let mut user_data_10 = UserData10::default();
 
         let end = br.pos + 0x60000;
-        
+
         user_data_10._0x19003b4 = br.read_i32()?;
-        
+
         // Steam ID
         user_data_10.steam_id = br.read_u64()?;
-        
-        user_data_10._0x19004fc.copy_from_slice(br.read_bytes(0x140)?);
+
+        user_data_10
+            ._0x19004fc
+            .copy_from_slice(br.read_bytes(0x140)?);
 
         user_data_10._cs_menu_system_save_load = CSMenuSystemSaveLoad::read(br)?;
 
@@ -55,7 +61,7 @@ impl Read for UserData10 {
             assert!(slot_active == 0x1 || slot_active == 0x0);
             user_data_10.active_slot[i] = slot_active == 0x1;
         }
-        
+
         for i in 0..0xA {
             let profile_summary = ProfileSummary::read(br)?;
             user_data_10.profile_summary[i] = profile_summary;
@@ -77,7 +83,7 @@ impl Write for UserData10 {
         let mut bytes: Vec<u8> = Vec::new();
 
         bytes.extend(self._0x19003b4.to_le_bytes());
-        
+
         // Steam ID
         bytes.extend(self.steam_id.to_le_bytes());
 
@@ -86,7 +92,12 @@ impl Write for UserData10 {
         bytes.extend(self._cs_menu_system_save_load.write()?);
 
         // Active Slots list
-        bytes.extend(self.active_slot.iter().map(|a| if *a {1} else {0}).collect::<Vec<u8>>());
+        bytes.extend(
+            self.active_slot
+                .iter()
+                .map(|a| if *a { 1 } else { 0 })
+                .collect::<Vec<u8>>(),
+        );
 
         // Profile Summaries
         for i in 0..0xA {

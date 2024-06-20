@@ -1,6 +1,6 @@
 pub mod map_name {
-    use std::{collections::HashMap, sync::Mutex};
     use once_cell::sync::Lazy;
+    use std::{collections::HashMap, sync::Mutex};
 
     #[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
     pub enum MapName {
@@ -44,7 +44,10 @@ pub mod map_name {
 
     pub static MAP_NAME: Lazy<Mutex<HashMap<MapName, &str>>> = Lazy::new(|| {
         Mutex::new(HashMap::from([
-            (MapName::RoundtableHold, "Table of Lost Grace / Roundtable Hold"),
+            (
+                MapName::RoundtableHold,
+                "Table of Lost Grace / Roundtable Hold",
+            ),
             (MapName::Limgrave, "Limgrave"),
             (MapName::StrandedGraveyard, "Stranded Graveyard"),
             (MapName::Stormhill, "Stormhill"),
@@ -60,18 +63,27 @@ pub mod map_name {
             (MapName::CapitalOutskirts, "Capital Outskirts"),
             (MapName::VolcanoManor, "Volcano Manor"),
             (MapName::LeyndellRoyalCapital, "Leyndell, Royal Capital"),
-            (MapName::SubterraneanShunningGrounds, "Subterranean Shunning-Grounds"),
+            (
+                MapName::SubterraneanShunningGrounds,
+                "Subterranean Shunning-Grounds",
+            ),
             (MapName::LeyndellAshenCapital, "Leyndell, Ashen Capital"),
             (MapName::StonePlatform, "Stone Platform"),
             (MapName::Caelid, "Caelid"),
             (MapName::SwampOfAeonia, "Swamp of Aeonia"),
             (MapName::GreyollsDragonbarrow, "Greyoll's Dragonbarrow"),
             (MapName::ForbiddenLands, "Forbidden Lands"),
-            (MapName::MountaintopsOfTheGiants, "Mountaintops of the Giants"),
+            (
+                MapName::MountaintopsOfTheGiants,
+                "Mountaintops of the Giants",
+            ),
             (MapName::FlamePeak, "Flame Peak"),
             (MapName::ConsecratedSnowfield, "Consecrated Snowfield"),
             (MapName::MiquellasHaligtree, "Miquella's Haligtree"),
-            (MapName::ElphaelBraceOfTheHaligtree, "Elphael, Brace of the Haligtree"),
+            (
+                MapName::ElphaelBraceOfTheHaligtree,
+                "Elphael, Brace of the Haligtree",
+            ),
             (MapName::AinselRiver, "Ainsel River"),
             (MapName::AinselRiverMain, "Ainsel River Main"),
             (MapName::LakeOfRot, "Lake of Rot"),

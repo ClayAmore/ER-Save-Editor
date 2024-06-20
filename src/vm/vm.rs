@@ -3,52 +3,46 @@ pub mod vm {
 
     use crate::{
         db::{
-            bosses::bosses::BOSSES, 
-            colosseums::colosseums::COLOSSEUMS, 
-            cookbooks::books::COOKBOKS, 
-            event_flags::event_flags::EVENT_FLAGS, 
-            graces::maps::GRACES, maps::maps::MAPS, 
-            regions::regions::REGIONS, 
-            stats::stats::{FP, HP, SP}, 
-            summoning_pools::summoning_pools::SUMMONING_POOLS, 
-            whetblades::whetblades::WHETBLADES
-        }, 
+            bosses::bosses::BOSSES,
+            colosseums::colosseums::COLOSSEUMS,
+            cookbooks::books::COOKBOKS,
+            event_flags::event_flags::EVENT_FLAGS,
+            graces::maps::GRACES,
+            maps::maps::MAPS,
+            regions::regions::REGIONS,
+            stats::stats::{FP, HP, SP},
+            summoning_pools::summoning_pools::SUMMONING_POOLS,
+            whetblades::whetblades::WHETBLADES,
+        },
         save::{
-            common::save_slot::{
-                EquipInventoryData, 
-                EquipInventoryItem
-            }, 
-            save::save::{
-                Save, SaveType
-            }}, util::{
-                regulation::Regulation, 
-                validator::validator::Validator
-            }, vm::{
-                inventory::{
-                    InventoryGaitemType, InventoryItemType
-                }, 
-                profile_summary::slot_view_model::ProfileSummaryViewModel, 
-                regulation::regulation_view_model::RegulationViewModel, 
-                slot::slot_view_model::SlotViewModel
-            }};
-    
-    
+            common::save_slot::{EquipInventoryData, EquipInventoryItem},
+            save::save::{Save, SaveType},
+        },
+        util::{regulation::Regulation, validator::validator::Validator},
+        vm::{
+            inventory::{InventoryGaitemType, InventoryItemType},
+            profile_summary::slot_view_model::ProfileSummaryViewModel,
+            regulation::regulation_view_model::RegulationViewModel,
+            slot::slot_view_model::SlotViewModel,
+        },
+    };
+
     #[derive(Clone)]
     pub struct ViewModel {
         pub active: Option<bool>,
-        pub index: usize, 
+        pub index: usize,
         pub steam_id: String,
         pub profile_summary: [ProfileSummaryViewModel; 0xA],
         pub slots: [SlotViewModel; 0xA],
         pub regulation: RegulationViewModel,
     }
 
-    impl Default for ViewModel{
+    impl Default for ViewModel {
         fn default() -> Self {
             Self {
                 active: Default::default(),
                 index: Default::default(),
-                steam_id: Default::default(), 
+                steam_id: Default::default(),
                 slots: Default::default(),
                 profile_summary: Default::default(),
                 regulation: Default::default(),
@@ -65,7 +59,9 @@ pub mod vm {
 
             // Check for irregular data
             vm.active = Some(Validator::validate(save));
-            if vm.active.is_some_and(|v| !v) {return vm;}
+            if vm.active.is_some_and(|v| !v) {
+                return vm;
+            }
 
             // Steam Id
             vm.steam_id = save.save_type.get_global_steam_id().to_string();
@@ -76,7 +72,9 @@ pub mod vm {
             // Get active characters
             for (index, active) in save.save_type.active_slots().iter().enumerate() {
                 if *active {
-                    vm.profile_summary[index] = ProfileSummaryViewModel::from_save(&save.save_type.get_profile_summary(index));
+                    vm.profile_summary[index] = ProfileSummaryViewModel::from_save(
+                        &save.save_type.get_profile_summary(index),
+                    );
                     vm.slots[index] = SlotViewModel::from_save(&save.save_type.get_slot(index));
                 }
             }
@@ -84,7 +82,7 @@ pub mod vm {
             vm
         }
 
-        pub fn update_save(&self,  save_type: &mut SaveType) {
+        pub fn update_save(&self, save_type: &mut SaveType) {
             let steam_id = self.steam_id.parse::<u64>().expect("");
             // Update SteamID for UserData10
             save_type.set_global_steam_id(steam_id);
@@ -96,8 +94,9 @@ pub mod vm {
                     save_type.set_character_steam_id(i, steam_id);
 
                     // Update Character name
-                    save_type.set_character_name(i, self.slots[i].general_vm.character_name.to_string());
-                    
+                    save_type
+                        .set_character_name(i, self.slots[i].general_vm.character_name.to_string());
+
                     // Update Gender
                     save_type.set_character_gender(i, self.slots[i].general_vm.gender as u8);
 
@@ -107,7 +106,7 @@ pub mod vm {
                     // Update Inventory (Held + Storage Box)
                     self.update_inventory(save_type, i);
 
-                    // Update Stats 
+                    // Update Stats
                     self.update_stats(save_type, i);
 
                     // Update Equipment
@@ -120,21 +119,20 @@ pub mod vm {
                     self.update_regions(save_type, i);
                 }
             }
-            
         }
 
         fn update_stats(&self, save_type: &mut SaveType, index: usize) {
             let stats_vm = &self.slots[index].stats_vm;
 
-            let level = 
-                stats_vm.vigor +
-                stats_vm.mind +
-                stats_vm.endurance +
-                stats_vm.strength +
-                stats_vm.dexterity +
-                stats_vm.intelligence +
-                stats_vm.faith +
-                stats_vm.arcane - 79;
+            let level = stats_vm.vigor
+                + stats_vm.mind
+                + stats_vm.endurance
+                + stats_vm.strength
+                + stats_vm.dexterity
+                + stats_vm.intelligence
+                + stats_vm.faith
+                + stats_vm.arcane
+                - 79;
 
             save_type.set_character_health(index, HP[stats_vm.vigor as usize] as u32);
             save_type.set_character_base_max_health(index, HP[stats_vm.vigor as usize] as u32);
@@ -169,45 +167,61 @@ pub mod vm {
 
             // Map somber to normal weapon upgrade
             let somber_to_normal: HashMap<u8, u8> = HashMap::from([
-                (0, 0), (1, 0),(2, 5), (3, 7), (4, 10), (5, 12), 
-                (6, 15), (7, 17), (8, 20), (9, 24), (10, 25), 
+                (0, 0),
+                (1, 0),
+                (2, 5),
+                (3, 7),
+                (4, 10),
+                (5, 12),
+                (6, 15),
+                (7, 17),
+                (8, 20),
+                (9, 24),
+                (10, 25),
             ]);
-            
+
             // Find the highest weapon upgrade in player inventory
             let mut max_level: u8 = 0;
-            for (held_item, storage_item) in inventory_vm.storage[0].common_items.iter().zip(&inventory_vm.storage[1].common_items) {
-                let held_weapon_res = Regulation::equip_weapon_params_map().get(&((&held_item.item_id/100)*100));
-                let storage_weapon_res = Regulation::equip_weapon_params_map().get(&((&storage_item.item_id/100)*100));
+            for (held_item, storage_item) in inventory_vm.storage[0]
+                .common_items
+                .iter()
+                .zip(&inventory_vm.storage[1].common_items)
+            {
+                let held_weapon_res =
+                    Regulation::equip_weapon_params_map().get(&((&held_item.item_id / 100) * 100));
+                let storage_weapon_res = Regulation::equip_weapon_params_map()
+                    .get(&((&storage_item.item_id / 100) * 100));
                 // Check held inventory item
                 if held_item.r#type == InventoryGaitemType::WEAPON {
                     match held_weapon_res {
                         Some(weapon_param) => {
                             // Check if weapon is somber
-                            let is_somber = weapon_param.data.reinforceTypeId != 0 && (
-                                weapon_param.data.reinforceTypeId % 2200 == 0 ||
-                                weapon_param.data.reinforceTypeId % 2400 == 0 ||
-                                weapon_param.data.reinforceTypeId % 3200 == 0 ||
-                                weapon_param.data.reinforceTypeId % 3300 == 0 ||
-                                weapon_param.data.reinforceTypeId % 8300 == 0 ||
-                                weapon_param.data.reinforceTypeId % 8500 == 0
-                            );
-                            
+                            let is_somber = weapon_param.data.reinforceTypeId != 0
+                                && (weapon_param.data.reinforceTypeId % 2200 == 0
+                                    || weapon_param.data.reinforceTypeId % 2400 == 0
+                                    || weapon_param.data.reinforceTypeId % 3200 == 0
+                                    || weapon_param.data.reinforceTypeId % 3300 == 0
+                                    || weapon_param.data.reinforceTypeId % 8300 == 0
+                                    || weapon_param.data.reinforceTypeId % 8500 == 0);
+
                             // Extract weapon level based on wether weapon is somber or not
-                            let weapon_level = if is_somber{
+                            let weapon_level = if is_somber {
                                 somber_to_normal[&((held_item.item_id % 100) as u8)]
-                            }
-                            else {
+                            } else {
                                 (held_item.item_id % 100) as u8
                             };
 
-                            // Update max weapon level if inventory weapon is higher 
+                            // Update max weapon level if inventory weapon is higher
                             if weapon_level > max_level {
                                 max_level = weapon_level;
                             }
-                        },
+                        }
                         None => {
-                            println!("Couldn't find param info for weapon {}|{:#x}", held_item.item_id, held_item.item_id);
-                        },
+                            println!(
+                                "Couldn't find param info for weapon {}|{:#x}",
+                                held_item.item_id, held_item.item_id
+                            );
+                        }
                     }
                 }
 
@@ -216,31 +230,32 @@ pub mod vm {
                     match storage_weapon_res {
                         Some(weapon_param) => {
                             // Check if weapon is somber
-                            let is_somber = weapon_param.data.reinforceTypeId != 0 && (
-                                weapon_param.data.reinforceTypeId % 2200 == 0 ||
-                                weapon_param.data.reinforceTypeId % 2400 == 0 ||
-                                weapon_param.data.reinforceTypeId % 3200 == 0 ||
-                                weapon_param.data.reinforceTypeId % 3300 == 0 ||
-                                weapon_param.data.reinforceTypeId % 8300 == 0 ||
-                                weapon_param.data.reinforceTypeId % 8500 == 0
-                            );
-                            
+                            let is_somber = weapon_param.data.reinforceTypeId != 0
+                                && (weapon_param.data.reinforceTypeId % 2200 == 0
+                                    || weapon_param.data.reinforceTypeId % 2400 == 0
+                                    || weapon_param.data.reinforceTypeId % 3200 == 0
+                                    || weapon_param.data.reinforceTypeId % 3300 == 0
+                                    || weapon_param.data.reinforceTypeId % 8300 == 0
+                                    || weapon_param.data.reinforceTypeId % 8500 == 0);
+
                             // Extract weapon level based on wether weapon is somber or not
-                            let weapon_level = if is_somber{
+                            let weapon_level = if is_somber {
                                 somber_to_normal[&((storage_item.item_id % 100) as u8)]
-                            }
-                            else {
+                            } else {
                                 (storage_item.item_id % 100) as u8
                             };
 
-                            // Update max weapon level if inventory weapon is higher 
+                            // Update max weapon level if inventory weapon is higher
                             if weapon_level > max_level {
                                 max_level = weapon_level;
                             }
-                        },
+                        }
                         None => {
-                            println!("Couldn't find param info for weapon {}|{:#x}", held_item.item_id, held_item.item_id);
-                        },
+                            println!(
+                                "Couldn't find param info for weapon {}|{:#x}",
+                                held_item.item_id, held_item.item_id
+                            );
+                        }
                     }
                 }
             }
@@ -259,63 +274,135 @@ pub mod vm {
             }
 
             // (gaitem_handle, item_id, equipment_index)
-            let mut quickslots = [(0, u32::MAX, u32::MAX); 10]; 
+            let mut quickslots = [(0, u32::MAX, u32::MAX); 10];
             let mut pouch_items = [(0, u32::MAX, u32::MAX); 6];
-            
+
             // Left hand armament
-            for (weapon_slot_index, left_hand_armament) in equipment_vm.left_hand_armaments.iter().enumerate() {
-                save_type.set_left_weapon_slot(index, weapon_slot_index, left_hand_armament.gaitem_handle, left_hand_armament.id, left_hand_armament.equip_index);
+            for (weapon_slot_index, left_hand_armament) in
+                equipment_vm.left_hand_armaments.iter().enumerate()
+            {
+                save_type.set_left_weapon_slot(
+                    index,
+                    weapon_slot_index,
+                    left_hand_armament.gaitem_handle,
+                    left_hand_armament.id,
+                    left_hand_armament.equip_index,
+                );
             }
 
             // Right hand armament
-            for (weapon_slot_index, right_hand_armament) in equipment_vm.right_hand_armaments.iter().enumerate() {
-                save_type.set_right_weapon_slot(index, weapon_slot_index, right_hand_armament.gaitem_handle, right_hand_armament.id, right_hand_armament.equip_index);
+            for (weapon_slot_index, right_hand_armament) in
+                equipment_vm.right_hand_armaments.iter().enumerate()
+            {
+                save_type.set_right_weapon_slot(
+                    index,
+                    weapon_slot_index,
+                    right_hand_armament.gaitem_handle,
+                    right_hand_armament.id,
+                    right_hand_armament.equip_index,
+                );
             }
 
             // Arrows
             for (arrow_slot_index, arrow) in equipment_vm.arrows.iter().enumerate() {
-                save_type.set_arrow_slot(index, arrow_slot_index, arrow.gaitem_handle, arrow.id, arrow.equip_index);
+                save_type.set_arrow_slot(
+                    index,
+                    arrow_slot_index,
+                    arrow.gaitem_handle,
+                    arrow.id,
+                    arrow.equip_index,
+                );
             }
 
             // Bolts
             for (bolt_slot_index, bolt) in equipment_vm.bolts.iter().enumerate() {
-                save_type.set_bolt_slot(index, bolt_slot_index, bolt.gaitem_handle, bolt.id, bolt.equip_index);
+                save_type.set_bolt_slot(
+                    index,
+                    bolt_slot_index,
+                    bolt.gaitem_handle,
+                    bolt.id,
+                    bolt.equip_index,
+                );
             }
-            
-            save_type.set_head_gear(index, equipment_vm.head.gaitem_handle, equipment_vm.head.id, equipment_vm.head.equip_index);
-            save_type.set_chest_piece(index, equipment_vm.chest.gaitem_handle, equipment_vm.chest.id, equipment_vm.chest.equip_index);
-            save_type.set_gauntlets(index, equipment_vm.arms.gaitem_handle, equipment_vm.arms.id, equipment_vm.arms.equip_index);
-            save_type.set_leggings(index, equipment_vm.legs.gaitem_handle, equipment_vm.legs.id, equipment_vm.legs.equip_index);
+
+            save_type.set_head_gear(
+                index,
+                equipment_vm.head.gaitem_handle,
+                equipment_vm.head.id,
+                equipment_vm.head.equip_index,
+            );
+            save_type.set_chest_piece(
+                index,
+                equipment_vm.chest.gaitem_handle,
+                equipment_vm.chest.id,
+                equipment_vm.chest.equip_index,
+            );
+            save_type.set_gauntlets(
+                index,
+                equipment_vm.arms.gaitem_handle,
+                equipment_vm.arms.id,
+                equipment_vm.arms.equip_index,
+            );
+            save_type.set_leggings(
+                index,
+                equipment_vm.legs.gaitem_handle,
+                equipment_vm.legs.id,
+                equipment_vm.legs.equip_index,
+            );
 
             // Talismans
             for (talisman_slot_index, talisman) in equipment_vm.talismans.iter().enumerate() {
-                save_type.set_talisman_slot(index, talisman_slot_index, talisman.gaitem_handle, talisman.id, talisman.equip_index);
+                save_type.set_talisman_slot(
+                    index,
+                    talisman_slot_index,
+                    talisman.gaitem_handle,
+                    talisman.id,
+                    talisman.equip_index,
+                );
             }
 
             // Quickitem
             for (index, quickitem) in equipment_vm.quickitems.iter().enumerate() {
                 if quickitem.id != 0 {
-                    quickslots[index] = (quickitem.id | InventoryGaitemType::ITEM as u32, quickitem.id | InventoryItemType::ITEM as u32, quickitem.equip_index)
+                    quickslots[index] = (
+                        quickitem.id | InventoryGaitemType::ITEM as u32,
+                        quickitem.id | InventoryItemType::ITEM as u32,
+                        quickitem.equip_index,
+                    )
                 }
             }
             for (quickslot_index, quickslot) in quickslots.iter().enumerate() {
-                save_type.set_quickslot_item(index, quickslot_index, quickslot.0, quickslot.1, quickslot.2);
+                save_type.set_quickslot_item(
+                    index,
+                    quickslot_index,
+                    quickslot.0,
+                    quickslot.1,
+                    quickslot.2,
+                );
             }
-            
+
             // Pouch
             for (index, pouch) in equipment_vm.pouch.iter().enumerate() {
                 if pouch.id != 0 {
-                    pouch_items[index] = (pouch.id | InventoryGaitemType::ITEM as u32, pouch.id | InventoryItemType::ITEM as u32, pouch.equip_index)
+                    pouch_items[index] = (
+                        pouch.id | InventoryGaitemType::ITEM as u32,
+                        pouch.id | InventoryItemType::ITEM as u32,
+                        pouch.equip_index,
+                    )
                 }
             }
             for (pouch_index, pouch_item) in pouch_items.iter().enumerate() {
-                save_type.set_pouch_item(index, pouch_index, pouch_item.0, pouch_item.1, pouch_item.2);
+                save_type.set_pouch_item(
+                    index,
+                    pouch_index,
+                    pouch_item.0,
+                    pouch_item.1,
+                    pouch_item.2,
+                );
             }
-
         }
 
         fn update_events(&self, save_type: &mut SaveType, index: usize) {
-            
             for (grace, on) in self.slots[index].events_vm.graces.iter() {
                 let grace_info = GRACES.lock().unwrap()[&grace];
                 let offset = EVENT_FLAGS.lock().unwrap()[&grace_info.1];
@@ -366,12 +453,11 @@ pub mod vm {
         }
 
         fn update_regions(&self, save_type: &mut SaveType, index: usize) {
-            for (region, (activated, _, _,_)) in self.slots[index].regions_vm.regions.iter() {
+            for (region, (activated, _, _, _)) in self.slots[index].regions_vm.regions.iter() {
                 let region_id = REGIONS.lock().unwrap()[region].0;
                 if *activated {
                     save_type.add_region(index, region_id);
-                }
-                else {
+                } else {
                     save_type.remove_region(index, region_id);
                 }
             }
@@ -390,54 +476,63 @@ pub mod vm {
             // Update gaitem map
             save_type.set_gaitem_map(index, inventory_vm.gaitem_map.clone());
 
-
             // Update projectile list
             save_type.set_equip_projectile_data(index, inventory_vm.projectile_list.clone());
 
             let mut counter = 0;
             // Update held inventory;
-            let held_inventory = EquipInventoryData{
+            let held_inventory = EquipInventoryData {
                 common_inventory_items_distinct_count: inventory_held.common_item_count,
-                common_items: inventory_held.common_items.iter().map(|item| {
-                    EquipInventoryItem{
+                common_items: inventory_held
+                    .common_items
+                    .iter()
+                    .map(|item| EquipInventoryItem {
                         ga_item_handle: item.ga_item_handle,
                         inventory_index: item.inventory_index,
-                        quantity: item.quantity
-                    }
-                }).collect::<Vec<EquipInventoryItem>>(),
+                        quantity: item.quantity,
+                    })
+                    .collect::<Vec<EquipInventoryItem>>(),
                 key_inventory_items_distinct_count: inventory_held.key_item_count,
-                key_items: inventory_held.key_items.iter().map(|item| {
-                    counter = counter + 1;
-                    EquipInventoryItem{
-                        ga_item_handle: item.ga_item_handle,
-                        inventory_index: item.inventory_index,
-                        quantity: item.quantity
-                    }
-                }).collect::<Vec<EquipInventoryItem>>(),
+                key_items: inventory_held
+                    .key_items
+                    .iter()
+                    .map(|item| {
+                        counter = counter + 1;
+                        EquipInventoryItem {
+                            ga_item_handle: item.ga_item_handle,
+                            inventory_index: item.inventory_index,
+                            quantity: item.quantity,
+                        }
+                    })
+                    .collect::<Vec<EquipInventoryItem>>(),
                 next_acquisition_sort_id: inventory_held.next_acquisition_sort_order_index,
                 next_equip_index: inventory_held.next_equip_index,
                 ..Default::default()
             };
             save_type.set_held_inventory(index, held_inventory);
-            
+
             // Update storage box inventory;
-            let storage_box_inventory = EquipInventoryData{
+            let storage_box_inventory = EquipInventoryData {
                 common_inventory_items_distinct_count: inventory_storage_box.common_item_count,
-                common_items: inventory_storage_box.common_items.iter().map(|item| {
-                    EquipInventoryItem{
+                common_items: inventory_storage_box
+                    .common_items
+                    .iter()
+                    .map(|item| EquipInventoryItem {
                         ga_item_handle: item.ga_item_handle,
                         inventory_index: item.inventory_index,
-                        quantity: item.quantity
-                    }
-                }).collect::<Vec<EquipInventoryItem>>(),
+                        quantity: item.quantity,
+                    })
+                    .collect::<Vec<EquipInventoryItem>>(),
                 key_inventory_items_distinct_count: inventory_storage_box.key_item_count,
-                key_items: inventory_storage_box.key_items.iter().map(|item| {
-                    EquipInventoryItem{
+                key_items: inventory_storage_box
+                    .key_items
+                    .iter()
+                    .map(|item| EquipInventoryItem {
                         ga_item_handle: item.ga_item_handle,
                         inventory_index: item.inventory_index,
-                        quantity: item.quantity
-                    }
-                }).collect::<Vec<EquipInventoryItem>>(),
+                        quantity: item.quantity,
+                    })
+                    .collect::<Vec<EquipInventoryItem>>(),
                 next_acquisition_sort_id: inventory_storage_box.next_acquisition_sort_order_index,
                 next_equip_index: inventory_storage_box.next_equip_index,
                 ..Default::default()
@@ -447,8 +542,6 @@ pub mod vm {
             // Update gaitem item data
             let gaitem_data = inventory_vm.gaitem_data.clone();
             save_type.set_gaitem_item_data(index, gaitem_data);
-
-
         }
     }
 }

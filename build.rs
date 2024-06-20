@@ -1,8 +1,5 @@
 use {
-    std::{
-        env,
-        io,
-    },
+    std::{env, io},
     winres::WindowsResource,
 };
 

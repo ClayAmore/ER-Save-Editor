@@ -1,5 +1,5 @@
-use std::io;
 use binary_reader::BinaryReader;
+use std::io;
 
 use crate::{read::read::Read, write::write::Write};
 
@@ -10,7 +10,7 @@ pub struct SaveHeader {
 impl Default for SaveHeader {
     fn default() -> Self {
         Self {
-            data: vec![Default::default();0x300],
+            data: vec![Default::default(); 0x300],
         }
     }
 }

@@ -6,11 +6,11 @@ pub struct PCSaveSlot {
     pub save_slot: SaveSlot,
 }
 
-impl Default for PCSaveSlot{
+impl Default for PCSaveSlot {
     fn default() -> Self {
-        Self { 
+        Self {
             checksum: [0x0; 0x10],
-            save_slot: SaveSlot::default() 
+            save_slot: SaveSlot::default(),
         }
     }
 }
@@ -32,11 +32,11 @@ impl Read for PCSaveSlot {
 impl Write for PCSaveSlot {
     fn write(&self) -> Result<Vec<u8>, std::io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
-        
+
         // Get save slot bytes
         let save_slot_bytes = self.save_slot.write()?;
 
-        // Calculate checksum 
+        // Calculate checksum
         let digest = md5::compute(&save_slot_bytes);
 
         // Add Checksum

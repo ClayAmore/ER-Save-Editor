@@ -1,14 +1,17 @@
-use std::io;
-use binary_reader::BinaryReader;
-use crate::{read::read::Read, save::common::{save_slot::SaveSlot, user_data_11::UserData11}, write::write::Write};
 use super::{save_header::SaveHeader, user_data_10::UserData10};
-
+use crate::{
+    read::read::Read,
+    save::common::{save_slot::SaveSlot, user_data_11::UserData11},
+    write::write::Write,
+};
+use binary_reader::BinaryReader;
+use std::io;
 
 pub struct PSSave {
     pub header: SaveHeader,
     pub save_slots: Vec<SaveSlot>,
     pub user_data_10: UserData10,
-    pub user_data_11: UserData11
+    pub user_data_11: UserData11,
 }
 impl Default for PSSave {
     fn default() -> Self {
@@ -16,7 +19,7 @@ impl Default for PSSave {
             header: Default::default(),
             save_slots: vec![SaveSlot::default(); 0xA],
             user_data_10: UserData10::default(),
-            user_data_11: UserData11::default()
+            user_data_11: UserData11::default(),
         }
     }
 }
@@ -32,7 +35,7 @@ impl Read for PSSave {
 
         save.user_data_10 = UserData10::read(br)?;
         save.user_data_11 = UserData11::read(br)?;
-        
+
         Ok(save)
     }
 }

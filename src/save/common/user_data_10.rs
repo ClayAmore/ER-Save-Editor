@@ -1,17 +1,21 @@
-// Common user_data_10 chunks that is in both PC and Playstation save 
-use std::io;
-use binary_reader::BinaryReader;
+// Common user_data_10 chunks that is in both PC and Playstation save
 use crate::{read::read::Read, write::write::Write};
+use binary_reader::BinaryReader;
+use std::io;
 
 pub struct CSMenuSystemSaveLoad {
     unk: u32,
     length: u32,
-    data: Vec<u8>
+    data: Vec<u8>,
 }
 
 impl Default for CSMenuSystemSaveLoad {
     fn default() -> Self {
-        Self { unk: Default::default(), length: Default::default(), data: Default::default() }
+        Self {
+            unk: Default::default(),
+            length: Default::default(),
+            data: Default::default(),
+        }
     }
 }
 
@@ -20,7 +24,9 @@ impl Read for CSMenuSystemSaveLoad {
         let mut cs_menu_system_save_load = CSMenuSystemSaveLoad::default();
         cs_menu_system_save_load.unk = br.read_u32()?;
         cs_menu_system_save_load.length = br.read_u32()?;
-        cs_menu_system_save_load.data.extend(br.read_bytes(cs_menu_system_save_load.length as usize)?);
+        cs_menu_system_save_load
+            .data
+            .extend(br.read_bytes(cs_menu_system_save_load.length as usize)?);
         Ok(cs_menu_system_save_load)
     }
 }
@@ -57,7 +63,7 @@ pub struct ProfileSummaryEquipmentGaitem {
     pub legs: u32,
     pub _0x4_2: u32,
     pub talismans: [u32; 4],
-    pub _0x4_3: u32
+    pub _0x4_3: u32,
 }
 impl Read for ProfileSummaryEquipmentGaitem {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
@@ -88,7 +94,9 @@ impl Read for ProfileSummaryEquipmentGaitem {
         equipment.arms = br.read_u32()?;
         equipment.legs = br.read_u32()?;
         equipment._0x4_2 = br.read_u32()?;
-        for i in 0..4 { equipment.talismans[i] = br.read_u32()?; }
+        for i in 0..4 {
+            equipment.talismans[i] = br.read_u32()?;
+        }
         equipment._0x4_3 = br.read_u32()?;
         Ok(equipment)
     }
@@ -123,7 +131,9 @@ impl Write for ProfileSummaryEquipmentGaitem {
         bytes.extend(self.arms.to_le_bytes());
         bytes.extend(self.legs.to_le_bytes());
         bytes.extend(self._0x4_2.to_le_bytes());
-        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        for i in 0..4 {
+            bytes.extend(self.talismans[i].to_le_bytes());
+        }
         bytes.extend(self._0x4_3.to_le_bytes());
         Ok(bytes)
     }
@@ -143,7 +153,7 @@ pub struct ProfileSummaryEquipmentItem {
     pub legs: u32,
     _0x4_2: u32,
     pub talismans: [u32; 4],
-    _0x4_3: [u32; 6]
+    _0x4_3: [u32; 6],
 }
 impl Read for ProfileSummaryEquipmentItem {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
@@ -167,8 +177,12 @@ impl Read for ProfileSummaryEquipmentItem {
         equipment.legs = br.read_u32()?;
         equipment._0x4_2 = br.read_u32()?;
 
-        for i in 0..4 { equipment.talismans[i] = br.read_u32()?; }
-        for i in 0..6 { equipment._0x4_3[i] = br.read_u32()?; }
+        for i in 0..4 {
+            equipment.talismans[i] = br.read_u32()?;
+        }
+        for i in 0..6 {
+            equipment._0x4_3[i] = br.read_u32()?;
+        }
 
         Ok(equipment)
     }
@@ -194,31 +208,35 @@ impl Write for ProfileSummaryEquipmentItem {
         bytes.extend(self.arms.to_le_bytes());
         bytes.extend(self.legs.to_le_bytes());
         bytes.extend(self._0x4_2.to_le_bytes());
-        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
-        for i in 0..6 { bytes.extend(self._0x4_3[i].to_le_bytes()); }
+        for i in 0..4 {
+            bytes.extend(self.talismans[i].to_le_bytes());
+        }
+        for i in 0..6 {
+            bytes.extend(self._0x4_3[i].to_le_bytes());
+        }
         Ok(bytes)
     }
 }
 
 #[derive(Copy, Clone)]
-pub struct ProfileSummary{
+pub struct ProfileSummary {
     pub character_name: [u16; 0x11],
     pub level: u32,
-    _0x28: u32 ,
-    _0x2c: u32 ,
-    _0x30: u32 ,
-    _0x34: u32 ,
-    _0x38_0x150: u32 ,
-    _0x38_0x8: [u8;0x120] ,
+    _0x28: u32,
+    _0x2c: u32,
+    _0x30: u32,
+    _0x34: u32,
+    _0x38_0x150: u32,
+    _0x38_0x8: [u8; 0x120],
     pub equipment_gaitem: ProfileSummaryEquipmentGaitem,
     pub equipment_item: ProfileSummaryEquipmentItem,
-    _0x290: u8 ,
-    _0x291: u8 ,
-    _0x292: u8 ,
-    _0x293: u8 ,
-    _0x294: u8 ,
-    _0x295: u8 ,
-    _0x298: i32 ,
+    _0x290: u8,
+    _0x291: u8,
+    _0x292: u8,
+    _0x293: u8,
+    _0x294: u8,
+    _0x295: u8,
+    _0x298: i32,
 }
 
 impl Default for ProfileSummary {
@@ -248,14 +266,18 @@ impl Default for ProfileSummary {
 impl Read for ProfileSummary {
     fn read(br: &mut BinaryReader) -> Result<ProfileSummary, io::Error> {
         let mut profile_summary = ProfileSummary::default();
-        for i in 0..0x11 { profile_summary.character_name[i] = br.read_u16()?;}
+        for i in 0..0x11 {
+            profile_summary.character_name[i] = br.read_u16()?;
+        }
         profile_summary.level = br.read_u32()?;
         profile_summary._0x28 = br.read_u32()?;
         profile_summary._0x2c = br.read_u32()?;
         profile_summary._0x30 = br.read_u32()?;
         profile_summary._0x34 = br.read_u32()?;
         profile_summary._0x38_0x150 = br.read_u32()?;
-        profile_summary._0x38_0x8.copy_from_slice(br.read_bytes(0x120)?);
+        profile_summary
+            ._0x38_0x8
+            .copy_from_slice(br.read_bytes(0x120)?);
         profile_summary.equipment_gaitem = ProfileSummaryEquipmentGaitem::read(br)?;
         profile_summary.equipment_item = ProfileSummaryEquipmentItem::read(br)?;
         profile_summary._0x290 = br.read_u8()?;
@@ -269,10 +291,12 @@ impl Read for ProfileSummary {
     }
 }
 
-impl Write for ProfileSummary{
+impl Write for ProfileSummary {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
-        for i in 0..0x11 { bytes.extend(self.character_name[i].to_le_bytes());}
+        for i in 0..0x11 {
+            bytes.extend(self.character_name[i].to_le_bytes());
+        }
         bytes.extend(self.level.to_le_bytes());
         bytes.extend(self._0x28.to_le_bytes());
         bytes.extend(self._0x2c.to_le_bytes());
@@ -293,17 +317,19 @@ impl Write for ProfileSummary{
     }
 }
 
-
 #[derive(Clone)]
 
 pub struct CSKeyConfigSaveLoad {
     length: i32,
-    elements: Vec<u8>
+    elements: Vec<u8>,
 }
 
 impl Default for CSKeyConfigSaveLoad {
     fn default() -> Self {
-        Self { length: Default::default(), elements: Default::default() }
+        Self {
+            length: Default::default(),
+            elements: Default::default(),
+        }
     }
 }
 
@@ -311,7 +337,9 @@ impl Read for CSKeyConfigSaveLoad {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut cs_key_config_save_load = CSKeyConfigSaveLoad::default();
         cs_key_config_save_load.length = br.read_i32()?;
-        cs_key_config_save_load.elements.extend(br.read_bytes(cs_key_config_save_load.length as usize)?);
+        cs_key_config_save_load
+            .elements
+            .extend(br.read_bytes(cs_key_config_save_load.length as usize)?);
         Ok(cs_key_config_save_load)
     }
 }

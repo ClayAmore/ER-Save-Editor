@@ -1,9 +1,9 @@
 pub mod inventory {
-    use eframe::egui::{self, Color32, Ui};
     use crate::ui::inventory::{add::add, browse::browse_inventory};
     use crate::vm::{inventory::InventoryRoute, vm::vm::ViewModel};
+    use eframe::egui::{self, Color32, Ui};
 
-    pub fn inventory(ui: &mut Ui, vm:&mut ViewModel) {
+    pub fn inventory(ui: &mut Ui, vm: &mut ViewModel) {
         egui::SidePanel::left("inventory_menu").show(ui.ctx(), |ui|{
             egui::ScrollArea::vertical()
             .id_source("inventory_item_type_menu")
@@ -26,7 +26,6 @@ pub mod inventory {
                         vm.regulation.filter(&vm.slots[vm.index].inventory_vm.current_type_route, &vm.slots[vm.index].inventory_vm.filter_text);
                         vm.slots[vm.index].inventory_vm.current_route = InventoryRoute::Browse
                     }
-                    
                     // Highlight active 
                     match vm.slots[vm.index].inventory_vm.current_route {
                         InventoryRoute::None => {},
@@ -37,11 +36,17 @@ pub mod inventory {
             });
         });
 
-        egui::CentralPanel::default().show(ui.ctx(), |ui|{
+        egui::CentralPanel::default().show(ui.ctx(), |ui| {
             match vm.slots[vm.index].inventory_vm.current_route {
-                InventoryRoute::None => {ui.label("Empty");},
-                InventoryRoute::Add => {add(ui, vm);},
-                InventoryRoute::Browse => {browse_inventory(ui, vm);},
+                InventoryRoute::None => {
+                    ui.label("Empty");
+                }
+                InventoryRoute::Add => {
+                    add(ui, vm);
+                }
+                InventoryRoute::Browse => {
+                    browse_inventory(ui, vm);
+                }
             }
         });
     }

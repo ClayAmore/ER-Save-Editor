@@ -1,6 +1,6 @@
 pub mod classes {
-    use std::{collections::HashMap, sync::Mutex};
     use once_cell::sync::Lazy;
+    use std::{collections::HashMap, sync::Mutex};
 
     #[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
     pub enum ArcheType {
@@ -66,129 +66,148 @@ pub mod classes {
         pub arcane: u32,
     }
 
-
-    
-    pub static STARTER_CLASSES: Lazy<Mutex<HashMap<ArcheType,Stats>>> = Lazy::new(|| {
+    pub static STARTER_CLASSES: Lazy<Mutex<HashMap<ArcheType, Stats>>> = Lazy::new(|| {
         Mutex::new(HashMap::from([
-            (ArcheType::Vagabond, Stats{
-                level: 9,
-                vigor: 15,
-                mind: 10,
-                endurance: 11,
-                strength: 14,
-                dexterity: 13,
-                intelligence: 9,
-                faith: 9,
-                arcane: 7,
-            }),
-            
-            (ArcheType::Warrior, Stats{
-                level: 8,
-                vigor: 11,
-                mind: 12,
-                endurance: 11,
-                strength: 10,
-                dexterity: 16,
-                intelligence: 10,
-                faith: 8,
-                arcane: 9,
-            }),
-            
-            (ArcheType::Hero, Stats{
-                vigor: 14,
-                mind: 9,
-                endurance: 12,
-                strength: 16,
-                dexterity: 9,
-                intelligence: 7,
-                faith: 8,
-                arcane: 11,
-                level: 7,
-            }),
-            
-            (ArcheType::Bandit, Stats{
-                level: 5,
-                vigor: 10,
-                mind: 11,
-                endurance: 10,
-                strength: 9,
-                dexterity: 13,
-                intelligence: 9,
-                faith: 8,
-                arcane: 14,
-            }),
-            
-            (ArcheType::Astrologer, Stats{
-                level: 6,
-                vigor: 9,
-                mind: 15,
-                endurance: 9,
-                strength: 8,
-                dexterity: 12,
-                intelligence: 16,
-                faith: 7,
-                arcane: 9,
-            }),
-            
-            (ArcheType::Prophet, Stats{
-                level: 7,
-                vigor: 10,
-                mind: 14,
-                endurance: 8,
-                strength: 11,
-                dexterity: 10,
-                intelligence: 7,
-                faith: 16,
-                arcane: 10,
-            }),
-            
-            (ArcheType::Samurai, Stats{
-                level: 9,
-                vigor: 12,
-                mind: 11,
-                endurance: 13,
-                strength: 12,
-                dexterity: 15,
-                intelligence: 9,
-                faith: 8,
-                arcane: 8,
-            }),
-            
-            (ArcheType::Prisoner, Stats{
-                level: 9,
-                vigor: 11,
-                mind: 12,
-                endurance: 11,
-                strength: 11,
-                dexterity: 14,
-                intelligence: 14,
-                faith: 6,
-                arcane: 9,
-            }),
-            
-            (ArcheType::Confessor, Stats{
-                level: 10,
-                vigor: 10,
-                mind: 13,
-                endurance: 10,
-                strength: 12,
-                dexterity: 12,
-                intelligence: 9,
-                faith: 14,
-                arcane: 9,
-            }),
-            
-            (ArcheType::Wretch, Stats{
-                level: 1,
-                vigor: 10,
-                mind: 10,
-                endurance: 10,
-                strength: 10,
-                dexterity: 10,
-                intelligence: 10,
-                faith: 10,
-                arcane: 10,
-            }),
+            (
+                ArcheType::Vagabond,
+                Stats {
+                    level: 9,
+                    vigor: 15,
+                    mind: 10,
+                    endurance: 11,
+                    strength: 14,
+                    dexterity: 13,
+                    intelligence: 9,
+                    faith: 9,
+                    arcane: 7,
+                },
+            ),
+            (
+                ArcheType::Warrior,
+                Stats {
+                    level: 8,
+                    vigor: 11,
+                    mind: 12,
+                    endurance: 11,
+                    strength: 10,
+                    dexterity: 16,
+                    intelligence: 10,
+                    faith: 8,
+                    arcane: 9,
+                },
+            ),
+            (
+                ArcheType::Hero,
+                Stats {
+                    vigor: 14,
+                    mind: 9,
+                    endurance: 12,
+                    strength: 16,
+                    dexterity: 9,
+                    intelligence: 7,
+                    faith: 8,
+                    arcane: 11,
+                    level: 7,
+                },
+            ),
+            (
+                ArcheType::Bandit,
+                Stats {
+                    level: 5,
+                    vigor: 10,
+                    mind: 11,
+                    endurance: 10,
+                    strength: 9,
+                    dexterity: 13,
+                    intelligence: 9,
+                    faith: 8,
+                    arcane: 14,
+                },
+            ),
+            (
+                ArcheType::Astrologer,
+                Stats {
+                    level: 6,
+                    vigor: 9,
+                    mind: 15,
+                    endurance: 9,
+                    strength: 8,
+                    dexterity: 12,
+                    intelligence: 16,
+                    faith: 7,
+                    arcane: 9,
+                },
+            ),
+            (
+                ArcheType::Prophet,
+                Stats {
+                    level: 7,
+                    vigor: 10,
+                    mind: 14,
+                    endurance: 8,
+                    strength: 11,
+                    dexterity: 10,
+                    intelligence: 7,
+                    faith: 16,
+                    arcane: 10,
+                },
+            ),
+            (
+                ArcheType::Samurai,
+                Stats {
+                    level: 9,
+                    vigor: 12,
+                    mind: 11,
+                    endurance: 13,
+                    strength: 12,
+                    dexterity: 15,
+                    intelligence: 9,
+                    faith: 8,
+                    arcane: 8,
+                },
+            ),
+            (
+                ArcheType::Prisoner,
+                Stats {
+                    level: 9,
+                    vigor: 11,
+                    mind: 12,
+                    endurance: 11,
+                    strength: 11,
+                    dexterity: 14,
+                    intelligence: 14,
+                    faith: 6,
+                    arcane: 9,
+                },
+            ),
+            (
+                ArcheType::Confessor,
+                Stats {
+                    level: 10,
+                    vigor: 10,
+                    mind: 13,
+                    endurance: 10,
+                    strength: 12,
+                    dexterity: 12,
+                    intelligence: 9,
+                    faith: 14,
+                    arcane: 9,
+                },
+            ),
+            (
+                ArcheType::Wretch,
+                Stats {
+                    level: 1,
+                    vigor: 10,
+                    mind: 10,
+                    endurance: 10,
+                    strength: 10,
+                    dexterity: 10,
+                    intelligence: 10,
+                    faith: 10,
+                    arcane: 10,
+                },
+            ),
         ]))
     });
 }

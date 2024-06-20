@@ -3,15 +3,12 @@ pub mod br_ext {
     use std::io::Error;
 
     use binary_reader::{BinaryReader, Endian};
-    use encoding_rs::{UTF_16BE, UTF_16LE, SHIFT_JIS};
+    use encoding_rs::{SHIFT_JIS, UTF_16BE, UTF_16LE};
 
-    pub struct BinaryReaderExtensions {
-
-    }
+    pub struct BinaryReaderExtensions {}
 
     #[allow(unused)]
     impl BinaryReaderExtensions {
-
         pub fn get_i8(br: &mut BinaryReader, offset: usize) -> Result<i8, Error> {
             let prev_pos = br.pos;
             br.jmp(offset);
@@ -31,35 +28,39 @@ pub mod br_ext {
         pub fn get_utf_16(br: &mut BinaryReader, offset: usize) -> Result<String, Error> {
             let prev_pos = br.pos;
             br.jmp(offset);
-            let mut bytes: Vec<u8>= Vec::new();
-                let mut pair = br.read_bytes(2)?;
-                while pair[0] != 0 || pair[1] != 0 {
-                    bytes.extend(pair);
-                    pair = br.read_bytes(2)?;
+            let mut bytes: Vec<u8> = Vec::new();
+            let mut pair = br.read_bytes(2)?;
+            while pair[0] != 0 || pair[1] != 0 {
+                bytes.extend(pair);
+                pair = br.read_bytes(2)?;
+            }
+
+            let string = match br.endian {
+                binary_reader::Endian::Big => {
+                    let (res, _enc, errors) = UTF_16BE.decode(&bytes);
+                    if errors {
+                        eprintln!("Failed");
+                        String::new()
+                    } else {
+                        res.to_string()
+                    }
                 }
-                
-                let string = match br.endian {
-                    binary_reader::Endian::Big => {
-                        let (res, _enc, errors) = UTF_16BE.decode(&bytes);
-                        if errors {
-                            eprintln!("Failed");
-                            String::new()
-                        } else {
-                            res.to_string()
-                        }   
-                    },
-                    binary_reader::Endian::Little => {
-                        let (res, _enc, errors) = UTF_16LE.decode(&bytes);
-                        if errors {
-                            eprintln!("Failed");
-                            String::new()
-                        } else {
-                            res.to_string()
-                        }   
-                    },
-                    binary_reader::Endian::Native => {panic!("Endian type is wrong!")},
-                    binary_reader::Endian::Network => {panic!("Endian type is wrong!")},
-                };
+                binary_reader::Endian::Little => {
+                    let (res, _enc, errors) = UTF_16LE.decode(&bytes);
+                    if errors {
+                        eprintln!("Failed");
+                        String::new()
+                    } else {
+                        res.to_string()
+                    }
+                }
+                binary_reader::Endian::Native => {
+                    panic!("Endian type is wrong!")
+                }
+                binary_reader::Endian::Network => {
+                    panic!("Endian type is wrong!")
+                }
+            };
 
             br.jmp(prev_pos);
             Ok(string)
@@ -71,10 +72,9 @@ pub mod br_ext {
             let mut terminator = 0;
             for mut i in (0..size).step_by(2) {
                 terminator = i;
-                if i == size -1 {
-                    i = i-1;
-                }
-                else if bytes[i] == 0 && bytes[i + 1] == 0 {
+                if i == size - 1 {
+                    i = i - 1;
+                } else if bytes[i] == 0 && bytes[i + 1] == 0 {
                     break;
                 }
             }
@@ -86,21 +86,20 @@ pub mod br_ext {
                     String::new()
                 } else {
                     res.to_string()
-                }   
-            }
-            else {
+                }
+            } else {
                 let (res, _enc, errors) = UTF_16LE.decode(&bytes[0..terminator]);
                 if errors {
                     eprintln!("Failed");
                     String::new()
                 } else {
                     res.to_string()
-                }   
+                }
             };
             Ok(string)
         }
 
-        pub fn get_ascii(br: &mut BinaryReader, offset: usize) -> Result<String, Error>{
+        pub fn get_ascii(br: &mut BinaryReader, offset: usize) -> Result<String, Error> {
             let prev_pos = br.pos;
             br.jmp(offset);
             let string = Self::read_ascii(br)?;
@@ -137,20 +136,18 @@ pub mod br_ext {
                     String::new()
                 } else {
                     res.to_string()
-                }   
-            }
-            else {
+                }
+            } else {
                 let (res, _enc, errors) = UTF_16LE.decode(&bytes[0..terminator]);
                 if errors {
                     eprintln!("Failed");
                     String::new()
                 } else {
                     res.to_string()
-                }   
+                }
             };
             Ok(string)
         }
-
 
         pub fn get_shift_jis(br: &mut BinaryReader, offset: usize) -> Result<String, Error> {
             let prev_pos = br.pos;
@@ -167,7 +164,7 @@ pub mod br_ext {
                 panic!("Failed to read string!");
             } else {
                 Ok(res.to_string())
-            }  
+            }
         }
 
         fn read_chars_terminated(br: &mut BinaryReader) -> Result<Vec<u8>, Error> {
@@ -177,10 +174,14 @@ pub mod br_ext {
                 bytes.push(b);
                 b = br.read_u8()?;
             }
-            Ok(bytes) 
+            Ok(bytes)
         }
 
-        pub fn get_bytes(br: &mut BinaryReader, offset: usize, size: usize) -> Result<Vec<u8>, Error> {
+        pub fn get_bytes(
+            br: &mut BinaryReader,
+            offset: usize,
+            size: usize,
+        ) -> Result<Vec<u8>, Error> {
             let prev_pos = br.pos;
             br.jmp(offset);
             let bytes = br.read_bytes(size)?.to_vec();

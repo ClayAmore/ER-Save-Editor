@@ -14,8 +14,7 @@ pub mod bit {
     pub fn get_bit(byte: u8, bit_pos: u8) -> bool {
         if bit_pos < 8 {
             byte & (1 << bit_pos) != 0
-        } 
-        else {
+        } else {
             panic!("Bit pos out of range (0-7)");
         }
     }

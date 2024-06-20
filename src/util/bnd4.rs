@@ -1,7 +1,7 @@
 pub mod bnd4 {
-    use std::io::Error;
     use binary_reader::{BinaryReader, Endian};
     use encoding_rs::{SHIFT_JIS, UTF_16BE, UTF_16LE};
+    use std::io::Error;
 
     bitflags::bitflags! {
         #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -80,12 +80,7 @@ pub mod bnd4 {
         pub data_offset: i64,
     }
     impl BinderFile {
-        pub fn new(
-            flags: FileFlags,
-            id: i32,
-            name: String,
-            bytes: Vec<u8>,
-        ) -> Self {
+        pub fn new(flags: FileFlags, id: i32, name: String, bytes: Vec<u8>) -> Self {
             let mut binder_file = BinderFile::default();
             binder_file.flags = flags;
             binder_file.id = id;
@@ -114,8 +109,7 @@ pub mod bnd4 {
 
             if Binder::is_compressed(self.file_flags) {
                 todo!();
-            }
-            else {
+            } else {
                 let prev_pos = br.pos;
                 br.jmp(self.data_offset as usize);
                 bytes.extend(br.read_bytes(self.uncompressed_size as usize)?);
@@ -126,23 +120,35 @@ pub mod bnd4 {
                 self.file_flags,
                 self.id,
                 self.name.to_string(),
-                bytes
+                bytes,
             ))
         }
 
-        pub fn read_binder4_file_header(br: &mut BinaryReader, format: Format, big_endian: bool, bit_big_endian: bool, unicode: bool) -> Result<Self, Error> {
+        pub fn read_binder4_file_header(
+            br: &mut BinaryReader,
+            format: Format,
+            big_endian: bool,
+            bit_big_endian: bool,
+            unicode: bool,
+        ) -> Result<Self, Error> {
             let byte = br.read_u8()?;
-            let raw_flags = if big_endian {i32::from_be_bytes([byte, 0, 0, 0])} else {i32::from_le_bytes([byte, 0, 0, 0])};
-            
-            let file_flags = if bit_big_endian {raw_flags} else {
-                ((raw_flags & 0b00000001) << 7) |
-                ((raw_flags & 0b00000010) << 5) |
-                ((raw_flags & 0b00000100) << 3) |
-                ((raw_flags & 0b00001000) << 1) |
-                ((raw_flags & 0b00010000) >> 1) |
-                ((raw_flags & 0b00100000) >> 3) |
-                ((raw_flags & 0b01000000) >> 5) |
-                ((raw_flags & 0b10000000) >> 7)
+            let raw_flags = if big_endian {
+                i32::from_be_bytes([byte, 0, 0, 0])
+            } else {
+                i32::from_le_bytes([byte, 0, 0, 0])
+            };
+
+            let file_flags = if bit_big_endian {
+                raw_flags
+            } else {
+                ((raw_flags & 0b00000001) << 7)
+                    | ((raw_flags & 0b00000010) << 5)
+                    | ((raw_flags & 0b00000100) << 3)
+                    | ((raw_flags & 0b00001000) << 1)
+                    | ((raw_flags & 0b00010000) >> 1)
+                    | ((raw_flags & 0b00100000) >> 3)
+                    | ((raw_flags & 0b01000000) >> 5)
+                    | ((raw_flags & 0b10000000) >> 7)
             };
 
             assert_eq!(br.read_u8()?, 0);
@@ -151,21 +157,18 @@ pub mod bnd4 {
             assert_eq!(br.read_i32()?, -1);
 
             let compressed_size = br.read_i64()?;
-            
-            let uncompressed_size = if Binder::has_compression(format) { 
+
+            let uncompressed_size = if Binder::has_compression(format) {
                 br.read_i64()?
-            }
-            else { 
+            } else {
                 br.read_i32()? as i64
             };
 
             let data_offset = if Binder::has_long_offsets(format) {
                 br.read_i64()?
-            }
-            else {
+            } else {
                 br.read_i32()? as i64
             };
-
 
             let mut id = -1;
             if Binder::has_ids(format) {
@@ -179,13 +182,13 @@ pub mod bnd4 {
                 let saved_pos = br.pos;
                 br.jmp(name_offset as usize);
                 if unicode {
-                    let mut bytes: Vec<u8>= Vec::new();
+                    let mut bytes: Vec<u8> = Vec::new();
                     let mut pair = br.read_bytes(2)?;
                     while pair[0] != 0 || pair[1] != 0 {
                         bytes.extend(pair);
                         pair = br.read_bytes(2)?;
                     }
-                    
+
                     name = if big_endian {
                         let (res, _enc, errors) = UTF_16BE.decode(&bytes);
                         if errors {
@@ -193,7 +196,7 @@ pub mod bnd4 {
                             String::new()
                         } else {
                             res.to_string()
-                        }   
+                        }
                     } else {
                         let (res, _enc, errors) = UTF_16LE.decode(&bytes);
                         if errors {
@@ -201,11 +204,10 @@ pub mod bnd4 {
                             String::new()
                         } else {
                             res.to_string()
-                        }   
+                        }
                     };
-                }
-                else {
-                    let mut bytes: Vec<u8>= Vec::new();
+                } else {
+                    let mut bytes: Vec<u8> = Vec::new();
                     let mut b = br.read_u8()?;
                     while b != 0 {
                         bytes.push(b);
@@ -216,7 +218,7 @@ pub mod bnd4 {
                         eprintln!("Failed");
                     } else {
                         name = res.to_string();
-                    }   
+                    }
                 }
                 br.jmp(saved_pos);
             }
@@ -225,7 +227,6 @@ pub mod bnd4 {
                 id = br.read_i32()?;
                 assert_eq!(br.read_i32()?, 0);
             }
-            
 
             Ok(Self {
                 file_flags: FileFlags::from_bits_truncate(file_flags as u8),
@@ -239,9 +240,7 @@ pub mod bnd4 {
         }
     }
 
-
-    pub struct Binder {
-    }
+    pub struct Binder {}
 
     impl Binder {
         fn get_bnd4_header_size(format: Format) -> i64 {
@@ -263,28 +262,27 @@ pub mod bnd4 {
             }
             size
         }
-    
+
         fn has_long_offsets(format: Format) -> bool {
             (format & Format::LongOffsets).as_i32() != 0
         }
-    
+
         fn has_compression(format: Format) -> bool {
             (format & Format::Compression).as_i32() != 0
         }
-    
+
         fn has_ids(format: Format) -> bool {
             (format & Format::IDs).as_i32() != 0
         }
-    
+
         fn has_names(format: Format) -> bool {
             (format & (Format::Names1 | Format::Names2)).as_i32() != 0
         }
-    
+
         fn is_compressed(flags: FileFlags) -> bool {
-            (flags& FileFlags::Compressed).as_i32() != 0
+            (flags & FileFlags::Compressed).as_i32() != 0
         }
     }
-
 
     #[derive(Default)]
     pub struct BND4 {
@@ -316,14 +314,14 @@ pub mod bnd4 {
             magic == b"BND4"
         }
 
-        pub fn from_bytes(bytes: &[u8]) -> Result<BND4, Error>{
+        pub fn from_bytes(bytes: &[u8]) -> Result<BND4, Error> {
             let mut br = BinaryReader::from_u8(bytes);
             let mut bnd4 = BND4::new();
             bnd4.read(&mut br).expect("");
             Ok(bnd4)
         }
 
-        pub fn read(&mut self, br: &mut BinaryReader) -> Result<(), Error>{
+        pub fn read(&mut self, br: &mut BinaryReader) -> Result<(), Error> {
             let file_headers = self.read_header(br)?;
             for file_header in file_headers {
                 self.files.push(file_header.read_file_data(br)?);
@@ -344,16 +342,20 @@ pub mod bnd4 {
             self.bit_big_endian = br.read_bool()?;
             assert_eq!(br.read_u8()?, 0);
 
-            br.set_endian(if self.big_endian {binary_reader::Endian::Big} else {Endian::Little});
+            br.set_endian(if self.big_endian {
+                binary_reader::Endian::Big
+            } else {
+                Endian::Little
+            });
 
             let file_count = br.read_i32()?;
             assert_eq!(br.read_i64()?, 0x40);
-            
+
             let bytes = br.read_bytes(8)?;
             let mut terminator = 0;
             for i in 0..8 {
                 if bytes[i] == 0 {
-                    break
+                    break;
                 }
                 terminator = i;
             }
@@ -363,29 +365,37 @@ pub mod bnd4 {
             } else {
                 self.version = res.to_string();
             }
-            
+
             let file_header_size = br.read_i64()?;
             let _unused00 = br.read_i64();
 
             self.unicode = br.read_bool()?;
             let byte = br.read_u8()?;
-            let raw_format = if self.big_endian {i32::from_be_bytes([byte, 0, 0, 0])} else {i32::from_le_bytes([byte, 0, 0, 0])};
-            let reverse: bool = self.bit_big_endian || (raw_format & 1) != 0 && (raw_format & 0b1000_0000) == 0;
-            let format = if reverse {Format::from_bits_truncate(raw_format as u8)} else {
+            let raw_format = if self.big_endian {
+                i32::from_be_bytes([byte, 0, 0, 0])
+            } else {
+                i32::from_le_bytes([byte, 0, 0, 0])
+            };
+            let reverse: bool =
+                self.bit_big_endian || (raw_format & 1) != 0 && (raw_format & 0b1000_0000) == 0;
+            let format = if reverse {
+                Format::from_bits_truncate(raw_format as u8)
+            } else {
                 Format::from_bits_truncate(
-                (((raw_format & 0b00000001) << 7) |
-                ((raw_format & 0b00000010) << 5) |
-                ((raw_format & 0b00000100) << 3) |
-                ((raw_format & 0b00001000) << 1) |
-                ((raw_format & 0b00010000) >> 1) |
-                ((raw_format & 0b00100000) >> 3) |
-                ((raw_format & 0b01000000) >> 5) |
-                ((raw_format & 0b10000000) >> 7)) as u8)
+                    (((raw_format & 0b00000001) << 7)
+                        | ((raw_format & 0b00000010) << 5)
+                        | ((raw_format & 0b00000100) << 3)
+                        | ((raw_format & 0b00001000) << 1)
+                        | ((raw_format & 0b00010000) >> 1)
+                        | ((raw_format & 0b00100000) >> 3)
+                        | ((raw_format & 0b01000000) >> 5)
+                        | ((raw_format & 0b10000000) >> 7)) as u8,
+                )
             };
 
             let b = br.read_u8()?;
             self.extended = -1;
-            if  b == 0 {
+            if b == 0 {
                 self.extended = 0;
             } else if b == 1 {
                 self.extended = 1;
@@ -394,7 +404,12 @@ pub mod bnd4 {
             } else if b == 0x80 {
                 self.extended = 0x80;
             };
-            assert!(self.extended == 0 || self.extended == 1 || self.extended == 4 || self.extended == 0x80);
+            assert!(
+                self.extended == 0
+                    || self.extended == 1
+                    || self.extended == 4
+                    || self.extended == 0x80
+            );
             assert_eq!(br.read_u8()?, 0);
 
             assert_eq!(br.read_i32()?, 0);
@@ -410,23 +425,27 @@ pub mod bnd4 {
                 assert_eq!(br.read_u8()?, 8);
                 assert_eq!(br.read_u8()?, 0);
                 br.jmp(prev_pos);
-            }
-            else {
+            } else {
                 assert_eq!(br.read_i64()?, 0);
             }
 
             if file_header_size != Binder::get_bnd4_header_size(format) {
-                panic!("File header size for format {} is expected to be {:#X}, but was {:#X}", self.format.as_i32(), Binder::get_bnd4_header_size(self.format), file_header_size);
+                panic!(
+                    "File header size for format {} is expected to be {:#X}, but was {:#X}",
+                    self.format.as_i32(),
+                    Binder::get_bnd4_header_size(self.format),
+                    file_header_size
+                );
             }
 
             let mut file_headers: Vec<BinderHeader> = Vec::with_capacity(file_count as usize);
             for _i in 0..file_count {
                 file_headers.push(BinderHeader::read_binder4_file_header(
-                    br, 
-                    self.format, 
-                    self.big_endian, 
-                    self.bit_big_endian, 
-                    self.unicode
+                    br,
+                    self.format,
+                    self.big_endian,
+                    self.bit_big_endian,
+                    self.unicode,
                 )?);
             }
 
