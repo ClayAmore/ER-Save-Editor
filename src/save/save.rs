@@ -1049,8 +1049,7 @@ pub mod save {
     }
 
     impl Save {
-        pub fn from_path(path: &PathBuf) -> Result<Save, io::Error> {
-            let contents = fs::read(path).expect("Should have been able to read the file");
+        pub fn from_contents(contents: Vec<u8>) -> Result<Save, io::Error> {
             let mut br = BinaryReader::from_u8(&contents);
             br.set_endian(binary_reader::Endian::Little);
 
@@ -1058,6 +1057,11 @@ pub mod save {
             assert!(Self::is(&mut br));
 
             Self::read(&mut br)
+        }
+
+        pub fn from_path(path: &PathBuf) -> Result<Save, io::Error> {
+            let contents = fs::read(path).expect("Should have been able to read the file");
+            Self::from_contents(contents)
         }
 
         // Check if it's a save file

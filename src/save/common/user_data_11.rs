@@ -27,7 +27,7 @@ impl Read for UserData11 {
             .regulation
             .copy_from_slice(br.read_bytes(0x1c5f70)?);
         user_data_11.rest.copy_from_slice(br.read_bytes(0x7A090)?);
-        assert_eq!(user_data_11.rest[0], 0);
+        assert!(user_data_11.rest[0] == 0 || user_data_11.rest[0] == 151);
         Ok(user_data_11)
     }
 }
