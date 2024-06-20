@@ -1085,3 +1085,52 @@ pub mod save {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use super::*;
+    use save::{Save, SaveType};
+
+    #[test]
+    fn test_load_save_pre_dlc() {
+        let path = PathBuf::from("test_data/ER0000.preDLC.sl2");
+        let save = Save::from_path(&path).expect("Should have been able to load the save file");
+
+        let save_type = &save.save_type;
+        match save_type {
+            SaveType::PC(pc_save) => {
+                assert_eq!(pc_save.save_slots.len(), 10);
+                assert_eq!(pc_save.user_data_10.profile_summary.len(), 10);
+                assert_eq!(pc_save.user_data_11.user_data_11.regulation.len(), 0x1c5f70);
+            }
+            SaveType::PlayStation(ps_save) => {
+                assert_eq!(ps_save.save_slots.len(), 10);
+                assert_eq!(ps_save.user_data_10.profile_summary.len(), 10);
+                assert_eq!(ps_save.user_data_11.regulation.len(), 0x1c5f70);
+            }
+            SaveType::Unknown => panic!("Why are we here?"),
+        }
+    }
+    #[test]
+    fn test_load_save_post_dlc() {
+        let path = PathBuf::from("test_data/ER0000.postDLC.sl2");
+        let save = Save::from_path(&path).expect("Should have been able to load the save file");
+
+        let save_type = &save.save_type;
+        match save_type {
+            SaveType::PC(pc_save) => {
+                assert_eq!(pc_save.save_slots.len(), 10);
+                assert_eq!(pc_save.user_data_10.profile_summary.len(), 10);
+                assert_eq!(pc_save.user_data_11.user_data_11.regulation.len(), 0x1c5f70);
+            }
+            SaveType::PlayStation(ps_save) => {
+                assert_eq!(ps_save.save_slots.len(), 10);
+                assert_eq!(ps_save.user_data_10.profile_summary.len(), 10);
+                assert_eq!(ps_save.user_data_11.regulation.len(), 0x1c5f70);
+            }
+            SaveType::Unknown => panic!("Why are we here?"),
+        }
+    }
+}

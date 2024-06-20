@@ -545,3 +545,31 @@ pub mod vm {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use vm::ViewModel;
+
+    use crate::save::save::save::Save;
+
+    use super::*;
+
+    #[test]
+    fn test_load_save_pre_dlc() {
+        let path = PathBuf::from("test_data/ER0000.preDLC.sl2");
+        let save = Save::from_path(&path).expect("Should have been able to load the save file");
+        let vm = ViewModel::from_save(&save);
+
+        assert_eq!(vm.slots.len(), 10);
+    }
+    #[test]
+    fn test_load_save_post_dlc() {
+        let path = PathBuf::from("test_data/ER0000.postDLC.sl2");
+        let save = Save::from_path(&path).expect("Should have been able to load the save file");
+        let vm = ViewModel::from_save(&save);
+
+        assert_eq!(vm.slots.len(), 10);
+    }
+}
