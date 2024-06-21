@@ -2,7 +2,6 @@ use std::{collections::HashMap, io::Error, str::FromStr, sync::{Mutex, RwLock}};
 
 use aes::cipher::{block_padding::NoPadding, BlockDecryptMut, KeyIvInit};
 use binary_reader::{BinaryReader, Endian};
-use miniz_oxide::inflate::decompress_to_vec;
 use once_cell::sync::{Lazy, OnceCell};
 
 use crate::{db::{accessory_name::accessory_name::ACCESSORY_NAME, aow_name::aow_name::AOW_NAME, armor_name::armor_name::ARMOR_NAME, item_name::item_name::ITEM_NAME, weapon_name::weapon_name::WEAPON_NAME}, save::save::save::Save, util::{param_structs::{EQUIP_PARAM_ACCESSORY_ST, EQUIP_PARAM_GEM_ST, EQUIP_PARAM_GOODS_ST, EQUIP_PARAM_PROTECTOR_ST, EQUIP_PARAM_WEAPON_ST}, params::params::{Row, PARAM}}};
@@ -15,7 +14,15 @@ pub struct Regulation;
 
 impl Regulation {
     pub fn init_params(save: &Save) {
-        *PARAMS.write().unwrap() = Regulation::params_from_regulation(save.save_type.get_regulation()).unwrap();
+        let res = Regulation::params_from_regulation(save.save_type.get_regulation());
+
+        
+        match res {
+            Ok(res) => *PARAMS.write().unwrap() = res,
+            Err(err) => println!("{err}"),
+        }
+
+        
     }
 
     pub fn equip_accessory_param_map() -> &'static HashMap<u32, Row<EQUIP_PARAM_ACCESSORY_ST>> {
@@ -123,14 +130,14 @@ impl Regulation {
         let compressed_size = br.read_i32()?;
         
         assert_eq!(br.read_bytes(4)?, b"DCP\0");
-        assert_eq!(br.read_bytes(4)?, b"DFLT");
+        assert_eq!(br.read_bytes(4)?, b"ZSTD");
         assert_eq!(br.read_i32()?, 0x20);
-        assert_eq!(br.read_u8()?, 9);
+        assert_eq!(br.read_u8()?, 0x15);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_i32()?, 0);
-        assert_eq!(br.read_u8()?, 15);
+        assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_u8()?, 0);
@@ -138,14 +145,10 @@ impl Regulation {
         assert_eq!(br.read_i32()?, 0x00010100);
 
         assert_eq!(br.read_bytes(4)?, b"DCA\0");
-        let _compressed_header_length = br.read_i32()?;
+        assert_eq!(br.read_i32()?, 8);
 
-        assert_eq!(br.read_u8()?, 0x78);
-        let assert_value = br.read_u8()?;
-        assert!(assert_value == 0x01 || assert_value == 0x5E || assert_value == 0x9C || assert_value == 0xDA);
-        
-        let compressed = br.read_bytes(compressed_size as usize - 2)?;
-        let res = decompress_to_vec(compressed);
+        let compressed = br.read_bytes(compressed_size as usize)?;
+        let res = zstd::decode_all(compressed);
 
         match res {
             Ok(decompressed) => Ok(decompressed),
