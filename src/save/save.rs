@@ -10,7 +10,7 @@ pub mod save {
     };
 
     // Using a checksum of the regulation bin file to check for Save Wizard .txt save file
-    const REGULATION_MD5_CHECKSUM: [u8; 0x10] = [0x9D, 0xE4, 0x83, 0x80, 0x78, 0xB2, 0x28, 0x9D, 0x83, 0x8D, 0x28, 0x7A, 0x24, 0x31, 0xE6, 0x45];
+    const REGULATION_MD5_CHECKSUM: [u8; 0x10] =[0x2E, 0x88, 0x1A, 0x15, 0xAC, 0x05, 0x88, 0x8D, 0xF2, 0xC2, 0x6A, 0xEC, 0xC2, 0x90, 0x89, 0x23];
 
     pub enum SaveType {
         Unknown,
@@ -825,8 +825,8 @@ pub mod save {
 
         // Check if it's a PS Save Wizard save file
         pub fn is_ps_save_wizard(br: &mut BinaryReader) -> bool {
-            br.jmp(0x1960080);
-            let regulation = br.read_bytes(0x1c5f70).expect("");
+            br.jmp(0x1960070);
+            let regulation = br.read_bytes(0x240010).expect("");
             let digest = md5::compute(regulation);
             let is_ps_save_wizard = digest == md5::Digest(REGULATION_MD5_CHECKSUM);
             br.jmp(0);
