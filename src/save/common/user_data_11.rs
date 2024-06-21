@@ -13,8 +13,11 @@ impl Default for UserData11 {
     fn default() -> Self {
         Self {
             unk: Default::default(),
-            regulation: vec![0; 0x1c5f70],
-            rest: vec![0; 0x7A090],
+            // regulation: vec![0; 0x1c5f70], // 1859440
+            regulation: vec![0; 0x1E9FB0], // 2006957
+            // rest: vec![0; 0x7A090], // 499856
+            rest: vec![0; 0x56050], // 352339
+                                    //total:  2359296 == 0x240000
         }
     }
 }
@@ -25,9 +28,11 @@ impl Read for UserData11 {
         user_data_11.unk.copy_from_slice(br.read_bytes(0x10)?);
         user_data_11
             .regulation
-            .copy_from_slice(br.read_bytes(0x1c5f70)?);
-        user_data_11.rest.copy_from_slice(br.read_bytes(0x7A090)?);
-        assert!(user_data_11.rest[0] == 0 || user_data_11.rest[0] == 151);
+            .copy_from_slice(br.read_bytes(0x1E9FB0)?);
+        user_data_11.rest.copy_from_slice(br.read_bytes(0x56050)?);
+        assert!(
+            user_data_11.rest[0] == 0 || user_data_11.rest[0] == 151 || user_data_11.rest[0] == 27
+        );
         Ok(user_data_11)
     }
 }

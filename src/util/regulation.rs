@@ -1,14 +1,14 @@
 use std::{
     collections::HashMap,
-    io::Error,
+    io::{Error, ErrorKind, Read},
     str::FromStr,
     sync::{Mutex, RwLock},
 };
 
 use aes::cipher::{block_padding::NoPadding, BlockDecryptMut, KeyIvInit};
 use binary_reader::{BinaryReader, Endian};
-use miniz_oxide::inflate::decompress_to_vec;
 use once_cell::sync::{Lazy, OnceCell};
+use zstd::stream::read::Decoder;
 
 use crate::{
     db::{
@@ -173,14 +173,17 @@ impl Regulation {
         let compressed_size = br.read_i32()?;
 
         assert_eq!(br.read_bytes(4)?, b"DCP\0");
-        assert_eq!(br.read_bytes(4)?, b"DFLT");
+        let algo = br.read_bytes(4)?.to_vec();
+        assert!(algo == b"DFLT" || algo == b"ZSTD");
         assert_eq!(br.read_i32()?, 0x20);
-        assert_eq!(br.read_u8()?, 9);
+        let val = br.read_u8()?;
+        assert!(val == 9 || val == 21);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_i32()?, 0);
-        assert_eq!(br.read_u8()?, 15);
+        let val = br.read_u8()?;
+        assert!(val == 15 || val == 0);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_u8()?, 0);
         assert_eq!(br.read_u8()?, 0);
@@ -190,25 +193,36 @@ impl Regulation {
         assert_eq!(br.read_bytes(4)?, b"DCA\0");
         let _compressed_header_length = br.read_i32()?;
 
-        assert_eq!(br.read_u8()?, 0x78);
-        let assert_value = br.read_u8()?;
-        assert!(
-            assert_value == 0x01
-                || assert_value == 0x5E
-                || assert_value == 0x9C
-                || assert_value == 0xDA
-        );
+        // let val = br.read_u8()?;
+        // assert!(val == 0x78 || val == 0x28);
+        // let assert_value = br.read_u8()?;
+        // assert!(
+        //     assert_value == 0x01
+        //         || assert_value == 0x5E
+        //         || assert_value == 0x9C
+        //         || assert_value == 0xDA
+        //         || assert_value == 0xB5
+        // );
 
-        let compressed = br.read_bytes(compressed_size as usize - 2)?;
-        let res = decompress_to_vec(compressed);
+        let compressed = br.read_bytes(compressed_size as usize)?;
 
-        match res {
-            Ok(decompressed) => Ok(decompressed),
-            Err(msg) => Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!("{msg}"),
-            )),
-        }
+        let decompressed = if algo == b"DFLT" {
+            let res = miniz_oxide::inflate::decompress_to_vec(compressed);
+
+            match res {
+                Ok(decompressed) => Ok(decompressed),
+                Err(msg) => Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("{msg}"),
+                )),
+            }
+        } else {
+            let mut buf = Vec::new();
+            let mut decoder = zstd::stream::read::Decoder::new(&compressed[..]).unwrap();
+            decoder.read_to_end(&mut buf).unwrap();
+            Ok(buf)
+        };
+        decompressed
     }
 
     // Unpack the decrypted and decompressed regulation file (BND4)
