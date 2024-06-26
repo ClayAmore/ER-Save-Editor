@@ -125,122 +125,46 @@ pub fn talismans() -> &'static BTreeMap<String, Vec<u32>> {
             0x200017CA, // Host's Trick-Mirror
             0x200017D4, // Entwining Umbilical Cord
             0x200017DE, // Ancestral Spirit's Horn
+            0x20001B58, // Crimson Amber Medallion +3
+            0x20001B62, // Cerulean Amber Medallion +3
+            0x20001B6C, // Viridian Amber Medallion +3
+            0x20001B76, // Two-Headed Turtle Talisman
+            0x20001B80, // Stalwart Horn Charm +2
+            0x20001B8A, // Immunizing Horn Charm +2
+            0x20001B94, // Clarifying Horn Charm +2
+            0x20001BA8, // Mottled Necklace +2
+            0x20001BB2, // Spelldrake Talisman +3
+            0x20001BBC, // Flamedrake Talisman +3
+            0x20001BC6, // Boltdrake Talisman +3
+            0x20001BD0, // Golden Braid
+            0x20001BDA, // Pearldrake Talisman +3
+            0x20001BE4, // Crimson Seed Talisman +1
+            0x20001BEE, // Cerulean Seed Talisman +1
+            0x20001F40, // Blessed Blue Dew Talisman
+            0x20001F4A, // Fine Crucible Feather Talisman
+            0x20001F54, // Outer God Heirloom
+            0x20001F5E, // Shattered Stone Talisman
+            0x20001F68, // Two-Handed Sword Talisman
+            0x20001F72, // Crusade Insignia
+            0x20001F7C, // Aged One's Exultation
+            0x20001F86, // Arrow's Soaring Sting Talisman
+            0x20001F9A, // Pearl Shield Talisman
+            0x20001FA4, // Dried Bouquet
+            0x20001FAE, // Smithing Talisman
+            0x20001FB8, // Ailment Talisman
+            0x20001FC2, // Retaliatory Crossed-Tree
+            0x20001FCC, // Lacerating Crossed-Tree
+            0x20001FD6, // Sharpshot Talisman
+            0x20001FE0, // St. Trina's Smile
+            0x20001FEA, // Talisman of the Dread
+            0x20001FF4, // Enraged Divine Beast
+            0x20001FFE, // Beloved Stardust
+            0x20002008, // Talisman of Lord's Bestowal
+            0x20002012, // Verdigris Discus
+            0x2000201C, // Rellana's Cameo
+            0x20002026, // Blade of Mercy
+            0x20002030, // Talisman of All Crucibles
         ]);
         talisman_group
     })
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//

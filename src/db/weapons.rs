@@ -25,8 +25,10 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x00116520, // Bloodstained Dagger
             0x00118C30, // Erdsteel Dagger
             0x0011B340, // Blade of Calling
+            0x0016E360, // Main-gauche
         ]);
         weapon_groups.insert("Straight Swords".to_string(),vec![
+            0x00170A70, // Fire Knight's Shortsword
             0x001E8480, // Longsword
             0x001EAB90, // Short Sword
             0x001ED2A0, // Broadsword
@@ -48,6 +50,10 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x00222E00, // Warhawk's Talon
             0x00225510, // Lazuli Glintstone Sword
             0x00227C20, // Rotten Crystal Sword
+            0x00264CB0, // Velvet Sword of St. Trina
+            0x0026C1E0, // Stone-Sheathed Sword
+            0x0026E8F0, // Sword of Light
+            0x00271000, // Sword of Darkness
         ]);
         weapon_groups.insert("Greatswords".to_string(),vec![
             0x002DC6C0, // Bastard Sword
@@ -70,6 +76,10 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x0030ACF0, // Gargoyle's Greatsword
             0x0030D400, // Death's Poker
             0x0030FB10, // Gargoyle's Blackblade
+            0x00358EF0, // Greatsword of Damnation
+            0x0035B600, // Lizard Greatsword
+            0x00362B30, // Greatsword of Solitude
+            0x0081DA30, // Freyja's Greatsword
         ]);
         weapon_groups.insert("Colossal Swords".to_string(),vec![
             0x003D0900, // Greatsword
@@ -83,8 +93,15 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x003E4180, // Ruins Greatsword
             0x003E8FA0, // Grafted Blade Greatsword
             0x003EB6B0, // Troll Knight's Sword
+            0x00362B30, // Greatsword of Solitude
+            0x0044AA20, // Ancient Meteoric Ore Greatsword
+            0x0044F840, // Fire Knight's Greatsword
+            0x00451F50, // Greatsword of Radahn (Lord)
+            0x00454660, // Moonrithyll's Knight Sword
+            0x00456D70, // Greatsword of Radahn (Light)
         ]);
         weapon_groups.insert("Thrusting Swords".to_string(),vec![
+            0x00269AD0, // Carian Sorcery Sword
             0x004C4B40, // Estoc
             0x004C7250, // Cleanrot Knight's Sword
             0x004C9960, // Rapier
@@ -94,10 +111,12 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x004D35A0, // Noble's Estoc
         ]);
         weapon_groups.insert("Heavy Thrusting Swords".to_string(),vec![
+            0x003567E0, // Sword Lance
             0x005B8D80, // Bloody Helice
             0x005BB490, // Godskin Stitcher
             0x005BDBA0, // Great Épée
             0x005C29C0, // Dragon King's Cragblade
+            0x00632EA0, // Queelign's Greatsword
         ]);
         weapon_groups.insert("Curved Swords".to_string(),vec![
             0x006ACFC0, // Falchion
@@ -114,6 +133,10 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x006CA480, // Mantis Blade
             0x006CF2A0, // Scimitar
             0x006D19B0, // Grossmesser
+            0x007270E0, // Spirit Sword
+            0x007297F0, // Falx
+            0x0072BF00, // Dancing Blade of Ranah
+            0x0072E610, // Horned Warrior's Sword
         ]);
         weapon_groups.insert("Curved Greatswords".to_string(),vec![
             0x007A3910, // Onyx Lord's Greatsword
@@ -125,8 +148,10 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x007B2370, // Monk's Flameblade
             0x007B4A80, // Beastman's Cleaver
             0x007B98A0, // Morgott's Cursed Sword
+            0x00820140, // Horned Warrior's Greatsword
         ]);
         weapon_groups.insert("Katana".to_string(),vec![
+            0x002673C0, // Star-Lined Sword
             0x00895440, // Uchigatana
             0x00897B50, // Nagakiba
             0x0089A260, // Hand of Malenia
@@ -135,6 +160,7 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x008A3EA0, // Moonveil
             0x008A65B0, // Dragonscale Blade
             0x008A8CC0, // Serpentbone Blade
+            0x0090F560, // Sword of Night
         ]);
         weapon_groups.insert("Twinblades".to_string(),vec![
             0x00989680, // Twinblade
@@ -143,6 +169,8 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x009959D0, // Eleonora's Poleblade
             0x0099CF00, // Gargoyle's Twinblade
             0x0099F610, // Gargoyle's Black Blades
+            0x00A037A0, // Euporia
+            0x00A05EB0, // Black Steel Twinblade
         ]);
         weapon_groups.insert("Hammers".to_string(),vec![
             0x00A7D8C0, // Mace
@@ -160,6 +188,7 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x00A9D490, // Ringed Finger
             0x00A9FBA0, // Stone Club
             0x00AA22B0, // Marika's Hammer
+            0x00AF79E0, // Flowerstone Gavel
         ]);
         weapon_groups.insert("Great Hammers".to_string(),vec![
             0x00B71B00, // Large Club
@@ -168,6 +197,8 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x00B80560, // Great Mace
             0x00B85380, // Curved Great Club
             0x00B916D0, // Celebrant's Skull
+            0x00BEBC20, // Smithscript Greathammer
+            0x00BF0A40, // Black Steel Greathammer
         ]);
         weapon_groups.insert("Warhammers".to_string(),vec![
             0x00B93DE0, // Pickaxe
@@ -185,6 +216,7 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x00C6AB60, // Family Heads
             0x00C6D270, // Bastard's Stars
             0x00C6F980, // Chainlink Flail
+            0x00CDFE60, // Serpent Flail
         ]);
         weapon_groups.insert("Axes".to_string(),vec![
             0x00D59F80, // Battle Axe
@@ -199,8 +231,13 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x00D74D30, // Sacrificial Axe
             0x00D77440, // Rosus' Axe
             0x00D7C260, // Stormhawk Axe
+            0x00DD40A0, // Smithscript Axe
+            0x00DD67B0, // Death Knight's Twin Axes
+            0x00DD8EC0, // Messmer Soldier's Axe
+            0x00DDDCE0, // Forked-Tongue Hatchet
         ]);
         weapon_groups.insert("Greataxes".to_string(),vec![
+            0x0081B320,   // Putrescence Cleaver
             0x00E4E1C0, // Greataxe
             0x00E508D0, // Warped Axe
             0x00E52FE0, // Great Omenkiller Cleaver
@@ -213,6 +250,8 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x00E6B680, // Butchering Knife
             0x00E6DD90, // Gargoyle's Great Axe
             0x00E704A0, // Gargoyle's Black Axe
+            0x00EC82E0, // Death Knight's Longhaft Axe
+            0x00ECA9F0, // Bonny Butchering Knife
         ]);
         weapon_groups.insert("Spears".to_string(),vec![
             0x00F42400, // Short Spear
@@ -231,6 +270,9 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x00F646E0, // Spiked Spear
             0x00F66DF0, // Iron Spear
             0x00F69500, // Rotten Crystal Spear
+            0x00FBC520, // Smithscript Spear
+            0x00FC1340, // Swift Spear
+            0x00FC6160, // Bloodfiend's Fork
         ]);
         weapon_groups.insert("Great Spears".to_string(),vec![
             0x01038D50, // Mohgwyn's Sacred Spear
@@ -239,6 +281,10 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x01042990, // Vyke's War Spear
             0x010450A0, // Lance
             0x010477B0, // Treespear
+            0x010B0760, // Spear of the Impaler
+            0x00FC8870, // Bloodfiend's Sacred Spear
+            0x010B2E70, // Messmer Soldier's Spear
+            0x010B5580, // Barbed Staff-Spear
         ]);
         weapon_groups.insert("Halberds".to_string(),vec![
             0x0112A880, // Halberd
@@ -257,12 +303,15 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x0114CB60, // Dragon Halberd
             0x0114F270, // Gargoyle's Halberd
             0x01151980, // Gargoyle's Black Halberd
+            0x011A49A0, // Spirit Glaive
+            0x011A70B0, // Poleblade of the Bud
         ]);
         weapon_groups.insert("Reapers".to_string(),vec![
             0x0121EAC0, // Scythe
             0x012211D0, // Grave Scythe
             0x012238E0, // Halo Scythe
             0x0122D520, // Winged Scythe
+            0x01298BE0, // Obsidian Lamina
         ]);
         weapon_groups.insert("Whips".to_string(),vec![
             0x01312D00, // Whip
@@ -271,6 +320,7 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x0131F050, // Hoslow's Petal Whip
             0x01321760, // Giant's Red Braid
             0x01323E70, // Urumi
+            0x0138CE20, // Tooth Whip
         ]);
         weapon_groups.insert("Fists".to_string(),vec![
             0x01406F40, // Caestus
@@ -282,14 +332,21 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x01421CF0, // Clinging Bone
             0x01424400, // Veteran's Prosthesis
             0x01426B10, // Cipher Pata
+            0x01481060, // Thiollier's Hidden Needle
+            0x01483770, // Pata
+            0x01485E80, // Poisoned Hand
+            0x01488590, // Madding Hand
+            0x0148ACA0, // Golem Fist
         ]);
         weapon_groups.insert("Claws".to_string(),vec![
             0x014FB180, // Hookclaws
             0x014FD890, // Venomous Fang
             0x014FFFA0, // Bloodhound Claws
             0x015026B0, // Raptor Talons
+            0x015752A0, // Claws of Night
         ]);
         weapon_groups.insert("Colossal Weapons".to_string(),vec![
+            0x00BEE330, // Anvil Hammer
             0x015EF3C0, // Prelate's Inferno Crozier
             0x015F1AD0, // Watchdog's Staff
             0x015F41E0, // Great Club
@@ -305,7 +362,10 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x0160EF90, // Troll's Hammer
             0x016116A0, // Rotten Staff
             0x01613DB0, // Rotten Greataxe
-        ]); 
+            0x016694E0, // Devonia's Hammer
+            0x0166BBF0, // Shadow Sunflower Blossom
+            0x0166E300, // Gazing Finger
+        ]);
         weapon_groups.insert("Torches".to_string(),vec![
             0x016E3600, // Torch
             0x016E8420, // Steel-Wire Torch
@@ -313,8 +373,11 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x016EF950, // Ghostflame Torch
             0x016F2060, // Beast-Repellent Torch
             0x016F4770, // Sentry's Torch
+            0x0175D720, // Nanaya's Torch
+            0x0175FE30, // Lamenting Visage
         ]);
         weapon_groups.insert("Shields".to_string(),vec![
+            0x0148D3B0, // Shield of Night
             0x01C9C380, // Buckler
             0x01C9EA90, // Perfumer's Shield
             0x01CA11A0, // Man-Serpent's Shield
@@ -332,6 +395,7 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x01CC0D70, // Smoldering Shield
             0x01CCA9B0, // Spiralhorn Shield
             0x01CCD0C0, // Coil Shield
+            0x01D18BB0, // Smithscript Shield
             0x01D905C0, // Kite Shield
             0x01D92CD0, // Marred Leather Shield
             0x01D953E0, // Marred Wooden Shield
@@ -359,6 +423,10 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x01DDE7C0, // Inverted Hawk Heater Shield
             0x01DE0ED0, // Heater Shield
             0x01DE35E0, // Black Leather Shield
+            0x01E0A6E0, // Messmer Soldier Shield
+            0x01E0CDF0, // Wolf Crest Shield
+            0x01E0F500, // Serpent Crest Shield
+            0x01E11C10, // Golden Lion Shield
         ]);
         weapon_groups.insert("Greatshields".to_string(),vec![
             0x01E84800, // Dragon Towershield
@@ -386,6 +454,8 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x01EC8DC0, // Haligtree Crest Greatshield
             0x01ECB4D0, // Wooden Greatshield
             0x01ECDBE0, // Lordsworn's Shield
+            0x01EFE920, // Black Steel Greatshield
+            0x01F03740, // Verdigris Greatshield
         ]);
         weapon_groups.insert("Staves".to_string(),vec![
             0x01F78A40, // Glintstone Staff
@@ -406,6 +476,8 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x01FB81E0, // Staff of the Guilty
             0x01FBA8F0, // Rotten Crystal Staff
             0x01FBD000, // Staff of Loss
+            0x01FF5270, // Staff of the Great Beyond
+            0x01FF7980, // Maternal Staff
         ]);
         weapon_groups.insert("Seals".to_string(),vec![
             0x0206CC80, // Finger Seal
@@ -417,6 +489,9 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x0207DDF0, // Erdtree Seal
             0x02080500, // Dragon Communion Seal
             0x02082C10, // Frenzied Flame Seal
+            0x020E6DA0, // Dryleaf Seal
+            0x020E94B0, // Fire Knight's Seal
+            0x020EBBC0, // Spiraltree Seal
         ]);
         weapon_groups.insert("Light Bows".to_string(),vec![
             0x02625A00, // Shortbow
@@ -424,7 +499,8 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x0262A820, // Red Branch Shortbow
             0x0262CF30, // Harp Bow
             0x02631D50, // Composite Bow
-        ]); 
+            0x0269FB20, // Bone Bow
+        ]);
         weapon_groups.insert("Bows".to_string(),vec![
             0x02719C40, // Longbow
             0x0271C350, // Albinauric Bow
@@ -433,12 +509,14 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x02723880, // Serpent Bow
             0x027286A0, // Pulley Bow
             0x0272ADB0, // Black Bow
+            0x02796470, // Ansbach's Longbow
         ]);
         weapon_groups.insert("Greatbows".to_string(),vec![
             0x0280DE80, // Lion Greatbow
             0x02810590, // Golem Greatbow
             0x028153B0, // Erdtree Greatbow
             0x02817AC0, // Greatbow
+            0x02887FA0, // Igon's Greatbow
         ]);
         weapon_groups.insert("Crossbows".to_string(),vec![
             0x029020C0, // Soldier's Crossbow
@@ -448,10 +526,13 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x02910B20, // Full Moon Crossbow
             0x02915940, // Arbalest
             0x0291CE70, // Crepus's Black-Key Crossbow
+            0x0297C1E0, // Repeating Crossbow
+            0x0297E8F0, // Spread Crossbow
         ]);
         weapon_groups.insert("Ballistae".to_string(),vec![
             0x029F6300, // Hand Ballista
             0x029F8A10, // Jar Cannon
+            0x02A70420, // Rabbath's Cannon
         ]);
         weapon_groups.insert("Arrows".to_string(), vec![
             0x02FAF080, // Arrow
@@ -486,6 +567,8 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x02FFF990, // Coldbone Arrow
             0x030020A0, // Rotbone Arrow (Fletched)
             0x030047B0, // Rotbone Arrow
+            0x03032DE0, // Piquebone Arrow (Fletched)
+            0x030354F0, // Piquebone Arrow
         ]);
         weapon_groups.insert("Greatarrows".to_string(), vec![
             0x030A32C0, // Great Arrow
@@ -495,6 +578,7 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x030ACF00, // Radahn's Spear
             0x030AF610, // Bone Great Arrow (Fletched)
             0x030B1D20, // Bone Great Arrow
+            0x0311D3E0, // Igon's Harpoon
         ]);
         weapon_groups.insert("Bolts".to_string(), vec![
             0x03197500, // Bolt
@@ -517,12 +601,51 @@ pub fn weapons() -> &'static BTreeMap<String, Vec<u32>> {
             0x031C0D10, // Rotbone Bolt
             0x031C3420, // Sleepbone Bolt
             0x031C5B30, // Flaming Bolt
+            0x03216440, // Piquebone Bolt
         ]);
         weapon_groups.insert("Greatbolts".to_string(), vec![
             0x0328B740, // Ballista Bolt
             0x0328DE50, // Lightning Greatbolt
             0x03290560, // Explosive Greatbolt
             0x03292C70, // Bone Ballista Bolt
+            0x03305860, // Rabbath's Greatbolt
+        ]);
+        weapon_groups.insert("Hand-To-Hand Arts".to_string(),vec![
+            0x039B2820, // Dryleaf Arts
+            0x039B4F30, // Dane's Footwork
+        ]);
+        weapon_groups.insert("Perfume Bottles".to_string(),vec![
+            0x03AA6A60, // Firespark Perfume Bottle
+            0x03AA9170, // Chilling Perfume Bottle
+            0x03AAB880, // Frenzyflame Perfume Bottle
+            0x03AADF90, // Lightning Perfume Bottle
+            0x03AB06A0, // Deadly Poison Perfume Bottle
+        ]);
+        weapon_groups.insert("Thrusting Shields".to_string(),vec![
+            0x03B9ACA0, // Dueling Shield
+            0x03B9D3B0, // Carian Thrusting Shield
+        ]);
+        weapon_groups.insert("Throwing Blades".to_string(),vec![
+            0x03C8EEE0, // Smithscript Dagger
+        ]);
+        weapon_groups.insert("Backhand Blades".to_string(),vec![
+            0x03D83120, // Backhand Blade
+            0x03D85830, // Smithscript Cirque
+            0x03D87F40, // Curseblade's Cirque
+        ]);
+        weapon_groups.insert("Great Katanas".to_string(),vec![
+            0x03F6B5A0, // Great Katana
+            0x03F6DCB0, // Dragon-Hunter's Great Katana
+            0x03F703C0, // Rakshasa's Great Katana
+        ]);
+        weapon_groups.insert("Light Greatswords".to_string(),vec![
+            0x0405F7E0, // Milady
+            0x04061EF0, // Leda's Sword
+            0x04064600, // Rellana's Twin Blades
+        ]);
+        weapon_groups.insert("Beast Claws".to_string(),vec![
+            0x04153A20, // Beast Claw
+            0x04156130, // Red Bear's Claw
         ]);
         weapon_groups
     })
