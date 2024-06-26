@@ -33,6 +33,39 @@ pub fn items() -> &'static BTreeMap<String, Vec<u32>> {
             0x40001F40, // Stonesword Key
             0x40000834, // Soft Cotton
             0x40000802, // Grace Mimic
+            0x401E87A0, // Spirit Raisin
+            0x401E8804, // Blessing of Marika
+            0x401E880E, // Lulling Branch
+            0x401E88CC, // Dragon Communion Flesh
+            0x401E88D1, // Dragonscale Flesh
+            0x401E88D6, // Fingerprint Nostrum
+            0x401E88E0, // Spellproof Pickled Liver
+            0x401E88EA, // Fireproof Pickled Liver
+            0x401E88F4, // Lightningproof Pickled Liver
+            0x401E88FE, // Holyproof Pickled Liver
+            0x401E8908, // Opaline Pickled Liver
+            0x401E8912, // Well-Pickled Turtle Neck
+            0x401E8930, // Scorpion Stew
+            0x401E8931, // Gourmet Scorpion Stew
+            0x401E8932, // Scorpion Stew
+            0x401E8933, // Gourmet Scorpion Stew
+            0x401E893A, // Sacred Bloody Flesh
+            0x401E8944, // Silver Horn Tender
+            0x401E894E, // Golden Horn Tender
+            0x401E8B24, // Innard Meat
+            0x401E8B2E, // Dragon Communion Harpoon
+            0x401E8C50, // Polter Stone
+            0x401E8C5A, // Rock Heart
+            0x401E8C64, // Priestess Heart
+            0x401E8C6E, // Lamenter's Mask
+            0x401E8CB4, // Ancient Dragon's Blessing
+            0x401E8CC8, // Iris of Grace
+            0x401E8CD2, // Iris of Occultation
+            0x401E8CDC, // Thiollier's Concoction
+            0x401E9006, // Leda's Rune
+            0x401E9007, // Broken Rune
+            0x401E900F, // Rune of an Unsung Hero
+            0x401E9010, // Marika's Rune
         ]);
         item_groups.insert("Meats".to_string(), vec![
             0x4000044C, // Pickled Turtle Neck
@@ -95,6 +128,18 @@ pub fn items() -> &'static BTreeMap<String, Vec<u32>> {
             0x40000636, // Drawstring Rot Grease
             0x4000069A, // Shield Grease
             //0x40000CE4, // Holy Water Grease
+            0x401E89F8, // Messmerfire Grease
+            0x401E8A02, // Dragonbolt Grease
+            0x401E8A0C, // Royal Magic Grease
+            0x401E8A16, // Golden Grease
+            0x401E8A2A, // Eternal Sleep Grease
+            0x401E8A48, // Dragon Communion Grease
+            0x401E8A5C, // Drawstring Messmerfire Grease
+            0x401E8A66, // Drawstring Dragonbolt Grease
+            0x401E8A70, // Drawstring Royal Magic Grease
+            0x401E8A7A, // Drawstring Golden Grease
+            0x401E8A8E, // Drawstring Eternal Sleep Grease
+            0x401E8AC0, // Festive Grease
         ]);
         item_groups.insert("Crafting: Animal".to_string(), vec![
             0x40003A98, // Sliver of Meat
@@ -256,6 +301,26 @@ pub fn items() -> &'static BTreeMap<String, Vec<u32>> {
             0x40000276, // Cursed-Blood Pot
             0x40000294, // Magic Pot
             0x40000295, // Academy Magic Pot
+            0x401E85AC, // Hefty Fire Pot
+            0x401E85B6, // Hefty Rock Pot
+            0x401E85C0, // Hefty Lightning Pot
+            0x401E85CA, // Hefty Fetid Pot
+            0x401E85D4, // Hefty Fly Pot
+            0x401E85E8, // Hefty Freezing Pot
+            0x401E85F2, // Hefty Poison Pot
+            0x401E85FC, // Hefty Oil Pot
+            0x401E86D8, // Hefty Volcano Pot
+            0x401E86EC, // Hefty Frenzied Flame Pot
+            0x401E870A, // Hefty Rancor Pot
+            0x401E8714, // Hefty Magic Pot
+            0x401E871E, // Hefty Rot Pot
+            0x401E8728, // Hefty Furnace Pot
+            0x401E8732, // Hefty Red Lightning Pot
+            0x401E873C, // Red Lightning Pot
+            0x401E8746, // Frenzied Flame Pot
+            0x401E8764, // Eternal Sleep Pot
+            0x401E8778, // Roped Frenzied Flame Pot
+
         ]);
         item_groups.insert("Crystal tears".to_string(), vec![
             0x40002AF8, // Crimsonspill Crystal Tear
@@ -290,6 +355,14 @@ pub fn items() -> &'static BTreeMap<String, Vec<u32>> {
             0x40002B15, // Magic-Shrouding Cracked Tear
             0x40002B16, // Lightning-Shrouding Cracked Tear
             0x40002B17, // Holy-Shrouding Cracked Tear
+            0x401EAF78, // Viridian Hidden Tear
+            0x401EAF82, // Crimsonburst Dried Tear
+            0x401EAF8C, // Crimson-Sapping Cracked Tear
+            0x401EAF96, // Cerulean-Sapping Cracked Tear
+            0x401EAFA0, // Oil-Soaked Tear
+            0x401EAFAA, // Bloodsucking Cracked Tear
+            0x401EAFB4, // Glovewort Crystal Tear
+            0x401EAFBE, // Deflecting Hardtear
         ]);
         item_groups.insert("Prattling Pates".to_string(), vec![
             0x40000898, // Prattling Pate "Hello"
@@ -300,6 +373,7 @@ pub fn items() -> &'static BTreeMap<String, Vec<u32>> {
             0x4000089D, // Prattling Pate "My beloved"
             0x4000089E, // Prattling Pate "Let's get to it"
             0x4000089F, // Prattling Pate "You're beautiful"
+            0x401E8CE6, // Prattling Pate "Lamentation"
         ]);
         item_groups.insert("Bell Bearings".to_string(), vec![
             0x400022CE, // Pidia's Bell Bearing
@@ -355,6 +429,16 @@ pub fn items() -> &'static BTreeMap<String, Vec<u32>> {
             0x40002303, // Ghost-Glovewort Picker's Bell Bearing [1]
             0x40002304, // Ghost-Glovewort Picker's Bell Bearing [2]
             0x40002305, // Ghost-Glovewort Picker's Bell Bearing [3]
+            0x401EA744, // Moore's Bell Bearing
+            0x401EA745, // Ymir's Bell Bearing
+            0x401EA746, // Herbalist's Bell Bearing
+            0x401EA747, // Mushroom-Seller's Bell Bearing [1]
+            0x401EA748, // Mushroom-Seller's Bell Bearing [2]
+            0x401EA749, // Greasemonger's Bell Bearing
+            0x401EA74A, // Moldmonger's Bell Bearing
+            0x401EA74B, // Igon's Bell Bearing
+            0x401EA74C, // Spellmachinist's Bell Bearing
+            0x401EA74D, // String-Seller's Bell Bearing
         ]);
         item_groups.insert("Spirit Ashes".to_string(), vec![
             0x40030D40, // Black Knife Tiche
@@ -421,6 +505,26 @@ pub fn items() -> &'static BTreeMap<String, Vec<u32>> {
             0x4003FB88, // Finger Maiden Therolina Puppet
             0x4003FF70, // Dolores the Sleeping Arrow Puppet
             0x40040358, // Jarwight Puppet
+            0x402191C0, // Curseblade Meera
+            0x402195A8, // Bloodfiend Hexer's Ashes
+            0x40219990, // Gravebird Ashes
+            0x40219D78, // Fire Knight Hilde
+            0x4021A160, // Spider Scorpion Ashes
+            0x4021A548, // Inquisitor Ashes
+            0x4021A930, // Demi-Human Swordsman Yosh
+            0x4021AD18, // Messmer Soldier Ashes
+            0x4021B100, // Black Knight Commander Andreas
+            0x4021B4E8, // Black Knight Captain Huw
+            0x4021B8D0, // Bigmouth Imp Ashes
+            0x4021BCB8, // Man-Fly Ashes
+            0x4021C0A0, // Taylew the Golem Smith
+            0x4021C488, // Divine Bird Warrior Ornis
+            0x4021C870, // Horned Warrior Ashes
+            0x4021CC58, // Ancient Dragon Florissax
+            0x4021D428, // Fingercreeper Ashes
+            0x4021D810, // Fire Knight Queelign
+            0x4021DBF8, // Swordhand of Night Jolán
+            0x4021DFE0, // Jolán and Anna
         ]);
         item_groups.insert("Sorceries".to_string(), vec![
             0x40000FA0, // Glintstone Pebble
@@ -494,6 +598,18 @@ pub fn items() -> &'static BTreeMap<String, Vec<u32>> {
             0x400013EC, // Oracle Bubbles
             0x400013F6, // Great Oracular Bubble
             0x40001964, // Night Maiden's Mist
+            0x401E954C, // Miriam's Vanishing
+            0x401E9556, // Glintblade Trio
+            0x401E9560, // Rellana's Twin Moons
+            0x401E9614, // Glintstone Nail
+            0x401E961E, // Glintstone Nails
+            0x401E96DC, // Blades of Stone
+            0x401E96E6, // Gravitational Missile
+            0x401E97A4, // Mantle of Thorns
+            0x401E97AE, // Impenetrable Thorns
+            0x401E9808, // Rings of Spectral Light
+            0x401E9CB8, // Vortex of Putrescence
+            0x401E9CC2, // Mass of Putrescence
         ]);
         item_groups.insert("Incantations".to_string(), vec![
             0x40001770, // Catch Flame
@@ -596,6 +712,36 @@ pub fn items() -> &'static BTreeMap<String, Vec<u32>> {
             0x40001D6A, // Black Blade
             0x40001EDC, // Fire's Deadly Sin
             0x40001EDF, // Golden Lightning Fortification
+            0x401E9D1C, // Furious Blade of Ansbach
+            0x401E9D80, // Heal from Afar
+            0x401E9E7A, // Aspects of the Crucible: Thorns
+            0x401E9E84, // Aspects of the Crucible: Bloom
+            0x401E9E8E, // Minor Erdtree
+            0x401E9E98, // Land of Shadow
+            0x401E9EA2, // Wrath from Afar
+            0x401E9EAC, // Light of Miquella
+            0x401E9EB6, // Multilayered Ring of Light
+            0x401E9F10, // Roar of Rugalea
+            0x401E9F74, // Knight's Lightning Spear
+            0x401E9F7E, // Dragonbolt of Florissax
+            0x401E9F88, // Electrocharge
+            0x401E9FD8, // Bayle's Tyranny
+            0x401E9FE2, // Bayle's Flame Lightning
+            0x401E9FEC, // Ghostflame Breath
+            0x401EA0A0, // Rotten Butterflies
+            0x401EA0AA, // Pest-Thread Spears
+            0x401EA104, // Midra's Flame of Frenzy
+            0x401EA172, // Fleeting Microcosm
+            0x401EA17C, // Cherishing Fingers
+            0x401EA230, // Watchful Spirit
+            0x401EA294, // Golden Arcs
+            0x401EA29E, // Giant Golden Arc
+            0x401EA2A8, // Spira
+            0x401EA2B2, // Divine Beast Tornado
+            0x401EA2BC, // Divine Bird Feathers
+            0x401EA2F8, // Fire Serpent
+            0x401EA302, // Rain of Fire
+            0x401EA30C, // Messmer's Orb
         ]);
         item_groups
     })

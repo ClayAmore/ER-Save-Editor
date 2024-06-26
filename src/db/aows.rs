@@ -100,122 +100,33 @@ pub fn aows() -> &'static BTreeMap<String, Vec<u32>> {
             0x800138E4, // Ash of War: Bloodhound's Step
             0x80013948, // Ash of War: Raptor of the Mists
             0x80014C08, // Ash of War: White Shadow's Lure
-        ]);
+            0x80030D40, // Ash of War: Dryleaf Whirlwind
+            0x80030DA4, // Ash of War: Aspects of the Crucible: Wings
+            0x80061A80, // Ash of War: Spinning Gravity Thrust
+            0x80061E68, // Ash of War: Palm Blast
+            0x80062250, // Ash of War: Piercing Throw
+            0x80062638, // Ash of War: Scattershot Throw
+            0x80062A20, // Ash of War: Wall of Sparks
+            0x80062E08, // Ash of War: Rolling Sparks
+            0x800631F0, // Ash of War: Raging Beast
+            0x800635D8, // Ash of War: Savage Claws
+            0x80063DA8, // Ash of War: Blind Spot
+            0x80064190, // Ash of War: Swift Slash
+            0x80064578, // Ash of War: Overhead Stance
+            0x80064960, // Ash of War: Wing Stance
+            0x80064D48, // Ash of War: Blinkbolt
+            0x80065130, // Ash of War: Flame Skewer
+            0x80065518, // Ash of War: Savage Lion's Claw
+            0x80065900, // Ash of War: Divine Beast Frost Stomp
+            0x80065CE8, // Ash of War: Flame Spear
+            0x800660D0, // Ash of War: Carian Sovereignty
+            0x800664B8, // Ash of War: Shriek of Sorrow
+            0x80067070, // Ash of War: Ghostflame Call
+            0x8007B4A8, // Ash of War: The Poison Flower Blooms Twice
+            0x80085CA0, // Ash of War: Igon's Drake Hunt
+            0x800C3500, // Ash of War: Shield Strike
+            ],
+        );
         aow_group
     })
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//

@@ -844,6 +844,207 @@ pub fn armor_sets() -> &'static BTreeMap<String, Vec<u32>> {
             0x100CAAF8, // Sorcerer Manchettes
             0x100CAB5C, // Sorcerer Leggings
          ]);
+         armor_sets.insert("Dane's".to_string(), vec![
+             0x102DC6C0, // Dane's Hat
+             0x102DC724, // Dryleaf Robe
+             0x102DC788, // Dryleaf Arm Wraps
+             0x102DC7EC, // Dryleaf Cuissardes
+             0x102DCB0C, // Dryleaf Robe (Altered)
+         ]);
+         armor_sets.insert("Gaius's".to_string(), vec![
+             0x102DEDD0, // Gaius's Helm
+             0x102DEE34, // Gaius's Armor
+             0x102DEE98, // Gaius's Gauntlets
+             0x102DEEFC, // Gaius's Greaves
+         ]);
+         armor_sets.insert("Oathseeker Knight".to_string(), vec![
+             0x104C4B40, // Oathseeker Knight Helm
+             0x104C4BA4, // Leda's Armor
+             0x104C4C08, // Oathseeker Knight Gauntlets
+             0x104C4C6C, // Oathseeker Knight Greaves
+             0x104C5374, // Oathseeker Knight Armor
+         ]);
+         armor_sets.insert("Verdigris".to_string(), vec![
+             0x104C7250, // Verdigris Helm
+             0x104C72B4, // Verdigris Armor
+             0x104C7318, // Verdigris Gauntlets
+             0x104C737C, // Verdigris Greaves
+         ]);
+         armor_sets.insert("Iron Rivet".to_string(), vec![
+             0x104C9960, // Pelt of Ralva
+             0x104C99C4, // Iron Rivet Armor
+             0x104C9A28, // Iron Rivet Gauntlets
+             0x104C9A8C, // Iron Rivet Greaves
+             0x104C9D48, // Fang Helm
+
+         ]);
+         armor_sets.insert("Thiollier's".to_string(), vec![
+             0x104CC070, // Thiollier's Mask
+             0x104CC0D4, // Thiollier's Garb
+             0x104CC138, // Thiollier's Gloves
+             0x104CC19C, // Thiollier's Trousers
+             0x104CC4BC, // Thiollier's Garb (Altered)
+         ]);
+         armor_sets.insert("High Priest".to_string(), vec![
+             0x104D35A0, // High Priest Hat
+             0x104D3604, // High Priest Robe
+             0x104D3668, // High Priest Gloves
+             0x104D36CC, // High Priest Undergarments
+             0x104D3DD4, // Finger Robe
+         ]);
+         armor_sets.insert("Hornsent".to_string(), vec![
+             0x104D5CB0, // Caterpillar Mask
+             0x104D5D14, // Braided Cord Robe
+             0x104D5D78, // Braided Arm Wraps
+             0x104D5DDC, // Soiled Loincloth
+         ]);
+         armor_sets.insert("Dancer's".to_string(), vec![
+             0x104D83C0, // Dancer's Hood
+             0x104D8424, // Dancer's Dress
+             0x104D8488, // Dancer's Bracer
+             0x104D84EC, // Dancer's Trousers
+             0x104D880C, // Dancer's Dress (Altered)
+         ]);
+         armor_sets.insert("Night".to_string(), vec![
+             0x104DAAD0, // Helm of Night
+             0x104DAB34, // Armor of Night
+             0x104DAB98, // Gauntlets of Night
+             0x104DABFC, // Greaves of Night
+         ]);
+         armor_sets.insert("Igor's".to_string(), vec![
+             0x104DD1E0, // Igon's Helm
+             0x104DD244, // Igon's Armor
+             0x104DD2A8, // Igon's Gauntlets
+             0x104DD30C, // Igon's Loincloth
+             0x104DD5C8, // Igon's Helm (Altered)
+             0x104DD62C, // Igon's Armor (Altered)
+         ]);
+         armor_sets.insert("Ansbach's".to_string(), vec![
+             0x104DF8F0, // Wise Man's Mask
+             0x104DF954, // Ansbach's Attire
+             0x104DF9B8, // Ansbach's Manchettes
+             0x104DFA1C, // Ansbach's Boots
+             0x104DFD3C, // Ansbach's Attire (Altered)
+         ]);
+         armor_sets.insert("Freyja's".to_string(), vec![
+             0x104E2000, // Freyja's Helm
+             0x104E2064, // Freyja's Armor
+             0x104E20C8, // Freyja's Gauntlets
+             0x104E212C, // Freyja's Greaves
+             0x104E244C, // Freyja's Armor (Altered)
+         ]);
+         armor_sets.insert("Solitude".to_string(), vec![
+             0x104E4710, // Helm of Solitude
+             0x104E4774, // Armor of Solitude
+             0x104E47D8, // Gauntlets of Solitude
+             0x104E483C, // Greaves of Solitude
+             0x104E4B5C, // Armor of Solitude (Altered)
+         ]);
+         armor_sets.insert("Messmer Soldier".to_string(), vec![
+             0x104E6E20, // Messmer Soldier Helm
+             0x104E6E84, // Messmer Soldier Armor
+             0x104E6EE8, // Messmer Soldier Gauntlets
+             0x104E6F4C, // Messmer Soldier Greaves
+             0x104E726C, // Messmer Soldier Armor (Altered)
+         ]);
+         armor_sets.insert("Black Knight".to_string(), vec![
+             0x104E9530, // Black Knight Helm
+             0x104E9594, // Black Knight Armor
+             0x104E95F8, // Black Knight Gauntlets
+             0x104E965C, // Black Knight Greaves
+         ]);
+         armor_sets.insert("Rakshasa".to_string(), vec![
+             0x104EBC40, // Rakshasa Helm
+             0x104EBCA4, // Rakshasa Armor
+             0x104EBD08, // Rakshasa Gauntlets
+             0x104EBD6C, // Rakshasa Greaves
+         ]);
+         armor_sets.insert("Fire Knight".to_string(), vec![
+             0x104F0A60, // Fire Knight Helm
+             0x104F0AC4, // Fire Knight Armor
+             0x104F0B28, // Fire Knight Gauntlets
+             0x104F0B8C, // Fire Knight Greaves
+             0x104F0EAC, // Fire Knight Armor (Altered)
+             0x104F1230, // Death Mask Helm
+
+         ]);
+         armor_sets.insert("Highland Warrior".to_string(), vec![
+             0x104F3170, // Leather Headband
+             0x104F31D4, // Gloried Attire
+             0x104F3238, // Leather Arm Wraps
+             0x104F329C, // Leather Leg Wraps
+             0x104F3558, // Leather Crown
+             0x104F35BC, // Highland Attire
+         ]);
+         armor_sets.insert("Death Knight".to_string(), vec![
+             0x104F5880, // Death Knight Helm
+             0x104F58E4, // Death Knight Armor
+             0x104F5948, // Death Knight Gauntlets
+             0x104F59AC, // Death Knight Greaves
+         ]);
+         armor_sets.insert("Ascetic's".to_string(), vec![
+             0x104F7F90, // Curseblade Mask
+             0x104F7FF4, // Ascetic's Loincloth
+             0x104F8058, // Ascetic's Wrist Guards
+             0x104F80BC, // Ascetic's Ankle Guards
+         ]);
+         armor_sets.insert("Messmer's".to_string(), vec![
+             0x104FA6A0, // Messmer's Helm
+             0x104FA704, // Messmer's Armor
+             0x104FA768, // Messmer's Gauntlets
+             0x104FA7CC, // Messmer's Greaves
+             0x104FAA88, // Messmer's Helm (Altered)
+         ]);
+         armor_sets.insert("Gravebird".to_string(), vec![
+             0x104FCDB0, // Gravebird Helm
+             0x104FCE14, // Gravebird's Blackquill Armor
+             0x104FCE78, // Gravebird Bracelets
+             0x104FCEDC, // Gravebird Anklets
+             0x104FD1FC, // Gravebird Armor
+         ]);
+         armor_sets.insert("Common Soldier".to_string(), vec![
+             0x104FF4C0, // Common Soldier Helm
+             0x104FF524, // Common Soldier Cloth Armor
+             0x104FF588, // Common Soldier Gauntlets
+             0x104FF5EC, // Common Soldier Greaves
+         ]);
+         armor_sets.insert("Horned Warrior".to_string(), vec![
+             0x10501BD0, // Horned Warrior Helm
+             0x10501C34, // Horned Warrior Armor
+             0x10501C98, // Horned Warrior Gauntlets
+             0x10501CFC, // Horned Warrior Greaves
+         ]);
+         armor_sets.insert("Divine Beast".to_string(), vec![
+             0x105023A0, // Divine Beast Helm
+             0x10502404, // Divine Beast Warrior Armor
+             0x1050B810, // Divine Beast Head
+
+         ]);
+         armor_sets.insert("Divine Bird".to_string(), vec![
+             0x10502788, // Divine Bird Helm
+             0x105027EC, // Divine Bird Warrior Armor
+             0x10502850, // Divine Bird Warrior Gauntlets
+             0x105028B4, // Divine Bird Warrior Greaves
+         ]);
+         armor_sets.insert("Rellana's".to_string(), vec![
+             0x105042E0, // Rellana's Helm
+             0x10504344, // Rellana's Armor
+             0x105043A8, // Rellana's Gloves
+             0x1050440C, // Rellana's Greaves
+         ]);
+         armor_sets.insert("Young Lion's".to_string(), vec![
+             0x105069F0, // Young Lion's Helm
+             0x10506A54, // Young Lion's Armor
+             0x10506AB8, // Young Lion's Gauntlets
+             0x10506B1C, // Young Lion's Greaves
+             0x10506E3C, // Young Lion's Armor (Altered)
+         ]);
+         armor_sets.insert("Shadow Militiaman".to_string(), vec![
+             0x10509100, // Shadow Militiaman Helm
+             0x10509164, // Shadow Militiaman Armor
+             0x105091C8, // Shadow Militiaman Gauntlets
+             0x1050922C, // Shadow Militiaman Greaves
+         ]);
          armor_sets.insert("_Not part of a set".to_string(), vec![
             0x1010CD2C, // Eye Surcoatvec
             0x1010CCC8, // Greathelm
@@ -858,6 +1059,13 @@ pub fn armor_sets() -> &'static BTreeMap<String, Vec<u32>> {
             0x100249F0, // Iron Kasa
             0x1006B6C0, // Pumpkin Helm
             0x100D9878, // Blackguard's Iron Mask
+            0x104F1618, // Winged Serpent Helm
+            0x104F1A00, // Salza's Hood
+            0x105071C0, // Circlet of Light
+            0x1050DF20, // St. Trina's Blossom
+            0x10510630, // Crucible Hammer-Helm
+            0x10512D40, // Greatjar
+            0x10515450, // Imp Head (Lion)
          ]);
         armor_sets
     })
