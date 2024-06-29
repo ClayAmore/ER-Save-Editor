@@ -2,7 +2,7 @@ pub mod stats_view_model {
     use crate::{db::classes::classes::ArcheType, save::common::save_slot::SaveSlot};
 
     #[derive(Clone)]
-    pub struct StatsViewModel  {
+    pub struct StatsViewModel {
         pub arche_type: ArcheType,
         pub vigor: u32,
         pub mind: u32,
@@ -14,30 +14,34 @@ pub mod stats_view_model {
         pub arcane: u32,
         pub level: u32,
         pub souls: u32,
-        pub soulsmemory: u32
+        pub soulsmemory: u32,
+        pub scadutree: u32,
+        pub spirit_ash: u32,
     }
 
     impl Default for StatsViewModel {
         fn default() -> Self {
-            Self { 
+            Self {
                 arche_type: ArcheType::Unknown,
-                vigor: Default::default(), 
-                mind: Default::default(), 
-                endurance: Default::default(), 
-                strength: Default::default(), 
-                dexterity: Default::default(), 
-                intelligence: Default::default(), 
-                faith: Default::default(), 
+                vigor: Default::default(),
+                mind: Default::default(),
+                endurance: Default::default(),
+                strength: Default::default(),
+                dexterity: Default::default(),
+                intelligence: Default::default(),
+                faith: Default::default(),
                 arcane: Default::default(),
-                level: Default::default(), 
-                souls: Default::default(), 
-                soulsmemory: Default::default(), 
+                level: Default::default(),
+                souls: Default::default(),
+                soulsmemory: Default::default(),
+                scadutree: Default::default(),
+                spirit_ash: Default::default(),
             }
         }
     }
 
     impl StatsViewModel {
-        pub fn from_save(slot:& SaveSlot) -> Self {
+        pub fn from_save(slot: &SaveSlot) -> Self {
             let arche_type = ArcheType::try_from(slot.player_game_data.arche_type).expect("");
             let vigor = slot.player_game_data.vigor;
             let mind = slot.player_game_data.mind;
@@ -51,6 +55,10 @@ pub mod stats_view_model {
             let souls = slot.player_game_data.souls;
             let soulsmemory = slot.player_game_data.soulsmemory;
 
+            // DLC Stats
+            let scadutree = slot.player_game_data.scadutree_lvl.into();
+            let spirit_ash = slot.player_game_data.spirit_ash_lvl.into();
+
             Self {
                 arche_type,
                 vigor,
@@ -63,7 +71,9 @@ pub mod stats_view_model {
                 arcane,
                 level,
                 souls,
-                soulsmemory
+                soulsmemory,
+                scadutree,
+                spirit_ash,
             }
         }
     }

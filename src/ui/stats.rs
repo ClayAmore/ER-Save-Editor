@@ -55,6 +55,11 @@ pub mod stats {
                         self::stat_field(&mut body, class.faith..=99, "Faith:", &mut vm.slots[vm.index].stats_vm.faith);
                         self::stat_field(&mut body, class.arcane..=99, "Arcane:", &mut vm.slots[vm.index].stats_vm.arcane);
 
+                        // DLC Stats
+                        self::space(&mut body, 8.);
+                        self::stat_field(&mut body, 0..=20, "Scadutree Blessing:", &mut vm.slots[vm.index].stats_vm.scadutree);
+                        self::stat_field(&mut body, 0..=10, "Shadow Realm Blessing:", &mut vm.slots[vm.index].stats_vm.spirit_ash);
+
                         // Space
                         self::space(&mut body, 8.);
 
