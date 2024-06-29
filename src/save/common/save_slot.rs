@@ -1,17 +1,21 @@
-use std::io;
-use binary_reader::BinaryReader;
 use crate::{read::read::Read, write::write::Write};
+use binary_reader::BinaryReader;
+use std::io;
 
 #[derive(Clone)]
 pub struct WorldAreaTime {
     unk0: i32,
     unk1: i32,
-    unk2: i32
+    unk2: i32,
 }
 
 impl Default for WorldAreaTime {
     fn default() -> Self {
-        Self { unk0: Default::default(), unk1: Default::default(), unk2: Default::default() }
+        Self {
+            unk0: Default::default(),
+            unk1: Default::default(),
+            unk2: Default::default(),
+        }
     }
 }
 
@@ -35,17 +39,20 @@ impl Write for WorldAreaTime {
     }
 }
 
-
 #[derive(Clone)]
 pub struct WorldAreaWeather {
     unk0: i32,
     unk1: i32,
-    unk2: i32
+    unk2: i32,
 }
 
 impl Default for WorldAreaWeather {
     fn default() -> Self {
-        Self { unk0: Default::default(), unk1: Default::default(), unk2: Default::default() }
+        Self {
+            unk0: Default::default(),
+            unk1: Default::default(),
+            unk2: Default::default(),
+        }
     }
 }
 
@@ -69,7 +76,6 @@ impl Write for WorldAreaWeather {
     }
 }
 
-
 #[derive(Clone)]
 pub struct PlayerCoords {
     pub player_coords: (f32, f32, f32),
@@ -81,12 +87,12 @@ pub struct PlayerCoords {
 
 impl Default for PlayerCoords {
     fn default() -> Self {
-        Self { 
-            player_coords: Default::default(), 
-            map_id: Default::default(), 
-            _0x11: Default::default(), 
-            player_coords2: Default::default(), 
-            _0x10: Default::default() 
+        Self {
+            player_coords: Default::default(),
+            map_id: Default::default(),
+            _0x11: Default::default(),
+            player_coords2: Default::default(),
+            _0x10: Default::default(),
         }
     }
 }
@@ -122,12 +128,15 @@ impl Write for PlayerCoords {
 #[derive(Clone)]
 struct UknownList {
     length: i32,
-    elements: Vec<u8>
+    elements: Vec<u8>,
 }
 
 impl Default for UknownList {
     fn default() -> Self {
-        Self { length: Default::default(), elements: Default::default() }
+        Self {
+            length: Default::default(),
+            elements: Default::default(),
+        }
     }
 }
 
@@ -151,7 +160,6 @@ impl Write for UknownList {
     }
 }
 
-
 #[derive(Clone)]
 pub struct GaItem2 {
     pub id: u32,
@@ -166,7 +174,7 @@ impl Default for GaItem2 {
             id: Default::default(),
             unk: Default::default(),
             reinforce_type: Default::default(),
-            unk1: Default::default()
+            unk1: Default::default(),
         }
     }
 }
@@ -195,13 +203,13 @@ impl Write for GaItem2 {
 
 #[derive(Clone)]
 pub struct EventFlags {
-    pub flags: Vec<u8>
+    pub flags: Vec<u8>,
 }
 
 impl Default for EventFlags {
     fn default() -> Self {
-        Self { 
-            flags: vec![Default::default(); 0x1bf99f]
+        Self {
+            flags: vec![Default::default(); 0x1bf99f],
         }
     }
 }
@@ -226,7 +234,7 @@ impl Write for EventFlags {
 pub struct GaItemData {
     pub distinct_aquired_items_count: i32,
     pub unk1: i32,
-    pub ga_items: Vec<GaItem2>
+    pub ga_items: Vec<GaItem2>,
 }
 
 impl Default for GaItemData {
@@ -234,7 +242,7 @@ impl Default for GaItemData {
         Self {
             distinct_aquired_items_count: Default::default(),
             unk1: Default::default(),
-            ga_items: vec![GaItem2::default(); 0x1b58]
+            ga_items: vec![GaItem2::default(); 0x1b58],
         }
     }
 }
@@ -275,12 +283,12 @@ pub struct RideGameData {
 
 impl Default for RideGameData {
     fn default() -> Self {
-        Self { 
-            horse_coords: Default::default(), 
-            _0x4: Default::default(), 
-            _0x10: Default::default(), 
-            horse_hp: Default::default(), 
-            _0x4_1: Default::default() 
+        Self {
+            horse_coords: Default::default(),
+            _0x4: Default::default(),
+            _0x10: Default::default(),
+            horse_hp: Default::default(),
+            _0x4_1: Default::default(),
         }
     }
 }
@@ -293,7 +301,7 @@ impl Read for RideGameData {
 
         ride_game_data._0x4 = br.read_i32()?;
         ride_game_data._0x10.copy_from_slice(br.read_bytes(0x10)?);
-        
+
         ride_game_data.horse_hp = br.read_u32()?;
 
         ride_game_data._0x4_1 = br.read_u32()?;
@@ -319,12 +327,15 @@ impl Write for RideGameData {
 #[derive(Clone)]
 pub struct Regions {
     pub unlocked_regions_count: u32,
-    pub unlocked_regions: Vec<u32>
+    pub unlocked_regions: Vec<u32>,
 }
 
 impl Default for Regions {
     fn default() -> Self {
-        Self { unlocked_regions_count: Default::default(), unlocked_regions: Default::default() }
+        Self {
+            unlocked_regions_count: Default::default(),
+            unlocked_regions: Default::default(),
+        }
     }
 }
 
@@ -364,9 +375,9 @@ pub struct EquipPhysicsData {
 
 impl Default for EquipPhysicsData {
     fn default() -> Self {
-        Self { 
-            slot1: Default::default(), 
-            slot2: Default::default(), 
+        Self {
+            slot1: Default::default(),
+            slot2: Default::default(),
         }
     }
 }
@@ -402,8 +413,8 @@ pub struct EquipProjectile {
 
 impl Default for EquipProjectile {
     fn default() -> Self {
-        Self { 
-            projectile_id: Default::default(), 
+        Self {
+            projectile_id: Default::default(),
             unk: Default::default(),
         }
     }
@@ -430,12 +441,12 @@ impl Write for EquipProjectile {
 #[derive(Clone)]
 pub struct EquipProjectileData {
     pub projectile_count: i32,
-    pub projectiles: Vec<EquipProjectile>
+    pub projectiles: Vec<EquipProjectile>,
 }
 
 impl Default for EquipProjectileData {
     fn default() -> Self {
-        Self { 
+        Self {
             projectile_count: Default::default(),
             projectiles: vec![],
         }
@@ -444,13 +455,15 @@ impl Default for EquipProjectileData {
 impl Read for EquipProjectileData {
     fn read(br: &mut BinaryReader) -> Result<Self, io::Error> {
         let mut equip_projectile_data = EquipProjectileData::default();
-        
+
         // Distinct Projectile Count
         equip_projectile_data.projectile_count = br.read_i32()?;
 
         // Quick slot items
         for _i in 0..equip_projectile_data.projectile_count {
-            equip_projectile_data.projectiles.push(EquipProjectile::read(br)?);
+            equip_projectile_data
+                .projectiles
+                .push(EquipProjectile::read(br)?);
         }
 
         Ok(equip_projectile_data)
@@ -511,10 +524,16 @@ impl Read for EquippedItems {
         equipped_items.arms = br.read_u32()?;
         equipped_items.legs = br.read_u32()?;
         equipped_items._unk3 = br.read_u32()?;
-        for i in 0..4 { equipped_items.talismans[i] = br.read_u32()?; }
+        for i in 0..4 {
+            equipped_items.talismans[i] = br.read_u32()?;
+        }
         equipped_items._unk4 = br.read_u32()?;
-        for i in 0..0xA { equipped_items.quickitems[i] = br.read_u32()?; }
-        for i in 0..0x6 { equipped_items.pouch[i] = br.read_u32()?; }
+        for i in 0..0xA {
+            equipped_items.quickitems[i] = br.read_u32()?;
+        }
+        for i in 0..0x6 {
+            equipped_items.pouch[i] = br.read_u32()?;
+        }
         equipped_items._padding17 = br.read_u32()?;
         Ok(equipped_items)
     }
@@ -539,15 +558,20 @@ impl Write for EquippedItems {
         bytes.extend(self.arms.to_le_bytes());
         bytes.extend(self.legs.to_le_bytes());
         bytes.extend(self._unk3.to_le_bytes());
-        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        for i in 0..4 {
+            bytes.extend(self.talismans[i].to_le_bytes());
+        }
         bytes.extend(self._unk4.to_le_bytes());
-        for i in 0..0xA { bytes.extend(self.quickitems[i].to_le_bytes()); }
-        for i in 0..0x6 { bytes.extend(self.pouch[i].to_le_bytes()); }
+        for i in 0..0xA {
+            bytes.extend(self.quickitems[i].to_le_bytes());
+        }
+        for i in 0..0x6 {
+            bytes.extend(self.pouch[i].to_le_bytes());
+        }
         bytes.extend(self._padding17.to_le_bytes());
         Ok(bytes)
     }
 }
-
 
 #[derive(Copy, Clone)]
 pub struct EquipItem {
@@ -557,9 +581,9 @@ pub struct EquipItem {
 
 impl Default for EquipItem {
     fn default() -> Self {
-        Self { 
-            item_id: Default::default(), 
-            equipment_index: Default::default()
+        Self {
+            item_id: Default::default(),
+            equipment_index: Default::default(),
         }
     }
 }
@@ -592,11 +616,11 @@ pub struct EquipItemData {
 
 impl Default for EquipItemData {
     fn default() -> Self {
-        Self { 
-            quick_slot_items: vec![EquipItem::default(); 0xa], 
+        Self {
+            quick_slot_items: vec![EquipItem::default(); 0xa],
             active_slot: Default::default(),
             pouch_items: vec![EquipItem::default(); 0x6],
-            _0x8: [0; 0x8]
+            _0x8: [0; 0x8],
         }
     }
 }
@@ -654,9 +678,9 @@ pub struct EquipMagicSpell {
 
 impl Default for EquipMagicSpell {
     fn default() -> Self {
-        Self { 
-            spell_id: Default::default(), 
-            unk: Default::default() 
+        Self {
+            spell_id: Default::default(),
+            unk: Default::default(),
         }
     }
 }
@@ -688,10 +712,10 @@ pub struct EquipMagicData {
 
 impl Default for EquipMagicData {
     fn default() -> Self {
-        Self { 
-            equip_magic_spells: vec![EquipMagicSpell::default(); 0xc], 
+        Self {
+            equip_magic_spells: vec![EquipMagicSpell::default(); 0xc],
             _0x10: [0x0; 0x10],
-            active_slot: Default::default() 
+            active_slot: Default::default(),
         }
     }
 }
@@ -724,28 +748,27 @@ impl Write for EquipMagicData {
     }
 }
 
-
 #[derive(Copy, Clone)]
 pub struct EquipInventoryItem {
     pub ga_item_handle: u32,
     pub quantity: u32,
-    pub inventory_index: u32
+    pub inventory_index: u32,
 }
 
 impl Default for EquipInventoryItem {
     fn default() -> Self {
-        Self { 
+        Self {
             ga_item_handle: Default::default(),
             quantity: Default::default(),
-            inventory_index: Default::default() 
+            inventory_index: Default::default(),
         }
     }
 }
 
-impl Read for EquipInventoryItem{
+impl Read for EquipInventoryItem {
     fn read(br: &mut BinaryReader) -> Result<EquipInventoryItem, io::Error> {
         let mut equip_inventory_item = EquipInventoryItem::default();
-        
+
         equip_inventory_item.ga_item_handle = br.read_u32()?;
         equip_inventory_item.quantity = br.read_u32()?;
         equip_inventory_item.inventory_index = br.read_u32()?;
@@ -766,7 +789,6 @@ impl Write for EquipInventoryItem {
     }
 }
 
-
 #[derive(Clone)]
 pub struct EquipInventoryData {
     pub common_inventory_items_distinct_count: u32,
@@ -779,7 +801,7 @@ pub struct EquipInventoryData {
 
 impl Default for EquipInventoryData {
     fn default() -> Self {
-        Self { 
+        Self {
             common_inventory_items_distinct_count: Default::default(),
             common_items: vec![],
             key_inventory_items_distinct_count: Default::default(),
@@ -791,19 +813,27 @@ impl Default for EquipInventoryData {
 }
 
 impl EquipInventoryData {
-    fn read(br: &mut BinaryReader, length1: usize, length2: usize) -> Result<EquipInventoryData, io::Error> {
+    fn read(
+        br: &mut BinaryReader,
+        length1: usize,
+        length2: usize,
+    ) -> Result<EquipInventoryData, io::Error> {
         let mut equip_inventory_data = EquipInventoryData::default();
 
         equip_inventory_data.common_inventory_items_distinct_count = br.read_u32()?;
-        
+
         for _i in 0..length1 {
-            equip_inventory_data.common_items.push(EquipInventoryItem::read(br)?);
+            equip_inventory_data
+                .common_items
+                .push(EquipInventoryItem::read(br)?);
         }
-        
+
         equip_inventory_data.key_inventory_items_distinct_count = br.read_u32()?;
 
         for _i in 0..length2 {
-            equip_inventory_data.key_items.push(EquipInventoryItem::read(br)?);
+            equip_inventory_data
+                .key_items
+                .push(EquipInventoryItem::read(br)?);
         }
 
         equip_inventory_data.next_equip_index = br.read_u32()?;
@@ -812,7 +842,7 @@ impl EquipInventoryData {
         Ok(equip_inventory_data)
     }
 
-    fn write(&self, length1: usize, length2: usize) -> Result<Vec<u8>, io::Error>{
+    fn write(&self, length1: usize, length2: usize) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
 
         bytes.extend(self.common_inventory_items_distinct_count.to_le_bytes());
@@ -855,7 +885,7 @@ pub struct ChrAsm {
     pub legs: u32,
     pub _0x4_2: u32,
     pub talismans: [u32; 4],
-    pub unk: u32
+    pub unk: u32,
 }
 
 impl Read for ChrAsm {
@@ -886,7 +916,9 @@ impl Read for ChrAsm {
         chr_asm.arms = br.read_u32()?;
         chr_asm.legs = br.read_u32()?;
         chr_asm._0x4_2 = br.read_u32()?;
-        for i in 0..4 { chr_asm.talismans[i] = br.read_u32()?; }
+        for i in 0..4 {
+            chr_asm.talismans[i] = br.read_u32()?;
+        }
         chr_asm.unk = br.read_u32()?;
 
         Ok(chr_asm)
@@ -920,7 +952,9 @@ impl Write for ChrAsm {
         bytes.extend(self.arms.to_le_bytes());
         bytes.extend(self.legs.to_le_bytes());
         bytes.extend(self._0x4_2.to_le_bytes());
-        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        for i in 0..4 {
+            bytes.extend(self.talismans[i].to_le_bytes());
+        }
         bytes.extend(self.unk.to_le_bytes());
         Ok(bytes)
     }
@@ -963,7 +997,9 @@ impl Read for ChrAsm2 {
         chr_asm.arms = br.read_u32()?;
         chr_asm.legs = br.read_u32()?;
         chr_asm._unk2 = br.read_u32()?;
-        for i in 0..4 { chr_asm.talismans[i] = br.read_u32()?; }
+        for i in 0..4 {
+            chr_asm.talismans[i] = br.read_u32()?;
+        }
         chr_asm._unk3 = br.read_u32()?;
         Ok(chr_asm)
     }
@@ -989,7 +1025,9 @@ impl Write for ChrAsm2 {
         bytes.extend(self.arms.to_le_bytes());
         bytes.extend(self.legs.to_le_bytes());
         bytes.extend(self._unk2.to_le_bytes());
-        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        for i in 0..4 {
+            bytes.extend(self.talismans[i].to_le_bytes());
+        }
         bytes.extend(self._unk3.to_le_bytes());
         Ok(bytes)
     }
@@ -1036,9 +1074,11 @@ impl Read for EquipData {
 
         equip_data._0x4_2 = br.read_u32()?;
 
-        for i in 0..4 { equip_data.talismans[i] = br.read_u32()?; }
+        for i in 0..4 {
+            equip_data.talismans[i] = br.read_u32()?;
+        }
         equip_data.unk = br.read_u32()?;
-        
+
         Ok(equip_data)
     }
 }
@@ -1067,7 +1107,9 @@ impl Write for EquipData {
 
         bytes.extend(self._0x4_2.to_le_bytes());
 
-        for i in 0..4 { bytes.extend(self.talismans[i].to_le_bytes()); }
+        for i in 0..4 {
+            bytes.extend(self.talismans[i].to_le_bytes());
+        }
         bytes.extend(self.unk.to_le_bytes());
         Ok(bytes)
     }
@@ -1111,19 +1153,22 @@ pub struct PlayerGameData {
     pub gift: u8,
     _0x1e: [u8; 0x1e],
     pub match_making_wpn_lvl: u8,
-    _0x35: [u8; 0x35],
+    _0x19: [u8; 0x19],
+    pub scadutree_lvl: u8,
+    pub spirit_ash_lvl: u8,
+    _0x1a: [u8; 0x1a],
     pub password: [u8; 0x12],
     pub group_password1: [u8; 0x12],
     pub group_password2: [u8; 0x12],
     pub group_password3: [u8; 0x12],
     pub group_password4: [u8; 0x12],
     pub group_password5: [u8; 0x12],
-    _unk: [u8; 0x34]
+    _unk: [u8; 0x34],
 }
 
 impl Default for PlayerGameData {
     fn default() -> Self {
-        Self { 
+        Self {
             _0x4: 0,
             _0x4_1: 0,
             health: Default::default(),
@@ -1152,22 +1197,25 @@ impl Default for PlayerGameData {
             souls: Default::default(),
             soulsmemory: Default::default(),
             _0x28: [0; 0x28],
-            character_name: [0;0x10],
-            _0x2: [0;0x2],
+            character_name: [0; 0x10],
+            _0x2: [0; 0x2],
             gender: 0,
             arche_type: 0,
-            _0x3_1: [0;0x3],
-            gift:0,
+            _0x3_1: [0; 0x3],
+            gift: 0,
             _0x1e: [0; 0x1e],
             match_making_wpn_lvl: 0,
-            _0x35: [0; 0x35],
+            _0x19: [0; 0x19],
+            scadutree_lvl: 0,
+            spirit_ash_lvl: 0,
+            _0x1a: [0; 0x1a],
             password: Default::default(),
             group_password1: Default::default(),
             group_password2: Default::default(),
             group_password3: Default::default(),
             group_password4: Default::default(),
             group_password5: Default::default(),
-            _unk: [0x0; 0x34]
+            _unk: [0x0; 0x34],
         }
     }
 }
@@ -1175,8 +1223,8 @@ impl Default for PlayerGameData {
 impl Read for PlayerGameData {
     fn read(br: &mut BinaryReader) -> Result<PlayerGameData, io::Error> {
         let mut player_game_data = PlayerGameData::default();
-        
-        player_game_data._0x4 = br.read_i32()?; 
+
+        player_game_data._0x4 = br.read_i32()?;
         player_game_data._0x4_1 = br.read_i32()?;
 
         // Health
@@ -1214,7 +1262,7 @@ impl Read for PlayerGameData {
 
         // Level
         player_game_data.level = br.read_u32()?;
-        
+
         // Souls
         player_game_data.souls = br.read_u32()?;
         player_game_data.soulsmemory = br.read_u32()?;
@@ -1227,7 +1275,7 @@ impl Read for PlayerGameData {
         }
 
         player_game_data._0x2.copy_from_slice(br.read_bytes(0x2)?);
-        
+
         // Gender
         player_game_data.gender = br.read_u8()?;
         assert!(player_game_data.gender == 0 || player_game_data.gender == 1);
@@ -1236,35 +1284,53 @@ impl Read for PlayerGameData {
         player_game_data.arche_type = br.read_u8()?;
 
         player_game_data._0x3_1.copy_from_slice(br.read_bytes(0x3)?);
-        
+
         // Gift
         player_game_data.gift = br.read_u8()?;
 
         player_game_data._0x1e.copy_from_slice(br.read_bytes(0x1e)?);
 
         // Weapon Match Making Level
-        player_game_data.match_making_wpn_lvl  = br.read_u8()?;
+        player_game_data.match_making_wpn_lvl = br.read_u8()?;
 
-        player_game_data._0x35.copy_from_slice(br.read_bytes(0x35)?);
+        player_game_data._0x19.copy_from_slice(br.read_bytes(0x19)?);
+
+        // DLC - Scadutree Level
+        player_game_data.scadutree_lvl = br.read_u8()?;
+
+        // DLC - Revered Spirit Ash Level
+        player_game_data.spirit_ash_lvl = br.read_u8()?;
+
+        player_game_data._0x1a.copy_from_slice(br.read_bytes(0x1a)?);
 
         // Passwords
         let password = br.read_bytes(0x12)?;
         player_game_data.password.copy_from_slice(password);
-        
+
         let group_password1 = br.read_bytes(0x12)?;
-        player_game_data.group_password1.copy_from_slice(group_password1);
-        
+        player_game_data
+            .group_password1
+            .copy_from_slice(group_password1);
+
         let group_password2 = br.read_bytes(0x12)?;
-        player_game_data.group_password2.copy_from_slice(group_password2);
-        
+        player_game_data
+            .group_password2
+            .copy_from_slice(group_password2);
+
         let group_password3 = br.read_bytes(0x12)?;
-        player_game_data.group_password3.copy_from_slice(group_password3);
-        
+        player_game_data
+            .group_password3
+            .copy_from_slice(group_password3);
+
         let group_password4 = br.read_bytes(0x12)?;
-        player_game_data.group_password4.copy_from_slice(group_password4);
-        
+        player_game_data
+            .group_password4
+            .copy_from_slice(group_password4);
+
         let group_password5 = br.read_bytes(0x12)?;
-        player_game_data.group_password5.copy_from_slice(group_password5);
+        player_game_data
+            .group_password5
+            .copy_from_slice(group_password5);
 
         player_game_data._unk.copy_from_slice(br.read_bytes(0x34)?);
 
@@ -1344,7 +1410,15 @@ impl Write for PlayerGameData {
         // Weapon Match Making Level
         bytes.push(self.match_making_wpn_lvl);
 
-        bytes.extend(self._0x35);
+        bytes.extend(self._0x19);
+
+        // DLC - Scadutree Level
+        bytes.push(self.scadutree_lvl);
+
+        // DLC - Revered Spirit Ash Level
+        bytes.push(self.spirit_ash_lvl);
+
+        bytes.extend(self._0x1a);
 
         // Passwords
         bytes.extend(self.password);
@@ -1367,18 +1441,18 @@ pub struct GaItem {
     pub unk2: i32,
     pub unk3: i32,
     pub aow_gaitem_handle: u32,
-    pub unk5: u8
+    pub unk5: u8,
 }
 
 impl Default for GaItem {
     fn default() -> Self {
-        Self { 
-            gaitem_handle: 0, 
-            item_id: 0, 
-            unk2: -1, 
-            unk3: -1, 
-            aow_gaitem_handle: u32::MAX, 
-            unk5: 0
+        Self {
+            gaitem_handle: 0,
+            item_id: 0,
+            unk2: -1,
+            unk3: -1,
+            aow_gaitem_handle: u32::MAX,
+            unk5: 0,
         }
     }
 }
@@ -1418,8 +1492,7 @@ impl Write for GaItem {
             bytes.extend(self.unk3.to_le_bytes());
             bytes.extend(self.aow_gaitem_handle.to_le_bytes());
             bytes.extend(self.unk5.to_le_bytes());
-        }
-        else if self.item_id != 0 && (self.item_id & 0xf0000000) == 0x10000000 {
+        } else if self.item_id != 0 && (self.item_id & 0xf0000000) == 0x10000000 {
             bytes.extend(self.unk2.to_le_bytes());
             bytes.extend(self.unk3.to_le_bytes());
         }
@@ -1442,25 +1515,25 @@ pub struct SaveSlot {
     pub equip_inventory_data: EquipInventoryData,
     pub equip_magic_data: EquipMagicData,
     pub equip_item_data: EquipItemData,
-    pub equip_gesture_data: [i32;0x6],
+    pub equip_gesture_data: [i32; 0x6],
     pub equip_projectile_data: EquipProjectileData,
     pub equipped_items: EquippedItems,
     pub equip_physics_data: EquipPhysicsData,
     _0x4: u32,
-    _face_data: [u8;0x12f],
+    _face_data: [u8; 0x12f],
     pub storage_inventory_data: EquipInventoryData,
     pub gesture_game_data: Vec<i32>,
     pub regions: Regions,
     pub ride_game_data: RideGameData,
-    _0x1: u8, 
-    _0x40: [u8;0x40], 
-    _0x4_1: i32, 
-    _0x4_2: i32, 
-    _0x4_3: i32, 
+    _0x1: u8,
+    _0x40: [u8; 0x40],
+    _0x4_1: i32,
+    _0x4_2: i32,
+    _0x4_3: i32,
     _menu_profile_save_load: [u8; 0x1008],
     _trophy_equip_data: [u8; 0x34],
     pub ga_item_data: GaItemData,
-    _tutorial_data: [u8;0x408],
+    _tutorial_data: [u8; 0x408],
     _0x1d: [u8; 0x1d],
     pub event_flags: EventFlags,
     _0x1_1: u8,
@@ -1473,10 +1546,10 @@ pub struct SaveSlot {
     pub world_area_time: WorldAreaTime,
     _0x10_1: [u8; 0x10],
     pub steam_id: u64,
-    _cs_ps5_activity: [u8;0x20],
-    _cs_dlc: [u8;0x32],
-    _0x80: [u8;0x80],
-    _rest: Vec<u8>
+    _cs_ps5_activity: [u8; 0x20],
+    _cs_dlc: [u8; 0x32],
+    _0x80: [u8; 0x80],
+    _rest: Vec<u8>,
 }
 
 impl Default for SaveSlot {
@@ -1487,7 +1560,7 @@ impl Default for SaveSlot {
             _0x18: [0x0; 0x18],
             ga_items: vec![GaItem::default(); 0x1400],
             player_game_data: PlayerGameData::default(),
-            _0xd0: [0x0;0xd0],
+            _0xd0: [0x0; 0xd0],
             equip_data: EquipData::default(),
             chr_asm: ChrAsm::default(),
             chr_asm2: ChrAsm2::default(),
@@ -1499,23 +1572,23 @@ impl Default for SaveSlot {
             equipped_items: EquippedItems::default(),
             equip_physics_data: EquipPhysicsData::default(),
             _0x4: 0,
-            _face_data: [0x0;0x12f],
+            _face_data: [0x0; 0x12f],
             storage_inventory_data: EquipInventoryData::default(),
             gesture_game_data: vec![0; 0x40],
             regions: Regions::default(),
             ride_game_data: RideGameData::default(),
             _0x1: 0,
-            _0x40: [0x0;0x40],
+            _0x40: [0x0; 0x40],
             _0x4_1: 0,
             _0x4_2: 0,
             _0x4_3: 0,
-            _menu_profile_save_load: [0x0;0x1008],
-            _trophy_equip_data: [0x0;0x34],
+            _menu_profile_save_load: [0x0; 0x1008],
+            _trophy_equip_data: [0x0; 0x34],
             event_flags: EventFlags::default(),
             _0x1_1: 0,
             ga_item_data: GaItemData::default(),
-            _tutorial_data: [0x0;0x408],
-            _0x1d: [0x0;0x1d],
+            _tutorial_data: [0x0; 0x408],
+            _0x1d: [0x0; 0x1d],
             _unk_lists: Vec::new(),
             player_coords: PlayerCoords::default(),
             _game_man_unkown_values: [0x0; 0xf],
@@ -1525,9 +1598,9 @@ impl Default for SaveSlot {
             world_area_time: WorldAreaTime::default(),
             _0x10_1: [0x0; 0x10],
             steam_id: Default::default(),
-            _cs_ps5_activity: [0x0;0x20],
+            _cs_ps5_activity: [0x0; 0x20],
             _cs_dlc: [0x0; 0x32],
-            _0x80: [0x0;0x80],
+            _0x80: [0x0; 0x80],
             _rest: Default::default(),
         }
     }
@@ -1556,12 +1629,12 @@ impl Read for SaveSlot {
 
         // Player Game Data (Health, Fp, Stats, etc...)
         save_slot.player_game_data = PlayerGameData::read(br)?;
-        
+
         save_slot._0xd0.copy_from_slice(br.read_bytes(0xd0)?);
-        
+
         // Equip Data
         save_slot.equip_data = EquipData::read(br)?;
-        
+
         // Chr Asm
         save_slot.chr_asm = ChrAsm::read(br)?;
 
@@ -1571,7 +1644,7 @@ impl Read for SaveSlot {
         // Equip Inventory Data
         save_slot.equip_inventory_data = EquipInventoryData::read(br, 0xa80, 0x180)?;
 
-        // Equip Magic Spell 
+        // Equip Magic Spell
         save_slot.equip_magic_data = EquipMagicData::read(br)?;
 
         // Equip Item
@@ -1582,20 +1655,20 @@ impl Read for SaveSlot {
             save_slot.equip_gesture_data[i] = br.read_i32()?;
         }
 
-        // Equipped Projectiles 
+        // Equipped Projectiles
         save_slot.equip_projectile_data = EquipProjectileData::read(br)?;
 
         // Equip data again
         save_slot.equipped_items = EquippedItems::read(br)?;
-        
+
         // Equipped physics
         save_slot.equip_physics_data = EquipPhysicsData::read(br)?;
-        
+
         save_slot._0x4 = br.read_u32()?;
-        
+
         // Face data (skipping it)
         save_slot._face_data.copy_from_slice(br.read_bytes(0x12f)?);
-        
+
         // Equip Inventory Data 2
         save_slot.storage_inventory_data = EquipInventoryData::read(br, 0x780, 0x80)?;
 
@@ -1607,26 +1680,32 @@ impl Read for SaveSlot {
         // Regions
         save_slot.regions = Regions::read(br)?;
 
-        // Horse Data 
-        save_slot.ride_game_data = RideGameData::read(br)?;        
+        // Horse Data
+        save_slot.ride_game_data = RideGameData::read(br)?;
 
         save_slot._0x1 = br.read_bytes(1)?[0];
         save_slot._0x40.copy_from_slice(br.read_bytes(0x40)?);
-        save_slot._0x4_1= br.read_i32()?;
-        save_slot._0x4_2= br.read_i32()?;
-        save_slot._0x4_3= br.read_i32()?;
-        
+        save_slot._0x4_1 = br.read_i32()?;
+        save_slot._0x4_2 = br.read_i32()?;
+        save_slot._0x4_3 = br.read_i32()?;
+
         // Menu Profile Save Load (Skipping)
-        save_slot._menu_profile_save_load.copy_from_slice(br.read_bytes(0x1008)?);
+        save_slot
+            ._menu_profile_save_load
+            .copy_from_slice(br.read_bytes(0x1008)?);
 
         // Trophy Equip Data (Skipping)
-        save_slot._trophy_equip_data.copy_from_slice(br.read_bytes(0x34)?);
+        save_slot
+            ._trophy_equip_data
+            .copy_from_slice(br.read_bytes(0x34)?);
 
-        // GaItems 
+        // GaItems
         save_slot.ga_item_data = GaItemData::read(br)?;
 
         // Tutorial Data (Skipping)
-        save_slot._tutorial_data.copy_from_slice(br.read_bytes(0x408)?);
+        save_slot
+            ._tutorial_data
+            .copy_from_slice(br.read_bytes(0x408)?);
 
         // Unknown values (Grouping and skipping)
         save_slot._0x1d.copy_from_slice(br.read_bytes(0x1d)?);
@@ -1639,18 +1718,22 @@ impl Read for SaveSlot {
         for _i in 0..0x5 {
             save_slot._unk_lists.push(UknownList::read(br)?);
         }
-        
+
         // Player Coordinates
         save_slot.player_coords = PlayerCoords::read(br)?;
-        
-        save_slot._game_man_unkown_values.copy_from_slice(br.read_bytes(0xf)?);
+
+        save_slot
+            ._game_man_unkown_values
+            .copy_from_slice(br.read_bytes(0xf)?);
 
         save_slot._0x1_2 = br.read_u32()?;
         // Value should always be 2 for active accounts. 0 for empty ones.
         assert!(save_slot._0x1_2 == 2 || save_slot._0x1_2 == 0);
 
-        save_slot._cs_net_data_chunks.copy_from_slice( br.read_bytes(0x20000)?);
-        
+        save_slot
+            ._cs_net_data_chunks
+            .copy_from_slice(br.read_bytes(0x20000)?);
+
         save_slot.world_area_weather = WorldAreaWeather::read(br)?;
         save_slot.world_area_time = WorldAreaTime::read(br)?;
 
@@ -1659,7 +1742,9 @@ impl Read for SaveSlot {
         save_slot.steam_id = br.read_u64()?;
 
         // CSPS5Activity (Skipping)
-        save_slot._cs_ps5_activity.copy_from_slice(br.read_bytes(0x20)?);
+        save_slot
+            ._cs_ps5_activity
+            .copy_from_slice(br.read_bytes(0x20)?);
 
         // DLC?
         save_slot._cs_dlc.copy_from_slice(br.read_bytes(0x32)?);
@@ -1675,7 +1760,7 @@ impl Read for SaveSlot {
 impl Write for SaveSlot {
     fn write(&self) -> Result<Vec<u8>, io::Error> {
         let mut bytes: Vec<u8> = Vec::new();
-        
+
         bytes.extend(self.ver.to_le_bytes());
 
         // MapId
@@ -1715,8 +1800,8 @@ impl Write for SaveSlot {
         for i in 0..0x6 {
             bytes.extend(self.equip_gesture_data[i].to_le_bytes());
         }
-        
-        // Equipped Projectiles 
+
+        // Equipped Projectiles
         bytes.extend(self.equip_projectile_data.write()?);
 
         bytes.extend(self.equipped_items.write()?);
@@ -1755,16 +1840,16 @@ impl Write for SaveSlot {
         // Trophy Equip Data (Skipping)
         bytes.extend(self._trophy_equip_data);
 
-        // GaItems 
+        // GaItems
         bytes.extend(self.ga_item_data.write()?);
 
-        // Tutorial Data 
+        // Tutorial Data
         bytes.extend(self._tutorial_data);
 
         // Unknown values
         bytes.extend(self._0x1d);
 
-        // Event Flags 
+        // Event Flags
         bytes.extend(self.event_flags.write()?);
 
         bytes.push(self._0x1_1);
@@ -1790,7 +1875,7 @@ impl Write for SaveSlot {
         bytes.extend(self.world_area_time.write()?);
 
         bytes.extend(self._0x10_1);
-        
+
         // Steam ID
         bytes.extend(self.steam_id.to_le_bytes());
 
@@ -1803,7 +1888,7 @@ impl Write for SaveSlot {
         bytes.extend(self._0x80);
 
         // Empty calories
-        bytes.extend(vec![0;0x280000-bytes.len()]);
+        bytes.extend(vec![0; 0x280000 - bytes.len()]);
 
         Ok(bytes)
     }
