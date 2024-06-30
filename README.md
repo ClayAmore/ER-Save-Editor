@@ -22,7 +22,7 @@ Tool for editing Elden Ring save files. Compatible with PC and Playstation Save 
 - Activate/deactivate Sites of Grace, summoning pools, colosseums, etc.
 - Revive or kill bosses
 - Activate/deactivate invasion regions
-- More features will be added in future updates
+- Nothing more
 
 ## Permissions
 Feel free to use this save editor for learning or development purposes. However, I do not authorize its use for creating tools or modifications that enable actions online outside the bounds of what the game allows.
