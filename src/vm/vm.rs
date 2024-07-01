@@ -192,7 +192,7 @@ pub mod vm {
                                 weapon_param.data.reinforceTypeId % 8500 == 0
                             );
                             
-                            // Extract weapon level based on wether weapon is somber or not
+                            // Extract weapon level based on whether weapon is somber or not
                             let weapon_level = if is_somber{
                                 somber_to_normal[&((held_item.item_id % 100) as u8)]
                             }
@@ -225,7 +225,7 @@ pub mod vm {
                                 weapon_param.data.reinforceTypeId % 8500 == 0
                             );
                             
-                            // Extract weapon level based on wether weapon is somber or not
+                            // Extract weapon level based on whether weapon is somber or not
                             let weapon_level = if is_somber{
                                 somber_to_normal[&((storage_item.item_id % 100) as u8)]
                             }
