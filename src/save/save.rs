@@ -6,11 +6,8 @@ pub mod save {
             common::{ save_slot::{EquipInventoryData, EquipProjectileData, GaItem, GaItemData, SaveSlot}, user_data_10::ProfileSummary, user_data_11::UserData11 },
             pc::pc_save::PCSave, 
             playstation::ps_save::PSSave, 
-        }, util::bit::bit::set_bit, write::write::Write
+        }, util::{bit::bit::set_bit, regulation::Regulation}, write::write::Write
     };
-
-    // Using a checksum of the regulation bin file to check for Save Wizard .txt save file
-    const REGULATION_MD5_CHECKSUM: [u8; 0x10] =[0x2E, 0x88, 0x1A, 0x15, 0xAC, 0x05, 0x88, 0x8D, 0xF2, 0xC2, 0x6A, 0xEC, 0xC2, 0x90, 0x89, 0x23];
 
     pub enum SaveType {
         Unknown,
@@ -825,10 +822,12 @@ pub mod save {
 
         // Check if it's a PS Save Wizard save file
         pub fn is_ps_save_wizard(br: &mut BinaryReader) -> bool {
-            br.jmp(0x1960070);
-            let regulation = br.read_bytes(0x240010).expect("");
-            let digest = md5::compute(regulation);
-            let is_ps_save_wizard = digest == md5::Digest(REGULATION_MD5_CHECKSUM);
+            br.jmp(0x1960080);
+            let regulation = br.read_bytes(0x1e9fb0).expect("");
+            let is_ps_save_wizard = match Regulation::get_decrypted_decompressed(&regulation) {
+                Ok(_v) => true,
+                Err(_e) => false,
+            };
             br.jmp(0);
             is_ps_save_wizard
         }

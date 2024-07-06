@@ -87,10 +87,16 @@ impl Regulation {
         });
     }
 
-    pub fn params_from_regulation(bytes: &[u8]) -> Result<HashMap<Param, Vec<u8>>, Error>{
+    pub fn get_decrypted_decompressed(bytes: &[u8]) -> Result<BND4, Error>{
         let decrypted = Self::decrypt(&bytes)?;
         let decompressed = Self::decompress(&decrypted)?;
         let res = Self::unpack(&decompressed)?;
+
+        Ok(res)
+    }
+
+    pub fn params_from_regulation(bytes: &[u8]) -> Result<HashMap<Param, Vec<u8>>, Error>{
+        let res = Self::get_decrypted_decompressed(&bytes)?;
         let mut params: HashMap<Param, Vec<u8>> = HashMap::new();
 
         for file in &res.files {
