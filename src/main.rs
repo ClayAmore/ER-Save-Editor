@@ -51,6 +51,7 @@ fn main() -> Result<(), eframe::Error> {
         visuals.window_rounding = Rounding::default().at_least(rounding);
         visuals.window_highlight_topmost = false;
         creation_context.egui_ctx.set_visuals(visuals);
+        creation_context.egui_ctx.set_zoom_factor(1.75);
         Box::new(App::new(creation_context))
     }))
 }
@@ -116,7 +117,6 @@ impl App {
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        ctx.set_zoom_factor(1.75);
         // TOP PANEL
         egui::TopBottomPanel::top("toolbar").default_height(35.).show(ctx, |ui| {
             ui.columns(2, |uis|{
