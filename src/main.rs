@@ -36,12 +36,14 @@ fn main() -> Result<(), eframe::Error> {
     app_icon.height = icon_height;
 
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT])
-        .with_icon(app_icon),
+        viewport: egui::ViewportBuilder::default()
+            .with_title(format!("ER Save Editor {}", env!("CARGO_PKG_VERSION")))
+            .with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT])
+            .with_icon(app_icon),
         ..Default::default()
     };
 
-    eframe::run_native("ER Save Editor 0.0.21", options, Box::new(|creation_context| {
+    eframe::run_native("ER Save Editor", options, Box::new(|creation_context| {
         let mut fonts = egui::FontDefinitions::default();
         egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
         egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Fill);
