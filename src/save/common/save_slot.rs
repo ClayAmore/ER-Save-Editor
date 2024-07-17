@@ -1452,16 +1452,20 @@ pub struct SaveSlot {
     pub gesture_game_data: Vec<i32>,
     pub regions: Regions,
     pub ride_game_data: RideGameData,
-    _0x1: u8, 
-    _0x40: [u8;0x40], 
-    _0x4_1: i32, 
-    _0x4_2: i32, 
-    _0x4_3: i32, 
+    _0x1: u8,
+    _0x40: [u8;0x40],
+    _0x4_1: i32,
+    _0x4_2: i32,
+    _0x4_3: i32,
     _menu_profile_save_load: [u8; 0x1008],
     _trophy_equip_data: [u8; 0x34],
     pub ga_item_data: GaItemData,
     _tutorial_data: [u8;0x408],
-    _0x1d: [u8; 0x1d],
+    _0x3_1: [u8; 0x3],
+    pub death_counter: u32,
+    _c0xffffffff: u32,
+    _c0x800: u16,
+    _0x10_1: [u8; 0x10],
     pub event_flags: EventFlags,
     _0x1_1: u8,
     _unk_lists: Vec<UknownList>,
@@ -1471,7 +1475,7 @@ pub struct SaveSlot {
     _cs_net_data_chunks: Vec<u8>,
     pub world_area_weather: WorldAreaWeather,
     pub world_area_time: WorldAreaTime,
-    _0x10_1: [u8; 0x10],
+    _0x10_2: [u8; 0x10],
     pub steam_id: u64,
     _cs_ps5_activity: [u8;0x20],
     _cs_dlc: [u8;0x32],
@@ -1515,7 +1519,11 @@ impl Default for SaveSlot {
             _0x1_1: 0,
             ga_item_data: GaItemData::default(),
             _tutorial_data: [0x0;0x408],
-            _0x1d: [0x0;0x1d],
+            _0x3_1: [0x0; 0x3],
+            death_counter: 0,
+            _c0xffffffff: 0,
+            _c0x800: 0,
+            _0x10_1: [0x0; 0x10],
             _unk_lists: Vec::new(),
             player_coords: PlayerCoords::default(),
             _game_man_unkown_values: [0x0; 0xf],
@@ -1523,7 +1531,7 @@ impl Default for SaveSlot {
             _cs_net_data_chunks: vec![0x0; 0x20000],
             world_area_weather: WorldAreaWeather::default(),
             world_area_time: WorldAreaTime::default(),
-            _0x10_1: [0x0; 0x10],
+            _0x10_2: [0x0; 0x10],
             steam_id: Default::default(),
             _cs_ps5_activity: [0x0;0x20],
             _cs_dlc: [0x0; 0x32],
@@ -1556,12 +1564,12 @@ impl Read for SaveSlot {
 
         // Player Game Data (Health, Fp, Stats, etc...)
         save_slot.player_game_data = PlayerGameData::read(br)?;
-        
+
         save_slot._0xd0.copy_from_slice(br.read_bytes(0xd0)?);
-        
+
         // Equip Data
         save_slot.equip_data = EquipData::read(br)?;
-        
+
         // Chr Asm
         save_slot.chr_asm = ChrAsm::read(br)?;
 
@@ -1628,8 +1636,20 @@ impl Read for SaveSlot {
         // Tutorial Data (Skipping)
         save_slot._tutorial_data.copy_from_slice(br.read_bytes(0x408)?);
 
+        // Unknown values
+        save_slot._0x3_1.copy_from_slice(br.read_bytes(0x3)?); 
+
+        // Death counter
+        save_slot.death_counter = br.read_u32()?;
+
+        // 0xffffffff if profile is active. 
+        save_slot._c0xffffffff = br.read_u32()?; 
+
+        // 0x800   if profile is active 
+        save_slot._c0x800 = br.read_u16()?; 
+        
         // Unknown values (Grouping and skipping)
-        save_slot._0x1d.copy_from_slice(br.read_bytes(0x1d)?);
+        save_slot._0x10_1.copy_from_slice(br.read_bytes(0x10)?); 
 
         // Event Flags
         save_slot.event_flags = EventFlags::read(br)?;
@@ -1762,7 +1782,16 @@ impl Write for SaveSlot {
         bytes.extend(self._tutorial_data);
 
         // Unknown values
-        bytes.extend(self._0x1d);
+        bytes.extend(self._0x3_1);
+
+        // Death counter
+        bytes.extend(self.death_counter.to_le_bytes());
+
+        // 0xffffffff (Using for validation)
+        bytes.extend(self._c0xffffffff.to_le_bytes());
+
+        // 0x800 (Using for validation)
+        bytes.extend(self._c0x800.to_le_bytes());
 
         // Event Flags 
         bytes.extend(self.event_flags.write()?);
@@ -1789,7 +1818,7 @@ impl Write for SaveSlot {
         // WorldAreaTime
         bytes.extend(self.world_area_time.write()?);
 
-        bytes.extend(self._0x10_1);
+        bytes.extend(self._0x10_2);
         
         // Steam ID
         bytes.extend(self.steam_id.to_le_bytes());
