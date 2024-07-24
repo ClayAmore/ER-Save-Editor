@@ -17,7 +17,7 @@ pub mod inventory {
                         vm.slots[vm.index].inventory_vm.current_route = InventoryRoute::Add
                     }
                     if add_items.hovered() {
-                        egui::popup::show_tooltip(ui.ctx(), add_items.id, |ui|{
+                        add_items.show_tooltip_ui(|ui| {
                             ui.label(egui::RichText::new("Warning: This is an experimental feature that is still being worked on. Use with catution.").size(8.0).color(Color32::PLACEHOLDER));
                         });
                     }

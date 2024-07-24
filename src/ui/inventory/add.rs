@@ -377,7 +377,7 @@ fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel,
                         let item = res.unwrap();
                         let goods_type = GoodsType::from(item.data.goodsType);
                         let max_repository_num = if goods_type == GoodsType::KeyItem {item.data.maxNum} else {item.data.maxRepositoryNum};
-                        let field = egui::DragValue::new(regulation_vm.selected_item.quantity.as_mut().unwrap()).clamp_range(1..=max_repository_num);
+                        let field = egui::DragValue::new(regulation_vm.selected_item.quantity.as_mut().unwrap()).range(1..=max_repository_num);
                         ui.horizontal(|ui|{
                             let label = ui.label("Quantity");
                             ui.add(field).labelled_by(label.id);
@@ -393,7 +393,7 @@ fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel,
                         
                             if wep_type == WepType::Arrow || wep_type == WepType::Greatarrow || wep_type == WepType::Bolt || wep_type == WepType::BallistaBolt  {
                                 ui.horizontal(|ui|{
-                                    let field = egui::DragValue::new(regulation_vm.selected_item.quantity.as_mut().unwrap()).clamp_range(1..=item.data.maxArrowQuantity);
+                                    let field = egui::DragValue::new(regulation_vm.selected_item.quantity.as_mut().unwrap()).range(1..=item.data.maxArrowQuantity);
                                     let label = ui.label("Quantity");
                                     ui.add(field).labelled_by(label.id);
                                 });
@@ -407,7 +407,7 @@ fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel,
                                     item.data.reinforceTypeId % 8300 == 0 ||
                                     item.data.reinforceTypeId % 8500 == 0) {10} else {25};
                                 let field = egui::DragValue::new(regulation_vm.selected_item.upgrade.as_mut().unwrap())
-                                .clamp_range(0..=max_upgrade)
+                                .range(0..=max_upgrade)
                                 .custom_formatter(|n, _| {
                                     format!("+{}", n)
                                 });
@@ -467,13 +467,13 @@ fn bulk_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel) {
             }
             InventoryTypeRoute::Weapons => {
                 egui::Grid::new("bulk_items_customization").spacing(Vec2::new(6., 6.)).show(ui,|ui| {
-                    let field = egui::DragValue::new(&mut inventory_vm.bulk_items_arrow_quantity).clamp_range(1..=99);
+                    let field = egui::DragValue::new(&mut inventory_vm.bulk_items_arrow_quantity).range(1..=99);
                     let label = ui.label("Projectile Quantity");
                     ui.add(field).labelled_by(label.id);
                     ui.end_row();
 
                     let label = ui.label("Weapon Level:");
-                    ui.add(egui::DragValue::new(&mut inventory_vm.bulk_items_weapon_level).clamp_range(0..=25).custom_formatter(|val, _| {
+                    ui.add(egui::DragValue::new(&mut inventory_vm.bulk_items_weapon_level).range(0..=25).custom_formatter(|val, _| {
                         let somber_upgrade_level: f64 = (val + 0.5)/2.5;
                         format!("Normal: +{}\t Somber: +{}", val as u32, somber_upgrade_level as u32)
                     })).labelled_by(label.id);

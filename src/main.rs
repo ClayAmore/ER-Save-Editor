@@ -42,16 +42,20 @@ fn main() -> Result<(), eframe::Error> {
     };
 
     eframe::run_native("ER Save Editor 0.0.21", options, Box::new(|creation_context| {
-        let mut fonts = egui::FontDefinitions::default();
-        egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
-        egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Fill);
-        creation_context.egui_ctx.set_fonts(fonts);
+        /*
+             Until compatibility for egui 0.28.2 reaches egui_phosphor there is a conflict of FontDefinitions..
+        */
+        
+        //let mut fonts = egui::FontDefinitions::default();
+        //egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
+        //egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Fill);
+        //creation_context.egui_ctx.set_fonts(fonts);
         let mut visuals = creation_context.egui_ctx.style().visuals.clone();
         let rounding = 3.;
         visuals.window_rounding = Rounding::default().at_least(rounding);
         visuals.window_highlight_topmost = false;
         creation_context.egui_ctx.set_visuals(visuals);
-        Box::new(App::new(creation_context))
+        Ok(Box::new(App::new(creation_context)))
     }))
 }
 
@@ -116,7 +120,9 @@ impl App {
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        ctx.set_zoom_factor(1.75);
+        // Scale Gui to match fractional scaling of the OS
+        ctx.set_pixels_per_point(ctx.pixels_per_point());
+        //ctx.set_zoom_factor(1.75);
         // TOP PANEL
         egui::TopBottomPanel::top("toolbar").default_height(35.).show(ctx, |ui| {
             ui.columns(2, |uis|{

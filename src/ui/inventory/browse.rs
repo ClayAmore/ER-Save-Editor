@@ -102,7 +102,7 @@ pub fn browse_inventory(ui: &mut Ui, vm:&mut ViewModel) {
             for i in row_range {
                 let item = &current_inventory_list[i];
                 ui.label(format!("{}",item.item_id));
-                ui.add(egui::Label::new(item.item_name.to_string()).wrap(true));
+                ui.add(egui::Label::new(item.item_name.to_string()).wrap());
                 ui.label(format!("{}",item.quantity));
                 ui.label(format!("{}",item.inventory_index));
                 ui.end_row();
