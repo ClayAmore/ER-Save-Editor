@@ -1,70 +1,49 @@
-pub mod stats_view_model {
-    use crate::{db::classes::classes::ArcheType, save::common::save_slot::SaveSlot};
+use er_save_lib::SaveApi;
 
-    #[derive(Clone)]
-    pub struct StatsViewModel  {
-        pub arche_type: ArcheType,
-        pub vigor: u32,
-        pub mind: u32,
-        pub endurance: u32,
-        pub strength: u32,
-        pub dexterity: u32,
-        pub intelligence: u32,
-        pub faith: u32,
-        pub arcane: u32,
-        pub level: u32,
-        pub souls: u32,
-        pub soulsmemory: u32
-    }
+use crate::db::classes::ArcheType;
 
-    impl Default for StatsViewModel {
-        fn default() -> Self {
-            Self { 
-                arche_type: ArcheType::Unknown,
-                vigor: Default::default(), 
-                mind: Default::default(), 
-                endurance: Default::default(), 
-                strength: Default::default(), 
-                dexterity: Default::default(), 
-                intelligence: Default::default(), 
-                faith: Default::default(), 
-                arcane: Default::default(),
-                level: Default::default(), 
-                souls: Default::default(), 
-                soulsmemory: Default::default(), 
-            }
-        }
-    }
+#[allow(unused)]
+#[derive(Clone, Default)]
+pub struct StatsViewModel {
+    pub arche_type: ArcheType,
+    pub vigor: u32,
+    pub mind: u32,
+    pub endurance: u32,
+    pub strength: u32,
+    pub dexterity: u32,
+    pub intelligence: u32,
+    pub faith: u32,
+    pub arcane: u32,
+    pub runes: u32,
+    pub runes_memory: u32,
+}
 
-    impl StatsViewModel {
-        pub fn from_save(slot:& SaveSlot) -> Self {
-            let arche_type = ArcheType::try_from(slot.player_game_data.arche_type).expect("");
-            let vigor = slot.player_game_data.vigor;
-            let mind = slot.player_game_data.mind;
-            let endurance = slot.player_game_data.endurance;
-            let strength = slot.player_game_data.strength;
-            let dexterity = slot.player_game_data.dexterity;
-            let intelligence = slot.player_game_data.intelligence;
-            let faith = slot.player_game_data.faith;
-            let arcane = slot.player_game_data.arcane;
-            let level = slot.player_game_data.level;
-            let souls = slot.player_game_data.souls;
-            let soulsmemory = slot.player_game_data.soulsmemory;
+impl StatsViewModel {
+    pub fn from_save(index: usize, save_api: &SaveApi) -> Self {
+        let arche_type = ArcheType::from(save_api.archetype(index));
+        let vigor = save_api.vigor(index);
+        let mind = save_api.mind(index);
+        let endurance = save_api.endurance(index);
+        let strength = save_api.strength(index);
+        let dexterity = save_api.dexterity(index);
+        let intelligence = save_api.intelligence(index);
+        let faith = save_api.faith(index);
+        let arcane = save_api.arcane(index);
+        let runes = save_api.runes(index);
+        let runes_memory = save_api.runes_memory(index);
 
-            Self {
-                arche_type,
-                vigor,
-                mind,
-                endurance,
-                strength,
-                dexterity,
-                intelligence,
-                faith,
-                arcane,
-                level,
-                souls,
-                soulsmemory
-            }
+        Self {
+            arche_type,
+            vigor,
+            mind,
+            endurance,
+            strength,
+            dexterity,
+            intelligence,
+            faith,
+            arcane,
+            runes,
+            runes_memory,
         }
     }
 }

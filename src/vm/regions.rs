@@ -1,44 +1,64 @@
-pub mod regions_view_model {
-    use std::collections::BTreeMap;
+use std::collections::BTreeMap;
 
-    use crate::{db::{map_name::map_name::MapName, regions::regions::{Region, ID_TO_REGION, REGIONS}}, save::common::save_slot::SaveSlot};
+use er_save_lib::SaveApi;
 
-    #[derive(Clone)]
-    pub struct RegionsViewModel  {
-        pub region_groups: BTreeMap<MapName, Vec<Region>>,
-        pub regions: BTreeMap<Region, (bool, bool, bool, bool)>, // (on/off, is_open_world, is_dungeon, is_boss)
-    }
+use crate::db::{map_name::MapName, regions::Region};
 
-    impl Default for RegionsViewModel {
-        fn default() -> Self {
-            let mut region_groups: BTreeMap<MapName, Vec<Region>> = REGIONS.lock().unwrap().iter().map(|r| (r.1.2, Vec::new())).collect();
-            let mut regions: BTreeMap<Region, (bool, bool, bool, bool)> = BTreeMap::new();
+#[derive(Clone)]
+pub struct RegionsViewModel {
+    pub region_groups: BTreeMap<MapName, Vec<Region>>,
+    pub regions: BTreeMap<Region, (bool, bool, bool, bool)>, // (on/off, is_open_world, is_dungeon, is_boss)
+}
 
-            for (region, (_,_, map, is_open_world, is_dungeon, is_boss)) in REGIONS.lock().unwrap().iter() {
-                regions.insert(*region, (false, *is_open_world, *is_dungeon, *is_boss));
-                region_groups.get_mut(&map).expect("").push(*region);
-                region_groups.get_mut(&map).expect("").sort();
+impl Default for RegionsViewModel {
+    fn default() -> Self {
+        let mut region_groups: BTreeMap<MapName, Vec<Region>> = Region::regions()
+            .iter()
+            .map(|r| (r.1 .2, Vec::new()))
+            .collect();
+        let mut regions: BTreeMap<Region, (bool, bool, bool, bool)> = BTreeMap::new();
+
+        for (region, (_, _, map, is_open_world, is_dungeon, is_boss)) in Region::regions().iter() {
+            regions.insert(*region, (false, *is_open_world, *is_dungeon, *is_boss));
+
+            if let Some(region_groups) = region_groups.get_mut(&map) {
+                region_groups.push(*region);
+                region_groups.sort();
             }
+        }
 
-            Self { region_groups, regions }
+        Self {
+            region_groups,
+            regions,
         }
     }
+}
 
-    impl RegionsViewModel {
-        pub fn from_save(slot:& SaveSlot) -> Self {
-            let mut regions_vm = RegionsViewModel::default();
+impl RegionsViewModel {
+    pub fn from_save(index: usize, save_api: &SaveApi) -> Self {
+        let mut regions_vm = RegionsViewModel::default();
 
-            for i in 0..slot.regions.unlocked_regions_count {
-                let key = &slot.regions.unlocked_regions[i as usize];
-                let is_invadeable_region = ID_TO_REGION.lock().unwrap().contains_key(key);
-                
-                if is_invadeable_region {
-                    let region = ID_TO_REGION.lock().unwrap()[key];
-                    regions_vm.regions.get_mut(&region).expect("").0 = true;
+        let res = save_api.regions(index);
+
+        match res {
+            Ok(regions) => {
+                for region in regions {
+                    let invadeable_region = Region::from(*region);
+
+                    if invadeable_region != Region::NonInvadeableRegion {
+                        if let Some((is_on, _, _, _)) =
+                            regions_vm.regions.get_mut(&invadeable_region)
+                        {
+                            *is_on = true;
+                        }
+                    }
                 }
             }
-
-            regions_vm
+            Err(err) => {
+                eprintln!("{err}");
+            }
         }
+
+        regions_vm
     }
 }

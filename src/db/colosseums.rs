@@ -1,18 +1,23 @@
-pub mod colosseums {
-    use std::{collections::HashMap, sync::Mutex};
-    use once_cell::sync::Lazy;
-    
-    #[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
-    pub enum Colosseum {
-        Royal,
-        Caelid,
-        Limgrave
+use std::{collections::HashMap, sync::OnceLock};
+
+#[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
+pub enum Colosseum {
+    Royal,
+    Caelid,
+    Limgrave,
+}
+
+impl Colosseum {
+    #[rustfmt::skip]
+    pub fn colusseums() -> &'static HashMap<Colosseum, (u32, &'static str)> {
+        static COLUSSEUMS: OnceLock<HashMap<Colosseum, (u32, &'static str)>> = OnceLock::new();
+
+        COLUSSEUMS.get_or_init(||
+            HashMap::from([
+                (Colosseum::Royal,(60370,"Royal Colosseum")),
+                (Colosseum::Caelid,(60350,"Caelid Colosseum")),
+                (Colosseum::Limgrave,(60360,"Limgrave Colosseum")),
+            ])
+        )
     }
-    pub static COLOSSEUMS: Lazy<Mutex<HashMap<Colosseum,(u32,&str)>>> = Lazy::new(|| {
-        Mutex::new(HashMap::from([
-            (Colosseum::Royal,(60370,"Royal Colosseum")),
-            (Colosseum::Caelid,(60350,"Caelid Colosseum")),
-            (Colosseum::Limgrave,(60360,"Limgrave Colosseum")),
-        ]))
-    });
 }

@@ -1,88 +1,75 @@
-pub mod general_view_model {
-    use crate::{save::save::save::Save, util::validator::validator::Validator, vm::{slot::slot_view_model::SlotViewModel, vm::vm::ViewModel}};
+use er_save_lib::{SaveApi, SaveApiError};
 
-    #[derive(Default, Clone)]
-    pub struct Character {
-        pub active: bool,
-        pub index: usize,
-        pub name: String,
+use super::{character::CharacterViewModel, vm::ViewModel};
+
+#[derive(Default, Clone)]
+pub struct Profile {
+    pub active: bool,
+    pub name: String,
+}
+impl Profile {
+    pub(crate) fn new(name: impl Into<String>) -> Self {
+        Profile {
+            active: true,
+            name: name.into(),
+        }
     }
+}
 
+#[derive(Default)]
+pub struct ImporterViewModel {
+    pub valid: bool,
+    pub from_index: usize,
+    pub to_index: usize,
+    pub from_list: Vec<Profile>,
+    pub to_list: Vec<Profile>,
+    pub save_api: Option<SaveApi>,
+}
 
-    pub struct ImporterViewModel  {
-        pub valid: bool,
-        pub selected_from_index: usize,
-        pub selected_to_index: usize,
-        pub from_list: [Character; 0x10],
-        pub to_list: [Character; 0x10],
-        from_save: Save,
-    }
-
-    impl Default for ImporterViewModel {
-        fn default() -> Self {
-            Self { 
-                valid: false,
-                selected_from_index: 0,
-                selected_to_index: 0,
-                from_list: Default::default(), 
-                to_list: Default::default(),
-                from_save: Save::default()
+impl ImporterViewModel {
+    pub fn new(save_api: SaveApi, vm: &ViewModel) -> Self {
+        let mut from_profiles = Vec::new();
+        for (index, active) in save_api.active_characters().iter().enumerate() {
+            if *active {
+                // Character Name
+                let character_name = save_api.character_name(index);
+                from_profiles.push(Profile::new(&character_name));
             }
+        }
+
+        let mut to_profiles = Vec::new();
+        for character in vm.characters.iter() {
+            to_profiles.push(Profile::new(&character.general_vm.character_name));
+        }
+
+        ImporterViewModel {
+            valid: true,
+            from_list: from_profiles,
+            to_list: to_profiles,
+            save_api: Some(save_api),
+            from_index: 0,
+            to_index: 0,
         }
     }
 
-    impl ImporterViewModel {
-        pub fn new(from: Save, vm: &ViewModel) -> Self {
-            let mut importer_view_model = ImporterViewModel::default();
+    pub fn import_character(
+        &mut self,
+        app_save_api: &mut SaveApi,
+        vm: &mut ViewModel,
+    ) -> Result<(), SaveApiError> {
+        // Try to import character. Notify if there's error.
+        app_save_api.import_character(
+            self.to_index,
+            self.save_api.as_ref().unwrap(),
+            self.from_index,
+        )?;
 
-            importer_view_model.valid = Validator::validate(&from);
+        // Refresh view model
+        vm.characters[self.to_index] = CharacterViewModel::from_save(app_save_api, self.to_index)?;
 
-            if !importer_view_model.valid {return importer_view_model;}
+        self.to_list[self.to_index] =
+            Profile::new(&vm.characters[self.to_index].general_vm.character_name);
 
-            importer_view_model.from_save = from;
-
-            for (i, active) in importer_view_model.from_save.save_type.active_slots().iter().enumerate() {
-                if *active {                    
-                    // Character Name
-                    let character_name = importer_view_model.from_save.save_type.get_slot(i).player_game_data.character_name;
-                    let mut character_name_trimmed: [u16; 0x10] = [0;0x10];
-                    for (i, char) in character_name.iter().enumerate() {
-                        if *char == 0 { break; }
-                        character_name_trimmed[i] = *char;
-                    }
-                    let character_name: String = String::from_utf16(&character_name_trimmed).expect("");
-                    importer_view_model.from_list[i].active = true;
-                    importer_view_model.from_list[i].index = i;
-                    importer_view_model.from_list[i].name = character_name;
-                }
-            }
-
-            for i in 0..0xA {
-                if vm.profile_summary[i].active {                    
-                    importer_view_model.to_list[i].active = true;
-                    importer_view_model.to_list[i].index = i;
-                    importer_view_model.to_list[i].name = vm.slots[i].general_vm.character_name.to_string();
-                }
-            }
-
-            importer_view_model
-        }
-
-        pub fn import_character(&mut self, to_save: &mut Save, vm: &mut ViewModel) {
-
-            // Retain slot version
-            let mut from_slot = self.from_save.save_type.get_slot(self.selected_from_index).clone();
-            let to_slot = to_save.save_type.get_slot(self.selected_to_index);
-            from_slot.ver = to_slot.ver;
-
-            // Save Slot
-            to_save.save_type.set_slot(self.selected_to_index, &from_slot);
-            
-            // Profile Summary
-            to_save.save_type.set_profile_summary(self.selected_to_index, self.from_save.save_type.get_profile_summary(self.selected_from_index));
-
-            // Refresh view model
-            vm.slots[self.selected_to_index] = SlotViewModel::from_save(to_save.save_type.get_slot(self.selected_to_index));
-        }
+        Ok(())
     }
 }

@@ -1,7 +1,7 @@
 pub mod slot_view_model {
     use crate::save::common::user_data_10::ProfileSummary;
 
-
+    #[allow(unused)]
     #[derive(Clone)]
     pub struct ProfileSummaryViewModel {
         pub active: bool,
