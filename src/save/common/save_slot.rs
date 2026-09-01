@@ -1803,7 +1803,7 @@ impl Write for SaveSlot {
         bytes.extend(self._0x80);
 
         // Everything past the structures mapped above, kept verbatim
-        bytes.extend(self._rest.to_vec());
+        bytes.extend_from_slice(&self._rest);
 
         // Only pads a default constructed slot, which carries no tail
         if bytes.len() < 0x280000 {

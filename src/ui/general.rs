@@ -1,6 +1,6 @@
 pub mod general {
     use eframe::egui::{self, Ui};
-    use crate::vm::{general::general_view_model::Gender, vm::vm::ViewModel};
+    use crate::vm::{general::general_view_model::{Gender, SteedAttire}, vm::vm::ViewModel};
 
 
     pub fn general(ui: &mut Ui, vm:&mut ViewModel) {
@@ -21,6 +21,16 @@ pub mod general {
                     general_vm.gender = Gender::Female;
                 };
             });
+
+            ui.add_space(16.0);
+
+            // Torrent appearance (Spectral Steed Attire, added by patch 1.17)
+            ui.label("Torrent Appearance:");
+            for attire in SteedAttire::ALL {
+                if ui.radio(general_vm.steed_attire == attire, attire.label()).clicked() {
+                    general_vm.steed_attire = attire;
+                }
+            }
         });
     }
 }

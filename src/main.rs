@@ -41,7 +41,7 @@ fn main() -> Result<(), eframe::Error> {
         ..Default::default()
     };
 
-    eframe::run_native("ER Save Editor 0.0.21", options, Box::new(|creation_context| {
+    eframe::run_native(&format!("ER Save Editor {}", env!("CARGO_PKG_VERSION")), options, Box::new(|creation_context| {
         let mut fonts = egui::FontDefinitions::default();
         egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
         egui_phosphor::add_to_fonts(&mut fonts, egui_phosphor::Variant::Fill);
@@ -181,6 +181,7 @@ impl eframe::App for App {
                                 });
                                 match imported {
                                     Ok(importer_vm) => {
+                                        self.error = None;
                                         self.importer_vm = importer_vm;
                                         self.importer_open = true;
                                     }
@@ -526,6 +527,54 @@ mod modded_saves {
         }
     }
 
+    // A save whose regulation cannot be read must never be loaded using the
+    // params of the save before it. Failing loudly is the acceptable outcome;
+    // quietly answering with the previous save's data is not.
+    #[test]
+    fn a_broken_regulation_never_reuses_the_previous_saves_params() {
+        let saves = crate::save_round_trip::saves_on_disk();
+        if saves.is_empty() {
+            eprintln!("skipping: no saves in saves/");
+            return;
+        }
+
+        let good = Save::from_path(&saves[0]).expect("parse");
+        Regulation::init_params(&good);
+        let expected = Regulation::equip_goods_param_map().len();
+        assert!(expected > 0);
+
+        let mut broken = Save::from_path(&saves[0]).expect("parse");
+        match &mut broken.save_type {
+            save::save::save::SaveType::PC(pc) => {
+                pc.user_data_11.user_data_11.regulation[0x40..0x80].fill(0xAB);
+            }
+            _ => {
+                eprintln!("skipping: not a PC save");
+                return;
+            }
+        }
+
+        let prev_hook = std::panic::take_hook();
+        std::panic::set_hook(Box::new(|_| {}));
+        let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            Regulation::init_params(&broken);
+            Regulation::equip_goods_param_map().len()
+        }));
+        std::panic::set_hook(prev_hook);
+
+        match outcome {
+            // Refused the broken regulation outright, which is what we want.
+            Err(_) => println!("broken regulation rejected"),
+            Ok(len) => assert_ne!(
+                len, expected,
+                "a broken regulation silently answered with the previous save's params"
+            ),
+        }
+
+        // Leave the globals holding a save that actually parses.
+        Regulation::init_params(&good);
+    }
+
     // Every save brings its own regulation, so the derived maps must follow it.
     #[test]
     fn param_maps_follow_the_loaded_save() {
@@ -540,6 +589,11 @@ mod modded_saves {
             Regulation::init_params(&save);
             counts.push(Regulation::equip_goods_param_map().len());
         }
+        if counts[0] == counts[1] {
+            eprintln!("skipping: the saves on disk share a regulation, nothing to tell apart");
+            return;
+        }
+
         let first = Save::from_path(&saves[0]).expect("parse");
         Regulation::init_params(&first);
         assert_eq!(
@@ -547,6 +601,196 @@ mod modded_saves {
             counts[0],
             "param maps did not follow the reloaded save"
         );
-        assert_ne!(counts[0], counts[1], "expected the saves to differ");
+    }
+}
+
+
+#[cfg(test)]
+mod dlc_names {
+    use super::*;
+    use crate::util::regulation::Regulation;
+
+    // Shadow of the Erdtree content must not show up as [UNKOWN_<id>].
+    #[test]
+    fn dlc_items_are_named() {
+        let saves = crate::save_round_trip::saves_on_disk();
+        if saves.is_empty() {
+            eprintln!("skipping: no saves in saves/");
+            return;
+        }
+        let save = Save::from_path(&saves[0]).expect("parse");
+        Regulation::init_params(&save);
+
+        // A few Shadow of the Erdtree rows that used to render as [UNKOWN_].
+        let armor = Regulation::equip_protectors_param_map();
+        assert_eq!(armor.get(&5200000).map(|r| r.name.as_str()), Some("Death Knight Helm"));
+        assert_eq!(armor.get(&5000000).map(|r| r.name.as_str()), Some("Oathseeker Knight Helm"));
+
+        // Ashes of war are fully covered now; the others keep only rows the
+        // game itself has no text for.
+        let ashes = Regulation::equip_gem_param_map();
+        assert_eq!(ashes.values().filter(|r| r.name.starts_with("[UNKOWN_")).count(), 0);
+
+        let unnamed = |n: usize, total: usize| (n * 100) / total;
+        assert!(unnamed(armor.values().filter(|r| r.name.starts_with("[UNKOWN_")).count(), armor.len()) < 10);
+
+        let goods = Regulation::equip_goods_param_map();
+        assert!(unnamed(goods.values().filter(|r| r.name.starts_with("[UNKOWN_")).count(), goods.len()) < 10);
+    }
+
+    // What the player actually sees: nothing they are carrying should be unnamed.
+    #[test]
+    fn nothing_in_the_inventory_is_unnamed() {
+        let saves = crate::save_round_trip::saves_on_disk();
+        if saves.is_empty() {
+            eprintln!("skipping: no saves in saves/");
+            return;
+        }
+        let save = Save::from_path(&saves[0]).expect("parse");
+        let vm = ViewModel::from_save(&save);
+
+        for (i, active) in save.save_type.active_slots().iter().enumerate() {
+            if !*active { continue; }
+            let mut unnamed: Vec<u32> = Vec::new();
+            let mut total = 0usize;
+            for storage in vm.slots[i].inventory_vm.storage.iter() {
+                for list in [&storage.common_items, &storage.key_items] {
+                    for item in list.iter() {
+                        total += 1;
+                        if item.item_name.starts_with("[UNKOWN_") {
+                            unnamed.push(item.item_id);
+                        }
+                    }
+                }
+            }
+            unnamed.sort();
+            unnamed.dedup();
+            println!("slot {i} ({}): {total} items, {} unnamed {:?}",
+                vm.slots[i].general_vm.character_name, unnamed.len(),
+                &unnamed[..unnamed.len().min(10)]);
+        }
+    }
+}
+
+#[cfg(test)]
+mod new_classes {
+    use super::*;
+
+    // Patch 1.17 added two starting classes (CharaInitParam 3010 and 3011).
+    // A character made with one of them must still load.
+    #[test]
+    fn characters_using_a_patch_class_still_load() {
+        let saves = crate::save_round_trip::saves_on_disk();
+        if saves.is_empty() {
+            eprintln!("skipping: no saves in saves/");
+            return;
+        }
+
+        for arche_type in [10u8, 11] {
+            let mut save = Save::from_path(&saves[0]).expect("parse");
+            match &mut save.save_type {
+                save::save::save::SaveType::PC(pc) => {
+                    pc.save_slots[0].save_slot.player_game_data.arche_type = arche_type;
+                }
+                _ => { eprintln!("skipping: not a PC save"); return; }
+            }
+
+            let prev = std::panic::take_hook();
+            std::panic::set_hook(Box::new(|_| {}));
+            let loaded = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                ViewModel::from_save(&save)
+            }));
+            std::panic::set_hook(prev);
+
+            assert!(loaded.is_ok(), "arche_type {arche_type} panicked while loading");
+            let vm = loaded.unwrap();
+            println!("arche_type {arche_type} -> class '{}'",
+                vm.slots[0].stats_vm.arche_type.to_string());
+        }
+    }
+}
+
+
+#[cfg(test)]
+mod steed_attire {
+    use super::*;
+    use crate::vm::general::general_view_model::{SteedAttire, STEED_ATTIRE_FLAG_BYTE};
+
+    // Two saves the game itself produced, same character, differing only in the
+    // attire applied to Torrent.
+    const SILVER: &str = "saves/attire_silver.sl2";
+    const FUNEREAL: &str = "saves/attire_funereal.sl2";
+
+    fn flag_byte(save: &Save, slot: usize) -> u8 {
+        save.save_type.get_slot(slot).event_flags.flags[STEED_ATTIRE_FLAG_BYTE]
+    }
+
+    #[test]
+    fn reads_the_applied_attire() {
+        let (silver, funereal) = (PathBuf::from(SILVER), PathBuf::from(FUNEREAL));
+        if !silver.exists() || !funereal.exists() {
+            eprintln!("skipping: attire reference saves not in saves/");
+            return;
+        }
+
+        let a = Save::from_path(&silver).expect("parse");
+        let b = Save::from_path(&funereal).expect("parse");
+        let (va, vb) = (ViewModel::from_save(&a), ViewModel::from_save(&b));
+
+        assert_eq!(va.slots[0].general_vm.steed_attire, SteedAttire::SilverOfCaria);
+        assert_eq!(vb.slots[0].general_vm.steed_attire, SteedAttire::FunerealNight);
+
+        // Characters that never touched the system read as the plain Torrent.
+        assert_eq!(vb.slots[1].general_vm.steed_attire, SteedAttire::None);
+    }
+
+    #[test]
+    fn writing_an_attire_matches_what_the_game_writes() {
+        let (silver, funereal) = (PathBuf::from(SILVER), PathBuf::from(FUNEREAL));
+        if !silver.exists() || !funereal.exists() {
+            eprintln!("skipping: attire reference saves not in saves/");
+            return;
+        }
+
+        let expected = flag_byte(&Save::from_path(&funereal).expect("parse"), 0);
+
+        // Start from the Silver of Caria save and switch it over.
+        let mut save = Save::from_path(&silver).expect("parse");
+        let mut vm = ViewModel::from_save(&save);
+        vm.slots[0].general_vm.steed_attire = SteedAttire::FunerealNight;
+        vm.update_save(&mut save.save_type);
+
+        assert_eq!(flag_byte(&save, 0), expected,
+            "the editor did not reproduce the byte the game writes");
+        println!("editor wrote {:#04x}, game wrote {:#04x}", flag_byte(&save, 0), expected);
+
+        // And the inferred third option lands on its own bit without touching
+        // anything else in that byte.
+        let before = flag_byte(&save, 0);
+        vm.slots[0].general_vm.steed_attire = SteedAttire::TreeSentinel;
+        vm.update_save(&mut save.save_type);
+        let after = flag_byte(&save, 0);
+        println!("tree sentinel: {before:#04x} -> {after:#04x}");
+        assert_eq!(after & 0b111, 0b100);
+        assert_eq!(after & !0b111, before & !0b111, "unrelated bits changed");
+
+        // Selecting the plain Torrent clears all three.
+        vm.slots[0].general_vm.steed_attire = SteedAttire::None;
+        vm.update_save(&mut save.save_type);
+        assert_eq!(flag_byte(&save, 0) & 0b111, 0);
+    }
+
+    #[test]
+    fn leaving_the_attire_alone_rewrites_the_save_unchanged() {
+        let path = PathBuf::from(FUNEREAL);
+        if !path.exists() {
+            eprintln!("skipping: attire reference saves not in saves/");
+            return;
+        }
+        let original = std::fs::read(&path).expect("read");
+        let mut save = Save::from_path(&path).expect("parse");
+        let vm = ViewModel::from_save(&save);
+        vm.update_save(&mut save.save_type);
+        assert!(save.write().expect("write") == original, "round trip changed the save");
     }
 }

@@ -1,5 +1,12 @@
 pub mod general_view_model {
     use crate::save::common::save_slot::SaveSlot;
+    use crate::util::bit::bit::get_bit;
+
+    // Patch 1.17 records which Spectral Steed Attire is applied to Torrent as
+    // one of three event flags: 6701 Tree Sentinel, 6702 Silver of Caria and
+    // 6703 Funereal Night. They share one byte of the flag block, a bit each,
+    // and no bit set means the plain Torrent.
+    pub const STEED_ATTIRE_FLAG_BYTE: usize = 0x345;
 
     #[derive(Default, Clone)]
     pub struct MapID {
@@ -11,6 +18,55 @@ pub mod general_view_model {
     impl ToString for MapID {
         fn to_string(&self) -> String {
             format!("{:02}{:02}{:02}{:02}", self.area_id, self.block_id, self.region_id, self.index_id)
+        }
+    }
+
+    #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
+    pub enum SteedAttire {
+        #[default] None,
+        TreeSentinel,
+        SilverOfCaria,
+        FunerealNight,
+    }
+
+    impl SteedAttire {
+        pub const ALL: [SteedAttire; 4] = [
+            SteedAttire::None,
+            SteedAttire::TreeSentinel,
+            SteedAttire::SilverOfCaria,
+            SteedAttire::FunerealNight,
+        ];
+
+        // Bit within STEED_ATTIRE_FLAG_BYTE, or None for the plain Torrent.
+        pub fn bit(&self) -> Option<u8> {
+            match self {
+                SteedAttire::None => Option::None,
+                SteedAttire::FunerealNight => Some(0),
+                SteedAttire::SilverOfCaria => Some(1),
+                SteedAttire::TreeSentinel => Some(2),
+            }
+        }
+
+        pub fn label(&self) -> &'static str {
+            match self {
+                SteedAttire::None => "Default (no attire)",
+                SteedAttire::TreeSentinel => "Tree Sentinel",
+                SteedAttire::SilverOfCaria => "Silver of Caria",
+                SteedAttire::FunerealNight => "Funereal Night",
+            }
+        }
+
+        pub fn from_flags(flags: &[u8]) -> SteedAttire {
+            let byte = match flags.get(STEED_ATTIRE_FLAG_BYTE) {
+                Some(byte) => *byte,
+                Option::None => return SteedAttire::None,
+            };
+            for attire in SteedAttire::ALL {
+                if attire.bit().is_some_and(|bit| get_bit(byte, bit)) {
+                    return attire;
+                }
+            }
+            SteedAttire::None
         }
     }
 
@@ -38,6 +94,7 @@ pub mod general_view_model {
         pub character_name: String,
         pub gender: Gender,
         pub weapon_level: u8,
+        pub steed_attire: SteedAttire,
     }
 
     impl GeneralViewModel {
@@ -61,11 +118,15 @@ pub mod general_view_model {
             // Weapon Level
             let weapon_level = slot.player_game_data.match_making_wpn_lvl;
 
+            // Torrent appearance
+            let steed_attire = SteedAttire::from_flags(&slot.event_flags.flags);
+
             Self {
                 steam_id,
                 character_name,
                 gender,
                 weapon_level,
+                steed_attire,
             }
         }
     }

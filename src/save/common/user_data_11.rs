@@ -32,11 +32,12 @@ impl Read for UserData11 {
 
         let block = br.read_bytes(REGULATION_BLOCK_SIZE)?;
 
-        // The regulation is AES-CBC encrypted, so its final byte is never 0 in
-        // practice: everything past the last non-zero byte is the padding.
+        // The block is zero filled after the regulation, so the trailing run of
+        // zeros marks where the real data ended.
         let data_len = block.iter().rposition(|byte| *byte != 0).map_or(0, |i| i + 1);
 
-        // Keep the regulation a whole number of AES blocks so decryption lines up.
+        // Rounding up to a whole AES block keeps decryption aligned, and also
+        // takes back any zero bytes the ciphertext happened to end on.
         let regulation_len = data_len.next_multiple_of(0x10).min(REGULATION_BLOCK_SIZE);
 
         user_data_11.regulation = block[..regulation_len].to_vec();

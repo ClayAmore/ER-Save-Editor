@@ -38,7 +38,11 @@ pub mod stats_view_model {
 
     impl StatsViewModel {
         pub fn from_save(slot:& SaveSlot) -> Self {
-            let arche_type = ArcheType::try_from(slot.player_game_data.arche_type).expect("");
+            // A class this build does not know (a later patch adding one) must
+            // not take the save down with it. The raw byte is written back
+            // untouched, so falling back here changes nothing on disk.
+            let arche_type = ArcheType::try_from(slot.player_game_data.arche_type)
+                .unwrap_or(ArcheType::Unknown);
             let vigor = slot.player_game_data.vigor;
             let mind = slot.player_game_data.mind;
             let endurance = slot.player_game_data.endurance;

@@ -1,10 +1,12 @@
+// Item names for the base game plus Shadow of the Erdtree.
+// Names the original table was missing were filled in from Paramdex:
+// https://github.com/soulsmods/Paramdex (ER/Names/EquipParamGem.txt)
 pub mod aow_name {
     use std::{collections::HashMap, sync::Mutex};
     use once_cell::sync::Lazy;
 
     pub static AOW_NAME: Lazy<Mutex<HashMap<u32, &str>>> = Lazy::new(|| {
         Mutex::new(HashMap::from([
-            (0, ""),
             (10,"test gem 1"),
             (20,"test gem 2"),
             (30,"test gem 3"),
@@ -222,6 +224,31 @@ pub mod aow_name {
             (80100,"Ash of War: Bloodhound's Step"),
             (80200,"Ash of War: Raptor of the Mists"),
             (85000,"Ash of War: White Shadow's Lure"),
+            (200000,"Ash of War: Dryleaf Whirlwind"),
+            (200100,"Ash of War: Aspects of the Crucible: Wings"),
+            (400000,"Ash of War: Spinning Gravity Thrust"),
+            (401000,"Ash of War: Palm Blast"),
+            (402000,"Ash of War: Piercing Throw"),
+            (403000,"Ash of War: Scattershot Throw"),
+            (404000,"Ash of War: Wall of Sparks"),
+            (405000,"Ash of War: Rolling Sparks"),
+            (406000,"Ash of War: Raging Beast"),
+            (407000,"Ash of War: Savage Claws"),
+            (409000,"Ash of War: Blind Spot"),
+            (410000,"Ash of War: Swift Slash"),
+            (411000,"Ash of War: Overhead Stance"),
+            (412000,"Ash of War: Wing Stance"),
+            (413000,"Ash of War: Blinkbolt"),
+            (414000,"Ash of War: Flame Skewer"),
+            (415000,"Ash of War: Savage Lion's Claw"),
+            (416000,"Ash of War: Divine Beast Frost Stomp"),
+            (417000,"Ash of War: Flame Spear"),
+            (418000,"Ash of War: Carian Sovereignty"),
+            (419000,"Ash of War: Shriek of Sorrow"),
+            (422000,"Ash of War: Ghostflame Call"),
+            (505000,"Ash of War: The Poison Flower Blooms Twice"),
+            (548000,"Ash of War: Igon's Drake Hunt"),
+            (800000,"Ash of War: Shield Strike"),
         ]))
     });
 }

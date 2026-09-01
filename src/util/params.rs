@@ -5,7 +5,7 @@ pub mod params {
     use crate::util::br_ext::br_ext::BinaryReaderExtensions as br_ext;
 
     #[allow(non_camel_case_types)]
-    #[derive(Clone, PartialEq, Hash, Eq)]
+    #[derive(Clone, PartialEq, Hash, Eq, Debug)]
     pub enum Param {
         ActionButtonParam,
         AiSoundParam,
