@@ -57,8 +57,14 @@ pub fn browse_inventory(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemText
     let mut frame = egui::Frame::none();
     frame.inner_margin = Margin { top: 8., left: 0., bottom: 8., right: 0. };
     frame.show(ui,|ui| {
-        egui::Grid::new("browse_header").spacing([16., 16.]).min_col_width(ui.available_width()/4.).striped(true).show(ui, |ui| {
+        egui::Grid::new("browse_header").spacing([16., 16.]).min_col_width(ui.available_width()/5.).striped(true).show(ui, |ui| {
             // Table Header
+            // Leading empty cell to line up with the icon column browse_body adds
+            // before "Item ID" (Task 8). Keeps this grid at five cells so both
+            // grids divide the same available width into the same number of
+            // columns.
+            ui.label("");
+
             let mut job = LayoutJob::default();
             job.append("Item ID", 0., TextFormat{
                 color: Color32::BLACK,
@@ -99,7 +105,7 @@ pub fn browse_inventory(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemText
         InventoryTypeRoute::Talismans => &inventory_vm.storage[inventory_vm.at_storage_box as usize].filtered_accessories,
     };
     egui::ScrollArea::vertical().show_rows(ui, 10., current_inventory_list.len(), |ui, row_range| {
-        egui::Grid::new("browse_body").spacing([8., 8.]).min_col_width(ui.available_width()/4.).striped(true).show(ui, |ui| {
+        egui::Grid::new("browse_body").spacing([8., 8.]).min_col_width(ui.available_width()/5.).striped(true).show(ui, |ui| {
             for i in row_range {
                 let item = &current_inventory_list[i];
 
