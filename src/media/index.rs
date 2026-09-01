@@ -7,8 +7,7 @@ use serde::Deserialize;
 // Only the generated index is embedded; assets/ also holds large icon
 // artwork that has no business in the binary.
 #[derive(RustEmbed)]
-#[folder = "assets/"]
-#[include = "item_media.json"]
+#[folder = "assets/media/"]
 struct MediaAsset;
 
 #[derive(Deserialize, Clone, Debug, Default)]
