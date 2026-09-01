@@ -77,4 +77,12 @@ mod tests {
         // broken one.
         assert!(super::entry(1000000).is_some() || super::count() == 0);
     }
+
+    #[test]
+    fn the_shipped_index_keeps_its_coverage() {
+        // Floor recorded from the first successful generation (2253 entries),
+        // rounded down to the nearest fifty, not guessed. Rerun the
+        // generator and update this deliberately if the API changes.
+        assert!(super::count() >= 2250);
+    }
 }
