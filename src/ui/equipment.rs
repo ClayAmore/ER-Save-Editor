@@ -3,6 +3,10 @@ pub mod equipment {
 
     use eframe::egui::{self, Color32, Layout, Ui, Vec2};
 
+    // Aliased: `combo_box` below already has a parameter named `index`
+    // (the equipment slot's array index), which would otherwise shadow
+    // this module inside that function.
+    use crate::media::index as media_index;
     use crate::media::textures::ItemTextures;
     use crate::vm::{inventory::InventorySubTypeRoute, vm::vm::ViewModel};
 
@@ -15,74 +19,74 @@ pub mod equipment {
 
         egui::CentralPanel::default().show(ui.ctx(), |ui| {
             egui::ScrollArea::vertical().auto_shrink(false).show(ui, |ui| {
-                row(ui, vm, format!("Weapons - Right Hand"), |ui, vm| {
-                    group(ui, vm, |ui, vm| {
+                row(ui, vm, textures, format!("Weapons - Right Hand"), |ui, vm, textures| {
+                    group(ui, vm, textures, |ui, vm, textures| {
                         for index in 0..3 {
-                            combo_box( ui, vm, index, InventorySubTypeRoute::WeaponRight);
+                            combo_box( ui, vm, textures, index, InventorySubTypeRoute::WeaponRight);
                         }
                     });
                 });
-                row(ui, vm, format!("Weapons - Left Hand"), |ui, vm| {
-                    group(ui, vm, |ui, vm| {
+                row(ui, vm, textures, format!("Weapons - Left Hand"), |ui, vm, textures| {
+                    group(ui, vm, textures, |ui, vm, textures| {
                         for index in 0..3 {
-                            combo_box( ui, vm, index, InventorySubTypeRoute::WeaponLeft);
+                            combo_box( ui, vm, textures, index, InventorySubTypeRoute::WeaponLeft);
                         }
                     });
                 });
-    
-                row(ui, vm, format!("Arrows"), |ui, vm| {
-                    group(ui, vm, |ui, vm| {
+
+                row(ui, vm, textures, format!("Arrows"), |ui, vm, textures| {
+                    group(ui, vm, textures, |ui, vm, textures| {
                         for index in 0..2 {
-                            combo_box(ui,vm, index, InventorySubTypeRoute::Arrow);
+                            combo_box(ui, vm, textures, index, InventorySubTypeRoute::Arrow);
                         }
                     });
                 });
-                
-    
-                row(ui, vm, format!("Bolts"), |ui, vm| {
-                    group(ui, vm, |ui, vm| {
+
+
+                row(ui, vm, textures, format!("Bolts"), |ui, vm, textures| {
+                    group(ui, vm, textures, |ui, vm, textures| {
                         for index in 0..2 {
-                            combo_box(ui, vm, index, InventorySubTypeRoute::Bolt);
+                            combo_box(ui, vm, textures, index, InventorySubTypeRoute::Bolt);
                         }
                     });
                 });
-                
-                row(ui, vm, format!("Armor"), |ui, vm| {
-                    group(ui, vm, |ui, vm| {
-                        combo_box(ui, vm, 0, InventorySubTypeRoute::Head);
-                        combo_box(ui, vm, 0, InventorySubTypeRoute::Body);
-                        combo_box(ui, vm, 0, InventorySubTypeRoute::Arms);
-                        combo_box(ui, vm, 0, InventorySubTypeRoute::Legs);
+
+                row(ui, vm, textures, format!("Armor"), |ui, vm, textures| {
+                    group(ui, vm, textures, |ui, vm, textures| {
+                        combo_box(ui, vm, textures, 0, InventorySubTypeRoute::Head);
+                        combo_box(ui, vm, textures, 0, InventorySubTypeRoute::Body);
+                        combo_box(ui, vm, textures, 0, InventorySubTypeRoute::Arms);
+                        combo_box(ui, vm, textures, 0, InventorySubTypeRoute::Legs);
                     });
                 });
-                
-                row(ui, vm, format!("Talismans"), |ui, vm| {
-                    group(ui, vm, |ui, vm| {
+
+                row(ui, vm, textures, format!("Talismans"), |ui, vm, textures| {
+                    group(ui, vm, textures, |ui, vm, textures| {
                         for index in 0..vm.slots[vm.index].equipment_vm.talisman_count as usize {
-                            combo_box(ui, vm, index, InventorySubTypeRoute::Talisman);
+                            combo_box(ui, vm, textures, index, InventorySubTypeRoute::Talisman);
                         }
                     });
                 });
-                
-                row(ui, vm, format!("Quickslots"), |ui, vm| {
-                    group(ui, vm, |ui, vm| {
+
+                row(ui, vm, textures, format!("Quickslots"), |ui, vm, textures| {
+                    group(ui, vm, textures, |ui, vm, textures| {
                         for index in 0..5 {
-                            combo_box(ui, vm, index, InventorySubTypeRoute::QuickItem);
+                            combo_box(ui, vm, textures, index, InventorySubTypeRoute::QuickItem);
                         }
                     });
                 });
-                row(ui, vm, format!(""), |ui, vm| {
-                    group(ui, vm, |ui, vm| {
+                row(ui, vm, textures, format!(""), |ui, vm, textures| {
+                    group(ui, vm, textures, |ui, vm, textures| {
                         for index in 5..10 {
-                            combo_box(ui, vm, index, InventorySubTypeRoute::QuickItem);
+                            combo_box(ui, vm, textures, index, InventorySubTypeRoute::QuickItem);
                         }
                     });
                 });
-    
-                row(ui, vm, format!("Pouch"), |ui, vm| {
-                    group(ui, vm, |ui, vm| {
+
+                row(ui, vm, textures, format!("Pouch"), |ui, vm, textures| {
+                    group(ui, vm, textures, |ui, vm, textures| {
                         for index in 0..6 {
-                            combo_box(ui, vm, index, InventorySubTypeRoute::Pouch);
+                            combo_box(ui, vm, textures, index, InventorySubTypeRoute::Pouch);
                         }
                     });
                 });
@@ -90,31 +94,90 @@ pub mod equipment {
         });
     }
 
-    fn row(ui: &mut Ui, vm: &mut ViewModel, heading: String, f: fn(&mut Ui, &mut ViewModel) -> ()) {
+    // `row` and `group` used to take bare `fn` pointers, which cannot close
+    // over anything. Widened to `impl FnOnce` so the closures below can
+    // thread `textures` down to `combo_box` without capturing it from an
+    // outer scope (each closure runs exactly once per frame, so FnOnce is
+    // enough).
+    fn row(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemTextures, heading: String, f: impl FnOnce(&mut Ui, &mut ViewModel, &mut ItemTextures)) {
         if !heading.is_empty() {
             ui.heading(egui::RichText::new(heading));
             ui.add_space(4.);
         };
         ui.with_layout(Layout::left_to_right(egui::Align::Min), |ui| {
-            f(ui, vm);
+            f(ui, vm, textures);
         });
         ui.add_space(16.);
     }
 
-    fn group(ui: &mut Ui, vm: &mut ViewModel, f: fn(&mut Ui, &mut ViewModel) -> ()) {
+    fn group(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemTextures, f: impl FnOnce(&mut Ui, &mut ViewModel, &mut ItemTextures)) {
         egui::Frame::none().show(ui, |ui| {
             ui.horizontal_wrapped(|ui|{
-                f(ui, vm);
+                f(ui, vm, textures);
             });
         });
     }
 
-    fn combo_box(ui: &mut Ui, vm: &mut ViewModel, index: usize, r#type: InventorySubTypeRoute) {
+    // Maps a slot's route to the media category its equipped item's raw id
+    // belongs to. The five equipment param tables are independent id
+    // spaces (see media::index), so this must match the category the
+    // EquipmentViewModel builder used when it derived `.id` for that slot.
+    fn media_category(r#type: &InventorySubTypeRoute) -> Option<media_index::MediaCategory> {
+        match r#type {
+            InventorySubTypeRoute::WeaponLeft |
+            InventorySubTypeRoute::WeaponRight |
+            InventorySubTypeRoute::Arrow |
+            InventorySubTypeRoute::Bolt => Some(media_index::MediaCategory::Weapon),
+            InventorySubTypeRoute::Head |
+            InventorySubTypeRoute::Body |
+            InventorySubTypeRoute::Arms |
+            InventorySubTypeRoute::Legs => Some(media_index::MediaCategory::Armor),
+            InventorySubTypeRoute::Talisman => Some(media_index::MediaCategory::Accessory),
+            InventorySubTypeRoute::QuickItem |
+            InventorySubTypeRoute::Pouch => Some(media_index::MediaCategory::Goods),
+            InventorySubTypeRoute::None => None,
+        }
+    }
+
+    fn combo_box(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemTextures, index: usize, r#type: InventorySubTypeRoute) {
         let inventory_vm = &mut vm.slots[vm.index].inventory_vm;
         let equipment_vm = &mut vm.slots[vm.index].equipment_vm;
         ui.allocate_ui_with_layout(Vec2::new(EQUIPMENT_BOX_WIDTH, ui.available_height()), Layout::top_down(egui::Align::Center), |ui| {
             ui.group(|ui| {
                 ui.add_space(8.);
+
+                // id 0 is how every "Empty" slot is represented (see
+                // EquipmentViewModel::armor/talisman/item/projectile), so it
+                // is never a request worth making.
+                let equipped_id = match r#type {
+                    InventorySubTypeRoute::None => 0,
+                    InventorySubTypeRoute::WeaponLeft => equipment_vm.left_hand_armaments[index].id,
+                    InventorySubTypeRoute::WeaponRight => equipment_vm.right_hand_armaments[index].id,
+                    InventorySubTypeRoute::Head => equipment_vm.head.id,
+                    InventorySubTypeRoute::Body => equipment_vm.chest.id,
+                    InventorySubTypeRoute::Arms => equipment_vm.arms.id,
+                    InventorySubTypeRoute::Legs => equipment_vm.legs.id,
+                    InventorySubTypeRoute::Arrow => equipment_vm.arrows[index].id,
+                    InventorySubTypeRoute::Bolt => equipment_vm.bolts[index].id,
+                    InventorySubTypeRoute::Talisman => equipment_vm.talismans[index].id,
+                    InventorySubTypeRoute::QuickItem => equipment_vm.quickitems[index].id,
+                    InventorySubTypeRoute::Pouch => equipment_vm.pouch[index].id,
+                };
+                let texture = if equipped_id != 0 {
+                    media_category(&r#type).and_then(|category| textures.texture(media_index::key(category, equipped_id)))
+                } else {
+                    None
+                };
+                match texture {
+                    Some(handle) => {
+                        ui.image((handle.id(), egui::vec2(40., 40.)));
+                    }
+                    None => {
+                        let (rect, _) = ui.allocate_exact_size(egui::vec2(40., 40.), egui::Sense::hover());
+                        ui.painter().rect_filled(rect, 4.0, egui::Color32::from_black_alpha(40));
+                    }
+                }
+
                 ui.label(match r#type {
                     InventorySubTypeRoute::None => egui::RichText::new(""),
                     InventorySubTypeRoute::WeaponLeft => egui::RichText::new(format!("WeaponLeft{}", index+1)).strong(),
