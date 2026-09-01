@@ -3,11 +3,12 @@ pub mod equipment {
 
     use eframe::egui::{self, Color32, Layout, Ui, Vec2};
 
+    use crate::media::textures::ItemTextures;
     use crate::vm::{inventory::InventorySubTypeRoute, vm::vm::ViewModel};
 
-    const EQUIPMENT_BOX_WIDTH: f32 = 110.; 
+    const EQUIPMENT_BOX_WIDTH: f32 = 110.;
 
-    pub fn equipment(ui: &mut Ui, vm: &mut ViewModel) {
+    pub fn equipment(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemTextures) {
         egui::SidePanel::right("equipment_list").show(ui.ctx(), |ui| {
             side_panel(ui, vm);
         });

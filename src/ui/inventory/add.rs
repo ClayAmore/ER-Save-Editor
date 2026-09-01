@@ -3,20 +3,22 @@ use eframe::{egui::{self, Layout, Ui, Vec2}, epaint::Color32};
 use crate::{db::{
     accessory_name::accessory_name::ACCESSORY_NAME, aow_name::aow_name::AOW_NAME, aows::aows, armor_name::armor_name::ARMOR_NAME, armors::armor_sets, item_name::item_name::ITEM_NAME, items::items, talismans::talismans, weapon_name::weapon_name::WEAPON_NAME, weapons::weapons}, ui::custom::checkbox::checkbox::{
         three_states_checkbox, State
-    }, 
-    util::regulation::Regulation, 
+    },
+    media::{index::{self, MediaCategory}, textures::ItemTextures},
+    util::regulation::Regulation,
     vm::{
         inventory::{
             InventoryTypeRoute, InventoryViewModel
-        }, 
+        },
+        item_details,
         regulation::regulation_view_model::{
             GoodsType, RegulationViewModel, WepType
-        }, 
+        },
             vm::vm::ViewModel
         }
     };
 
-pub fn add(ui: &mut Ui, vm:&mut ViewModel) {
+pub fn add(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemTextures) {
     let regulation_vm = &mut vm.regulation;
     let inventory_vm = &mut vm.slots[vm.index].inventory_vm;
 
@@ -156,7 +158,7 @@ pub fn add(ui: &mut Ui, vm:&mut ViewModel) {
                 ui.vertical(|ui|{
                     // Single Item customization view
                     if inventory_vm.at_single_items {
-                        single_item_customization(ui,  inventory_vm, regulation_vm);
+                        single_item_customization(ui, inventory_vm, regulation_vm, textures);
                     }
                     // Bulk Item customization view
                     else {
@@ -364,10 +366,58 @@ fn bulk(ui: &mut Ui, inventory_vm: &mut InventoryViewModel) {
     });
 }
 
-fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel, regulation_vm: &mut RegulationViewModel) {
+fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel, regulation_vm: &mut RegulationViewModel, textures: &mut ItemTextures) {
     if !regulation_vm.selected_item.name.is_empty() {
         egui::Frame::none().inner_margin(8.).show(ui, |ui|{
-            ui.label(egui::RichText::new(regulation_vm.selected_item.name.to_string()).strong().heading().size(24.));
+            // The route already selects which regulation table `selected_item.id`
+            // came from, so it also picks the media category (the five equipment
+            // param tables are independent id spaces, see media::index) and which
+            // details function knows how to read that table.
+            let (category, details) = match inventory_vm.current_type_route {
+                InventoryTypeRoute::CommonItems | InventoryTypeRoute::KeyItems => (
+                    MediaCategory::Goods,
+                    item_details::simple_details(regulation_vm.selected_item.id),
+                ),
+                InventoryTypeRoute::Weapons => (
+                    MediaCategory::Weapon,
+                    item_details::weapon_details(regulation_vm.selected_item.id),
+                ),
+                InventoryTypeRoute::Armors => (
+                    MediaCategory::Armor,
+                    item_details::protector_details(regulation_vm.selected_item.id),
+                ),
+                InventoryTypeRoute::Talismans => (
+                    MediaCategory::Accessory,
+                    item_details::simple_details(regulation_vm.selected_item.id),
+                ),
+                InventoryTypeRoute::AshOfWar => (
+                    MediaCategory::AshOfWar,
+                    item_details::ash_details(regulation_vm.selected_item.id),
+                ),
+            };
+
+            ui.horizontal(|ui| {
+                match textures.texture(index::key(category, regulation_vm.selected_item.id)) {
+                    Some(handle) => {
+                        ui.image((handle.id(), egui::vec2(64., 64.)));
+                    }
+                    None => {
+                        // Normal for DLC content the dataset never covered.
+                        let (rect, _) = ui.allocate_exact_size(egui::vec2(64., 64.), egui::Sense::hover());
+                        ui.painter().rect_filled(rect, 4.0, egui::Color32::from_black_alpha(40));
+                    }
+                }
+                ui.label(egui::RichText::new(regulation_vm.selected_item.name.to_string()).strong().heading().size(24.));
+            });
+
+            if let Some(description) = &details.description {
+                ui.add_space(4.0);
+                ui.label(egui::RichText::new(description).size(11.).italics());
+            }
+            for (label, value) in &details.attributes {
+                ui.label(format!("{label}: {value}"));
+            }
+
             ui.add_space(8.);
 
             match inventory_vm.current_type_route {

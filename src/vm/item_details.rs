@@ -80,6 +80,13 @@ pub fn protector_details(param_id: u32) -> ItemDetails {
     details
 }
 
+pub fn ash_details(param_id: u32) -> ItemDetails {
+    ItemDetails {
+        description: description(MediaCategory::AshOfWar, param_id),
+        attributes: Vec::new(),
+    }
+}
+
 pub fn simple_details(param_id: u32) -> ItemDetails {
     let mut details = ItemDetails {
         description: None,

@@ -1,7 +1,8 @@
 use eframe::{egui::{self, Margin, TextFormat, Ui}, epaint::{text::LayoutJob, Color32}};
+use crate::media::textures::ItemTextures;
 use crate::vm::{inventory::InventoryTypeRoute, vm::vm::ViewModel};
 
-pub fn browse_inventory(ui: &mut Ui, vm:&mut ViewModel) {
+pub fn browse_inventory(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemTextures) {
     let inventory_vm = &mut vm.slots[vm.index].inventory_vm;
     
     ui.columns(2, |uis| {
