@@ -245,10 +245,10 @@ pub mod bnd4 {
 
     impl Binder {
         fn get_bnd4_header_size(format: Format) -> i64 {
+            // 0x10 covers the flags, the -1 marker and the compressed size.
             let mut size = 0x10;
-            if Binder::has_long_offsets(format) {
-                size += 8;
-            }
+            // The data offset is always present, as an i64 or an i32.
+            size += if Binder::has_long_offsets(format) { 8 } else { 4 };
             if Binder::has_compression(format) {
                 size += 8;
             }
@@ -341,7 +341,8 @@ pub mod bnd4 {
 
             assert_eq!(br.read_u8()?, 0);
             self.big_endian = br.read_bool()?;
-            self.bit_big_endian = br.read_bool()?;
+            // Stored inverted: a 0 here means the format bits are in reverse order.
+            self.bit_big_endian = !br.read_bool()?;
             assert_eq!(br.read_u8()?, 0);
 
             br.set_endian(if self.big_endian {binary_reader::Endian::Big} else {Endian::Little});
@@ -382,6 +383,7 @@ pub mod bnd4 {
                 ((raw_format & 0b01000000) >> 5) |
                 ((raw_format & 0b10000000) >> 7)) as u8)
             };
+            self.format = format;
 
             let b = br.read_u8()?;
             self.extended = -1;
@@ -415,7 +417,7 @@ pub mod bnd4 {
                 assert_eq!(br.read_i64()?, 0);
             }
 
-            if file_header_size != Binder::get_bnd4_header_size(format) {
+            if file_header_size != Binder::get_bnd4_header_size(self.format) {
                 panic!("File header size for format {} is expected to be {:#X}, but was {:#X}", self.format.as_i32(), Binder::get_bnd4_header_size(self.format), file_header_size);
             }
 

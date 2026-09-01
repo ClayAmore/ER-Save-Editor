@@ -62,6 +62,7 @@ pub struct App {
     current_route: Route,
     importer_vm: ImporterViewModel,
     importer_open: bool,
+    error: Option<String>,
 }
 
 impl App {
@@ -72,14 +73,42 @@ impl App {
             current_route: Route::None,
             vm: ViewModel::default(),
             importer_vm: Default::default(),
-            importer_open: Default::default()
+            importer_open: Default::default(),
+            error: None
+        }
+    }
+
+    // The parsers assert their way through the save layout, so a file this build
+    // does not understand surfaces as a panic rather than an Err. Every load
+    // goes through here so a bad file reports itself instead of killing the
+    // window with no message.
+    fn guarded<T>(load: impl FnOnce() -> Result<T, std::io::Error>) -> Result<T, String> {
+        match std::panic::catch_unwind(std::panic::AssertUnwindSafe(load)) {
+            Ok(Ok(value)) => Ok(value),
+            Ok(Err(err)) => Err(format!("Could not read this file: {err}")),
+            Err(_) => Err(
+                "Could not read this file. It is either not an Elden Ring save, or it comes from a game patch this build cannot parse yet."
+                    .to_string(),
+            ),
         }
     }
 
     fn open(&mut self, path: PathBuf) {
-        self.save = Save::from_path(&path).expect("Failed to read save");
-        self.vm = ViewModel::from_save(&self.save);
-        self.picked_path = path.clone();
+        let loaded = Self::guarded(|| {
+            let save = Save::from_path(&path)?;
+            let vm = ViewModel::from_save(&save);
+            Ok((save, vm))
+        });
+
+        match loaded {
+            Ok((save, vm)) => {
+                self.error = None;
+                self.save = save;
+                self.vm = vm;
+                self.picked_path = path;
+            }
+            Err(err) => self.error = Some(err),
+        }
     }
 
     fn save(&mut self, path: PathBuf) {
@@ -97,6 +126,7 @@ impl App {
     fn open_file_dialog() -> Option<PathBuf> {
         FileDialog::new()
         .add_filter("SL2", &["sl2", "Regular Save File"])
+        .add_filter("CO2", &["co2", "Seamless Co-op Save File"])
         .add_filter("TXT", &["txt", "Save Wizard Exported TXT File"])
         .add_filter("*", &["*", "All files"])
         .set_directory("/")
@@ -106,6 +136,7 @@ impl App {
     fn save_file_dialog() -> Option<PathBuf> {
         FileDialog::new()
         .add_filter("SL2", &["sl2", "Regular Save File"])
+        .add_filter("CO2", &["co2", "Seamless Co-op Save File"])
         .add_filter("TXT", &["txt", "Save Wizard Exported TXT File"])
         .add_filter("*", &["*", "Any format"])
         .set_directory("/")
@@ -143,12 +174,17 @@ impl eframe::App for App {
                         let files = Self::open_file_dialog();
                         match files {
                             Some(path) => {
-                                match Save::from_path(&path) {
-                                    Ok(save) => {
-                                        self.importer_vm = ImporterViewModel::new(save, &self.vm);
+                                let current = &self.vm;
+                                let imported = Self::guarded(|| {
+                                    let save = Save::from_path(&path)?;
+                                    Ok(ImporterViewModel::new(save, current))
+                                });
+                                match imported {
+                                    Ok(importer_vm) => {
+                                        self.importer_vm = importer_vm;
                                         self.importer_open = true;
-                                    },
-                                    Err(_) => {},
+                                    }
+                                    Err(err) => self.error = Some(err),
                                 }
                             },
                             None => {},
@@ -158,6 +194,12 @@ impl eframe::App for App {
                 });
             });
 
+
+            if let Some(error) = &self.error {
+                ui.horizontal_wrapped(|ui| {
+                    ui.label(RichText::new(error).color(Color32::DARK_RED));
+                });
+            }
         });
 
         // TOP PANEL
@@ -306,5 +348,205 @@ impl eframe::App for App {
                 });
             });
         }
+    }
+}
+
+#[cfg(test)]
+mod save_round_trip {
+    use super::*;
+    use crate::util::regulation::Regulation;
+
+    // Uses real saves, which are not part of the repo. Drop your own
+    // ER0000.sl2 / ER0000.co2 into saves/ to run this.
+    pub fn saves_on_disk() -> Vec<PathBuf> {
+        let dir = match std::fs::read_dir("saves") {
+            Ok(dir) => dir,
+            Err(_) => return Vec::new(),
+        };
+        let mut found: Vec<PathBuf> = dir
+            .filter_map(|e| e.ok().map(|e| e.path()))
+            .filter(|p| {
+                matches!(
+                    p.extension().and_then(|e| e.to_str()),
+                    Some("sl2") | Some("co2")
+                )
+            })
+            .collect();
+        found.sort();
+        found
+    }
+
+    #[test]
+    fn reads_current_patch_save_and_writes_it_back_unchanged() {
+        let saves = saves_on_disk();
+        if saves.is_empty() {
+            eprintln!("skipping: no saves in saves/");
+            return;
+        }
+        for path in saves {
+            println!("--- {} ---", path.display());
+            round_trip(&path);
+        }
+    }
+
+    fn round_trip(path: &PathBuf) {
+        let original = std::fs::read(path).expect("read save file");
+        let save = Save::from_path(path).expect("save failed to parse");
+
+        // init_params swallows errors, so check the regulation separately.
+        let params = Regulation::params_from_regulation(save.save_type.get_regulation())
+            .expect("regulation failed to parse");
+        assert!(!params.is_empty(), "no params came out of the regulation");
+
+        let vm = ViewModel::from_save(&save);
+        assert_eq!(vm.active, Some(true), "validator rejected the save");
+
+        // Writing back an unedited save must reproduce the file exactly.
+        let rewritten = save.write().expect("save failed to serialize");
+        assert_eq!(rewritten.len(), original.len(), "size changed on round trip");
+        assert!(rewritten == original, "round trip lost or altered data");
+    }
+}
+
+#[cfg(test)]
+mod stat_edit {
+    use super::*;
+    use crate::save::save::save::Save;
+
+    #[test]
+    fn edited_stat_survives_a_save_and_reload() {
+        let saves = crate::save_round_trip::saves_on_disk();
+        if saves.is_empty() {
+            eprintln!("skipping: no saves in saves/");
+            return;
+        }
+        for path in saves {
+            println!("--- {} ---", path.display());
+            edit_and_reload(&path);
+        }
+    }
+
+    fn edit_and_reload(path: &PathBuf) {
+        let original_len = std::fs::metadata(path).expect("stat save").len();
+        let mut save = Save::from_path(path).expect("save failed to parse");
+        let mut vm = ViewModel::from_save(&save);
+
+        let before = vm.slots[0].stats_vm.clone();
+        println!("before: vigor {} level {}", before.vigor, before.level);
+
+        vm.slots[0].stats_vm.vigor = before.vigor + 1;
+        vm.update_save(&mut save.save_type);
+
+        let out = PathBuf::from("target/edited.sl2");
+
+        std::fs::write(&out, save.write().expect("serialize")).expect("write edited save");
+        assert_eq!(
+            std::fs::metadata(&out).expect("stat edited").len(),
+            original_len,
+            "edited save changed size"
+        );
+
+        let reloaded = Save::from_path(&out).expect("edited save no longer parses");
+        let vm2 = ViewModel::from_save(&reloaded);
+        assert_eq!(vm2.active, Some(true), "validator rejected the edited save");
+
+        let after = &vm2.slots[0].stats_vm;
+        println!("after:  vigor {} level {}", after.vigor, after.level);
+        assert_eq!(after.vigor, before.vigor + 1, "vigor did not persist");
+        assert_eq!(after.level, before.level + 1, "level was not recalculated");
+
+        // Only the edited character should have moved.
+        assert_eq!(vm2.slots[1].stats_vm.vigor, vm.slots[1].stats_vm.vigor);
+        assert_eq!(
+            vm2.slots[1].general_vm.character_name,
+            vm.slots[1].general_vm.character_name
+        );
+    }
+}
+
+#[cfg(test)]
+mod bad_file {
+    use super::*;
+
+    // Mirrors what App::open does, so a file it cannot parse reports an error
+    // instead of taking the process down with no message.
+    fn try_load(path: &PathBuf) -> Result<(), ()> {
+        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let save = Save::from_path(path).map_err(|_| ())?;
+            ViewModel::from_save(&save);
+            Ok(())
+        }))
+        .unwrap_or(Err(()))
+    }
+
+    #[test]
+    fn unparseable_files_are_caught_not_fatal() {
+        let prev = std::panic::take_hook();
+        std::panic::set_hook(Box::new(|_| {}));
+
+        let junk = PathBuf::from("target/junk.sl2");
+        std::fs::write(&junk, vec![0u8; 1024]).expect("write junk");
+        assert!(try_load(&junk).is_err(), "junk file should not load");
+
+        // A real BND4 magic but nothing valid behind it.
+        let mut truncated = b"BND4".to_vec();
+        truncated.extend(vec![0u8; 4096]);
+        let trunc = PathBuf::from("target/truncated.sl2");
+        std::fs::write(&trunc, truncated).expect("write truncated");
+        assert!(try_load(&trunc).is_err(), "truncated file should not load");
+
+        std::panic::set_hook(prev);
+    }
+}
+
+#[cfg(test)]
+mod modded_saves {
+    use super::*;
+    use crate::util::regulation::Regulation;
+
+    // A Seamless Co-op save (.co2) has the same layout but can carry items the
+    // vanilla regulation does not list.
+    #[test]
+    fn co_op_saves_load_and_are_editable() {
+        let path = PathBuf::from("saves/ER0000.co2");
+        if !path.exists() {
+            eprintln!("skipping: no saves/ER0000.co2");
+            return;
+        }
+
+        let save = Save::from_path(&path).expect("co2 failed to parse");
+        let vm = ViewModel::from_save(&save);
+        assert_eq!(vm.active, Some(true), "co2 was rejected as irregular");
+
+        let active: Vec<usize> = save.save_type.active_slots().iter().enumerate()
+            .filter(|(_, a)| **a).map(|(i, _)| i).collect();
+        assert!(!active.is_empty(), "no characters found in the co2");
+        for i in &active {
+            println!("co2 slot {i}: '{}'", vm.slots[*i].general_vm.character_name);
+        }
+    }
+
+    // Every save brings its own regulation, so the derived maps must follow it.
+    #[test]
+    fn param_maps_follow_the_loaded_save() {
+        let saves = crate::save_round_trip::saves_on_disk();
+        if saves.len() < 2 {
+            eprintln!("skipping: need two saves");
+            return;
+        }
+        let mut counts = Vec::new();
+        for path in &saves {
+            let save = Save::from_path(path).expect("parse");
+            Regulation::init_params(&save);
+            counts.push(Regulation::equip_goods_param_map().len());
+        }
+        let first = Save::from_path(&saves[0]).expect("parse");
+        Regulation::init_params(&first);
+        assert_eq!(
+            Regulation::equip_goods_param_map().len(),
+            counts[0],
+            "param maps did not follow the reloaded save"
+        );
+        assert_ne!(counts[0], counts[1], "expected the saves to differ");
     }
 }

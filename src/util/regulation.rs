@@ -2,7 +2,7 @@ use std::{collections::HashMap, io::Error, str::FromStr, sync::{Mutex, RwLock}};
 
 use aes::cipher::{block_padding::NoPadding, BlockDecryptMut, KeyIvInit};
 use binary_reader::{BinaryReader, Endian};
-use once_cell::sync::{Lazy, OnceCell};
+use once_cell::sync::Lazy;
 
 use crate::{db::{accessory_name::accessory_name::ACCESSORY_NAME, aow_name::aow_name::AOW_NAME, armor_name::armor_name::ARMOR_NAME, item_name::item_name::ITEM_NAME, weapon_name::weapon_name::WEAPON_NAME}, save::save::save::Save, util::{param_structs::{EQUIP_PARAM_ACCESSORY_ST, EQUIP_PARAM_GEM_ST, EQUIP_PARAM_GOODS_ST, EQUIP_PARAM_PROTECTOR_ST, EQUIP_PARAM_WEAPON_ST}, params::params::{Row, PARAM}}};
 
@@ -10,64 +10,89 @@ use super::{bnd4::bnd4::BND4, params::params::Param};
 
 pub static PARAMS: Lazy<RwLock<HashMap<Param, Vec<u8>>>> = Lazy::new(|| RwLock::new(Default::default()));
 
+// md5 of the regulation the maps below were built from.
+static LOADED_REGULATION: RwLock<Option<[u8; 16]>> = RwLock::new(None);
+
+// Built on demand and rebuilt whenever a save brings a different regulation.
+// The maps are handed out as &'static, so a rebuild leaks the previous one;
+// that is bounded by the number of distinct regulations opened in a session.
+static ACCESSORY_PARAM_MAP: RwLock<Option<&'static HashMap<u32, Row<EQUIP_PARAM_ACCESSORY_ST>>>> = RwLock::new(None);
+static GEM_PARAM_MAP: RwLock<Option<&'static HashMap<u32, Row<EQUIP_PARAM_GEM_ST>>>> = RwLock::new(None);
+static GOOD_PARAM_MAP: RwLock<Option<&'static HashMap<u32, Row<EQUIP_PARAM_GOODS_ST>>>> = RwLock::new(None);
+static PROTECTOR_PARAM_MAP: RwLock<Option<&'static HashMap<u32, Row<EQUIP_PARAM_PROTECTOR_ST>>>> = RwLock::new(None);
+static WEAPON_PARAM_MAP: RwLock<Option<&'static HashMap<u32, Row<EQUIP_PARAM_WEAPON_ST>>>> = RwLock::new(None);
+
 pub struct Regulation;
 
 impl Regulation {
     pub fn init_params(save: &Save) {
-        let res = Regulation::params_from_regulation(save.save_type.get_regulation());
+        let regulation = save.save_type.get_regulation();
+        let res = Regulation::params_from_regulation(regulation);
 
-        
         match res {
             Ok(res) => *PARAMS.write().unwrap() = res,
             Err(err) => println!("{err}"),
         }
 
-        
+        // Each save carries its own regulation, so the derived lookup maps are
+        // only valid for the save they were built from. Dropping them when a
+        // different regulation shows up keeps a second save from being read
+        // against the first one's params.
+        let digest = md5::compute(regulation).0;
+        let mut loaded = LOADED_REGULATION.write().unwrap();
+        if *loaded != Some(digest) {
+            *loaded = Some(digest);
+            ACCESSORY_PARAM_MAP.write().unwrap().take();
+            GEM_PARAM_MAP.write().unwrap().take();
+            GOOD_PARAM_MAP.write().unwrap().take();
+            PROTECTOR_PARAM_MAP.write().unwrap().take();
+            WEAPON_PARAM_MAP.write().unwrap().take();
+        }
     }
 
     pub fn equip_accessory_param_map() -> &'static HashMap<u32, Row<EQUIP_PARAM_ACCESSORY_ST>> {
-        static ACCESSORY_PARAM_MAP: OnceCell<HashMap<u32, Row<EQUIP_PARAM_ACCESSORY_ST>>> = OnceCell::new();
-        ACCESSORY_PARAM_MAP.get_or_init(|| { 
-            let mut map = Self::get_param_map::<EQUIP_PARAM_ACCESSORY_ST>(&Param::EquipParamAccessory);
-            Self::try_fill_names::<EQUIP_PARAM_ACCESSORY_ST>(&mut map, &ACCESSORY_NAME);
-            map
-        })
+        if let Some(map) = *ACCESSORY_PARAM_MAP.read().unwrap() { return map; }
+        let mut map = Self::get_param_map::<EQUIP_PARAM_ACCESSORY_ST>(&Param::EquipParamAccessory);
+        Self::try_fill_names::<EQUIP_PARAM_ACCESSORY_ST>(&mut map, &ACCESSORY_NAME);
+        let map: &'static HashMap<u32, Row<EQUIP_PARAM_ACCESSORY_ST>> = Box::leak(Box::new(map));
+        *ACCESSORY_PARAM_MAP.write().unwrap() = Some(map);
+        map
     }
 
     pub fn equip_gem_param_map() -> &'static HashMap<u32, Row<EQUIP_PARAM_GEM_ST>> {
-        static GEM_PARAM_MAP: OnceCell<HashMap<u32, Row<EQUIP_PARAM_GEM_ST>>> = OnceCell::new();
-        GEM_PARAM_MAP.get_or_init(|| { 
-            let mut map = Self::get_param_map::<EQUIP_PARAM_GEM_ST>(&Param::EquipParamGem); 
-            Self::try_fill_names::<EQUIP_PARAM_GEM_ST>(&mut map, &AOW_NAME);
-            map
-        })
+        if let Some(map) = *GEM_PARAM_MAP.read().unwrap() { return map; }
+        let mut map = Self::get_param_map::<EQUIP_PARAM_GEM_ST>(&Param::EquipParamGem);
+        Self::try_fill_names::<EQUIP_PARAM_GEM_ST>(&mut map, &AOW_NAME);
+        let map: &'static HashMap<u32, Row<EQUIP_PARAM_GEM_ST>> = Box::leak(Box::new(map));
+        *GEM_PARAM_MAP.write().unwrap() = Some(map);
+        map
     }
 
     pub fn equip_goods_param_map() -> &'static HashMap<u32, Row<EQUIP_PARAM_GOODS_ST>> {
-        static GOOD_PARAM_MAP: OnceCell<HashMap<u32, Row<EQUIP_PARAM_GOODS_ST>>> = OnceCell::new();
-        GOOD_PARAM_MAP.get_or_init(|| { 
-            let mut map = Self::get_param_map::<EQUIP_PARAM_GOODS_ST>(&Param::EquipParamGoods); 
-            Self::try_fill_names::<EQUIP_PARAM_GOODS_ST>(&mut map, &ITEM_NAME);
-            map
-        })
+        if let Some(map) = *GOOD_PARAM_MAP.read().unwrap() { return map; }
+        let mut map = Self::get_param_map::<EQUIP_PARAM_GOODS_ST>(&Param::EquipParamGoods);
+        Self::try_fill_names::<EQUIP_PARAM_GOODS_ST>(&mut map, &ITEM_NAME);
+        let map: &'static HashMap<u32, Row<EQUIP_PARAM_GOODS_ST>> = Box::leak(Box::new(map));
+        *GOOD_PARAM_MAP.write().unwrap() = Some(map);
+        map
     }
 
     pub fn equip_protectors_param_map() -> &'static HashMap<u32, Row<EQUIP_PARAM_PROTECTOR_ST>> {
-        static PROTECTOR_PARAM_MAP: OnceCell<HashMap<u32, Row<EQUIP_PARAM_PROTECTOR_ST>>> = OnceCell::new();
-        PROTECTOR_PARAM_MAP.get_or_init(|| { 
-            let mut map = Self::get_param_map::<EQUIP_PARAM_PROTECTOR_ST>(&Param::EquipParamProtector); 
-            Self::try_fill_names::<EQUIP_PARAM_PROTECTOR_ST>(&mut map, &ARMOR_NAME);
-            map
-        })
+        if let Some(map) = *PROTECTOR_PARAM_MAP.read().unwrap() { return map; }
+        let mut map = Self::get_param_map::<EQUIP_PARAM_PROTECTOR_ST>(&Param::EquipParamProtector);
+        Self::try_fill_names::<EQUIP_PARAM_PROTECTOR_ST>(&mut map, &ARMOR_NAME);
+        let map: &'static HashMap<u32, Row<EQUIP_PARAM_PROTECTOR_ST>> = Box::leak(Box::new(map));
+        *PROTECTOR_PARAM_MAP.write().unwrap() = Some(map);
+        map
     }
 
     pub fn equip_weapon_params_map() -> &'static HashMap<u32, Row<EQUIP_PARAM_WEAPON_ST>> {
-        static WEAPON_PARAM_MAP: OnceCell<HashMap<u32, Row<EQUIP_PARAM_WEAPON_ST>>> = OnceCell::new();
-        WEAPON_PARAM_MAP.get_or_init(|| { 
-            let mut map = Self::get_param_map::<EQUIP_PARAM_WEAPON_ST>(&Param::EquipParamWeapon); 
-            Self::try_fill_names::<EQUIP_PARAM_WEAPON_ST>(&mut map, &WEAPON_NAME);
-            map
-        })
+        if let Some(map) = *WEAPON_PARAM_MAP.read().unwrap() { return map; }
+        let mut map = Self::get_param_map::<EQUIP_PARAM_WEAPON_ST>(&Param::EquipParamWeapon);
+        Self::try_fill_names::<EQUIP_PARAM_WEAPON_ST>(&mut map, &WEAPON_NAME);
+        let map: &'static HashMap<u32, Row<EQUIP_PARAM_WEAPON_ST>> = Box::leak(Box::new(map));
+        *WEAPON_PARAM_MAP.write().unwrap() = Some(map);
+        map
     }
 
     fn get_param_map<T>(param: &Param) -> HashMap<u32, Row<T>> where T: Default + Clone {
