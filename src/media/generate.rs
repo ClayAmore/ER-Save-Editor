@@ -12,6 +12,7 @@ mod generator {
         armor_name::armor_name::ARMOR_NAME, item_name::item_name::ITEM_NAME,
         weapon_name::weapon_name::WEAPON_NAME,
     };
+    use crate::media::index::{key, MediaCategory};
     use crate::media::name_match::normalise;
 
     const BASE: &str = "https://eldenring.fanapis.com/api";
@@ -79,17 +80,21 @@ mod generator {
             api.insert(group, by_name);
         }
 
-        let tables: [(&str, Vec<(u32, String)>); 5] = [
-            ("weapons", WEAPON_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
-            ("goods", ITEM_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
-            ("armor", ARMOR_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
-            ("talismans", ACCESSORY_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
-            ("ashes", AOW_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
+        // Each group is keyed under its own category offset (see
+        // media::index::MediaCategory) so that a weapon, an armor piece, a
+        // talisman, a good and an ash of war that happen to share a raw
+        // param id never collide in the emitted index.
+        let tables: [(&str, MediaCategory, Vec<(u32, String)>); 5] = [
+            ("weapons", MediaCategory::Weapon, WEAPON_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
+            ("goods", MediaCategory::Goods, ITEM_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
+            ("armor", MediaCategory::Armor, ARMOR_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
+            ("talismans", MediaCategory::Accessory, ACCESSORY_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
+            ("ashes", MediaCategory::AshOfWar, AOW_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
         ];
 
         let mut out: HashMap<String, serde_json::Value> = HashMap::new();
         println!("\ncoverage");
-        for (group, rows) in &tables {
+        for (group, category, rows) in &tables {
             let lookup = &api[group];
             let mut matched = 0usize;
             let mut named = 0usize;
@@ -103,7 +108,7 @@ mod generator {
                     Some((image, desc)) => {
                         matched += 1;
                         out.insert(
-                            id.to_string(),
+                            key(*category, *id).to_string(),
                             serde_json::json!({"image_url": image, "description": desc}),
                         );
                     }
