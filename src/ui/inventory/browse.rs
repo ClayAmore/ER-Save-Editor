@@ -1,6 +1,6 @@
 use eframe::{egui::{self, Margin, TextFormat, Ui}, epaint::{text::LayoutJob, Color32}};
-use crate::media::textures::ItemTextures;
-use crate::vm::{inventory::InventoryTypeRoute, vm::vm::ViewModel};
+use crate::media::{index, textures::ItemTextures};
+use crate::vm::{inventory::{InventoryGaitemType, InventoryTypeRoute}, vm::vm::ViewModel};
 
 pub fn browse_inventory(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemTextures) {
     let inventory_vm = &mut vm.slots[vm.index].inventory_vm;
@@ -102,6 +102,31 @@ pub fn browse_inventory(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemText
         egui::Grid::new("browse_body").spacing([8., 8.]).min_col_width(ui.available_width()/4.).striped(true).show(ui, |ui| {
             for i in row_range {
                 let item = &current_inventory_list[i];
+
+                // The item's own type is authoritative for which of the five
+                // equipment param tables item_id came from (the current route
+                // is not, e.g. Browse shows mixed types); EMPTY draws the
+                // placeholder without requesting anything. Only rows the
+                // scroll area actually renders reach this code, so only
+                // visible icons are ever requested.
+                let media_category = match item.r#type {
+                    InventoryGaitemType::WEAPON => Some(index::MediaCategory::Weapon),
+                    InventoryGaitemType::ARMOR => Some(index::MediaCategory::Armor),
+                    InventoryGaitemType::ACCESSORY => Some(index::MediaCategory::Accessory),
+                    InventoryGaitemType::ITEM => Some(index::MediaCategory::Goods),
+                    InventoryGaitemType::AOW => Some(index::MediaCategory::AshOfWar),
+                    InventoryGaitemType::EMPTY => None,
+                };
+                let texture = media_category.and_then(|category| textures.texture(index::key(category, item.item_id)));
+                match texture {
+                    Some(handle) => {
+                        ui.image((handle.id(), egui::vec2(24., 24.)));
+                    }
+                    None => {
+                        ui.allocate_exact_size(egui::vec2(24., 24.), egui::Sense::hover());
+                    }
+                }
+
                 ui.label(format!("{}",item.item_id));
                 ui.add(egui::Label::new(item.item_name.to_string()).wrap(true));
                 ui.label(format!("{}",item.quantity));
