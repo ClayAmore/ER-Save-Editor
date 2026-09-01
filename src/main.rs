@@ -6,6 +6,7 @@ mod read;
 mod write;
 mod ui;
 mod db;
+mod media;
 
 use std::{fs::File, io::Write, path::PathBuf};
 
