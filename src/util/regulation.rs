@@ -135,11 +135,21 @@ impl Regulation {
     }
 
     fn get_param_map<T>(param: &Param) -> HashMap<u32, Row<T>> where T: Default + Clone {
-        PARAM::<T>::from_bytes(&PARAMS.read().unwrap()[param])
-            .unwrap()
-            .rows.into_iter()
-            .map(|row| (row.id, row))
-            .collect::<HashMap<u32, Row<T>>>()
+        // No save loaded yet (or its regulation failed to parse) leaves
+        // PARAMS empty. That is a normal state, not an error, so item
+        // detail lookups against it return "no data" rather than panicking.
+        let params = PARAMS.read().unwrap();
+        let bytes = match params.get(param) {
+            Some(bytes) => bytes,
+            None => return HashMap::new(),
+        };
+        match PARAM::<T>::from_bytes(bytes) {
+            Ok(parsed) => parsed
+                .rows.into_iter()
+                .map(|row| (row.id, row))
+                .collect::<HashMap<u32, Row<T>>>(),
+            Err(_) => HashMap::new(),
+        }
     }
     
     fn try_fill_names<T>(rows: &mut HashMap<u32, Row<T>>, map: &Lazy<Mutex<HashMap<u32, &str>>>) where T: Default + Clone {
