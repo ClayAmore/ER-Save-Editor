@@ -26,6 +26,8 @@ impl ItemTextures {
         }
     }
 
+    // Test-only observability: the miss-remembering test counts states.
+    #[cfg(test)]
     pub fn state_count(&self) -> usize {
         self.state.len()
     }

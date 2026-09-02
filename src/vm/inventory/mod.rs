@@ -184,7 +184,6 @@ impl InventoryItemViewModel {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Default, Clone)]
 pub struct InventoryStorage {
     pub common_items: Vec<InventoryItemViewModel>,
@@ -195,7 +194,6 @@ pub struct InventoryStorage {
     pub filtered_weapons: Vec<InventoryItemViewModel>,
     pub filtered_armors: Vec<InventoryItemViewModel>,
     pub filtered_aows: Vec<InventoryItemViewModel>,
-    pub filtered_projectiles: Vec<InventoryItemViewModel>,
     pub filtered_accessories: Vec<InventoryItemViewModel>,
 
     pub common_item_count: u32,
@@ -204,7 +202,6 @@ pub struct InventoryStorage {
     pub next_equip_index: u32,
 }
 
-#[allow(dead_code)]
 #[derive(Default, Clone)]
 pub struct InventoryViewModel  {
     // Navigation
@@ -218,7 +215,6 @@ pub struct InventoryViewModel  {
     // Data
     pub filter_text: String,
     pub storage: Vec<InventoryStorage>,
-    pub infusions: Vec<(i32, String)>,
     pub gaitem_map: Vec<GaItem>,
     pub projectile_list: EquipProjectileData,
     pub gaitem_data: GaItemData,

@@ -50,35 +50,12 @@ pub mod bnd4 {
         }
     }
 
-    // I am only using this to read the regulation so I am setting this to (DCX_DFLT_11000_44_9_15 = 10)
-    bitflags::bitflags! {
-        #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Hash)]
-        pub struct CompressionType: u8 {
-            const Unkown = 0;
-            const None = 1;
-            const Zlib = 2;
-            const Dcp_edge = 3 ;
-            const Dcp_dflt = 4;
-            const Dcx_edge = 5;
-            const Dcx_dflt_10000_24_9 = 6 ;
-            const Dcx_dflt_10000_44_9 = 7 ;
-            const Dcx_dflt_11000_44_8 = 8;
-            const Dcx_dflt_11000_44_9 = 9 ;
-            const Dcx_dflt_11000_44_9_15 = 10;
-            const Dcx_krak = 11;
-        }
-    }
-
-    #[allow(dead_code)]
     #[derive(Default)]
     pub struct BinderFile {
         pub flags: FileFlags,
         pub id: i32,
         pub name: String,
         pub bytes: Vec<u8>,
-        pub compression_type: CompressionType,
-        pub uncompressed_size: i64,
-        pub data_offset: i64,
     }
     impl BinderFile {
         pub fn new(
@@ -96,14 +73,11 @@ pub mod bnd4 {
         }
     }
 
-    #[allow(unused)]
     #[derive(Default)]
     pub struct BinderHeader {
         file_flags: FileFlags,
         id: i32,
         name: String,
-        compression_type: CompressionType,
-        compressed_size: i64,
         uncompressed_size: i64,
         data_offset: i64,
     }
@@ -111,7 +85,6 @@ pub mod bnd4 {
     impl BinderHeader {
         pub fn read_file_data(&self, br: &mut BinaryReader) -> Result<BinderFile, Error> {
             let mut bytes: Vec<u8> = Vec::new();
-            let _compression_type = CompressionType::Zlib;
 
             if Binder::is_compressed(self.file_flags) {
                 todo!();
@@ -151,8 +124,7 @@ pub mod bnd4 {
             assert_eq!(br.read_u8()?, 0);
             assert_eq!(br.read_i32()?, -1);
 
-            let compressed_size = br.read_i64()?;
-            
+            br.read_i64()?;
             let uncompressed_size = if Binder::has_compression(format) { 
                 br.read_i64()?
             }
@@ -232,8 +204,6 @@ pub mod bnd4 {
                 file_flags: FileFlags::from_bits_truncate(file_flags as u8),
                 id,
                 name,
-                compression_type: CompressionType::Dcx_dflt_11000_44_9_15,
-                compressed_size,
                 uncompressed_size,
                 data_offset,
             })
@@ -306,15 +276,6 @@ pub mod bnd4 {
             bnd4.unicode = true;
             bnd4.extended = 4;
             bnd4
-        }
-
-        #[allow(unused)]
-        pub fn is(&self, br: &mut BinaryReader) -> bool {
-            if br.length < 4 {
-                return false;
-            }
-            let magic = br.read_bytes(4).unwrap();
-            magic == b"BND4"
         }
 
         pub fn from_bytes(bytes: &[u8]) -> Result<BND4, Error>{

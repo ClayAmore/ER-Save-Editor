@@ -61,9 +61,7 @@ pub mod classes {
         }
     }
 
-    #[allow(dead_code)]
     pub struct Stats {
-        pub level: u32,
         pub vigor: u32,
         pub mind: u32,
         pub endurance: u32,
@@ -79,7 +77,6 @@ pub mod classes {
     pub static STARTER_CLASSES: Lazy<Mutex<HashMap<ArcheType,Stats>>> = Lazy::new(|| {
         Mutex::new(HashMap::from([
             (ArcheType::Vagabond, Stats{
-                level: 9,
                 vigor: 15,
                 mind: 10,
                 endurance: 11,
@@ -91,7 +88,6 @@ pub mod classes {
             }),
             
             (ArcheType::Warrior, Stats{
-                level: 8,
                 vigor: 11,
                 mind: 12,
                 endurance: 11,
@@ -111,11 +107,9 @@ pub mod classes {
                 intelligence: 7,
                 faith: 8,
                 arcane: 11,
-                level: 7,
             }),
             
             (ArcheType::Bandit, Stats{
-                level: 5,
                 vigor: 10,
                 mind: 11,
                 endurance: 10,
@@ -127,7 +121,6 @@ pub mod classes {
             }),
             
             (ArcheType::Astrologer, Stats{
-                level: 6,
                 vigor: 9,
                 mind: 15,
                 endurance: 9,
@@ -139,7 +132,6 @@ pub mod classes {
             }),
             
             (ArcheType::Prophet, Stats{
-                level: 7,
                 vigor: 10,
                 mind: 14,
                 endurance: 8,
@@ -151,7 +143,6 @@ pub mod classes {
             }),
             
             (ArcheType::Samurai, Stats{
-                level: 9,
                 vigor: 12,
                 mind: 11,
                 endurance: 13,
@@ -163,7 +154,6 @@ pub mod classes {
             }),
             
             (ArcheType::Prisoner, Stats{
-                level: 9,
                 vigor: 11,
                 mind: 12,
                 endurance: 11,
@@ -175,7 +165,6 @@ pub mod classes {
             }),
             
             (ArcheType::Confessor, Stats{
-                level: 10,
                 vigor: 10,
                 mind: 13,
                 endurance: 10,
@@ -187,7 +176,6 @@ pub mod classes {
             }),
             
             (ArcheType::Wretch, Stats{
-                level: 1,
                 vigor: 10,
                 mind: 10,
                 endurance: 10,
@@ -199,7 +187,6 @@ pub mod classes {
             }),
 
             (ArcheType::IdusKnight, Stats{
-                level: 7,
                 vigor: 10,
                 mind: 12,
                 endurance: 11,
@@ -211,7 +198,6 @@ pub mod classes {
             }),
 
             (ArcheType::HeavyKnight, Stats{
-                level: 10,
                 vigor: 14,
                 mind: 8,
                 endurance: 17,
@@ -226,7 +212,6 @@ pub mod classes {
             // from a future patch still opens. Wretch minimums are the floor
             // the game allows for every class.
             (ArcheType::Unknown, Stats{
-                level: 1,
                 vigor: 10,
                 mind: 10,
                 endurance: 10,

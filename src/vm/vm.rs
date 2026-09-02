@@ -78,7 +78,7 @@ pub mod vm {
             // Get active characters
             for (index, active) in save.save_type.active_slots().iter().enumerate() {
                 if *active {
-                    vm.profile_summary[index] = ProfileSummaryViewModel::from_save(&save.save_type.get_profile_summary(index));
+                    vm.profile_summary[index] = ProfileSummaryViewModel { active: true };
                     vm.slots[index] = SlotViewModel::from_save(&save.save_type.get_slot(index));
                 }
             }

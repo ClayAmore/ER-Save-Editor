@@ -1,17 +1,8 @@
 use std::collections::HashMap;
 
 use once_cell::sync::Lazy;
-use rust_embed::RustEmbed;
 use serde::Deserialize;
 
-// Only the generated index is embedded; assets/ also holds large icon
-// artwork that has no business in the binary.
-#[allow(dead_code)]
-#[derive(RustEmbed)]
-#[folder = "assets/media/"]
-struct MediaAsset;
-
-#[allow(dead_code)]
 #[derive(Deserialize, Clone, Debug, Default)]
 pub struct MediaEntry {
     pub image_url: String,
@@ -23,7 +14,6 @@ pub struct MediaEntry {
 // Glintstone Crown. The index therefore keys on the category offset the
 // rest of this codebase already uses for the same reason, so a lookup
 // cannot return another table's item.
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum MediaCategory {
     Weapon,
@@ -34,7 +24,6 @@ pub enum MediaCategory {
 }
 
 impl MediaCategory {
-    #[allow(dead_code)]
     pub fn offset(self) -> u32 {
         match self {
             MediaCategory::Weapon => 0x0,
@@ -54,7 +43,6 @@ impl MediaCategory {
 // strips the upgrade level but leaves the affinity, so an affinity variant
 // would ask for artwork that does not exist under its own name - affinity
 // variants and upgrade levels both share the base weapon's artwork.
-#[allow(dead_code)]
 pub fn key(category: MediaCategory, param_id: u32) -> u32 {
     let base = match category {
         MediaCategory::Weapon => (param_id / 10000) * 10000,
@@ -63,7 +51,6 @@ pub fn key(category: MediaCategory, param_id: u32) -> u32 {
     category.offset() | base
 }
 
-#[allow(dead_code)]
 pub fn parse(json: &str) -> HashMap<u32, MediaEntry> {
     let raw: HashMap<String, MediaEntry> = match serde_json::from_str(json) {
         Ok(raw) => raw,
@@ -78,23 +65,20 @@ pub fn parse(json: &str) -> HashMap<u32, MediaEntry> {
         .collect()
 }
 
-#[allow(dead_code)]
+// The generated index ships inside the binary: include_str! embeds it at
+// compile time, so a missing file fails the build instead of costing icons
+// at runtime. A corrupt file is tolerated at runtime by `parse` - a broken
+// index costs icons, never the app.
 static INDEX: Lazy<HashMap<u32, MediaEntry>> = Lazy::new(|| {
-    match MediaAsset::get("item_media.json") {
-        Some(file) => match std::str::from_utf8(&file.data) {
-            Ok(text) => parse(text),
-            Err(_) => HashMap::new(),
-        },
-        None => HashMap::new(),
-    }
+    parse(include_str!("../../assets/media/item_media.json"))
 });
 
-#[allow(dead_code)]
 pub fn entry(param_id: u32) -> Option<&'static MediaEntry> {
     INDEX.get(&param_id)
 }
 
-#[allow(dead_code)]
+// Test-only coverage probes; nothing in the app needs the total count.
+#[cfg(test)]
 pub fn count() -> usize {
     INDEX.len()
 }

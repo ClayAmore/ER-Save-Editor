@@ -1,7 +1,6 @@
 pub mod stats_view_model {
     use crate::{db::classes::classes::ArcheType, save::common::save_slot::SaveSlot};
 
-    #[allow(dead_code)]
     #[derive(Clone)]
     pub struct StatsViewModel  {
         pub arche_type: ArcheType,
@@ -13,9 +12,7 @@ pub mod stats_view_model {
         pub intelligence: u32,
         pub faith: u32,
         pub arcane: u32,
-        pub level: u32,
-        pub souls: u32,
-        pub soulsmemory: u32
+        pub souls: u32
     }
 
     impl Default for StatsViewModel {
@@ -30,9 +27,7 @@ pub mod stats_view_model {
                 intelligence: Default::default(), 
                 faith: Default::default(), 
                 arcane: Default::default(),
-                level: Default::default(), 
-                souls: Default::default(), 
-                soulsmemory: Default::default(), 
+                souls: Default::default(),
             }
         }
     }
@@ -52,9 +47,7 @@ pub mod stats_view_model {
             let intelligence = slot.player_game_data.intelligence;
             let faith = slot.player_game_data.faith;
             let arcane = slot.player_game_data.arcane;
-            let level = slot.player_game_data.level;
             let souls = slot.player_game_data.souls;
-            let soulsmemory = slot.player_game_data.soulsmemory;
 
             Self {
                 arche_type,
@@ -66,9 +59,7 @@ pub mod stats_view_model {
                 intelligence,
                 faith,
                 arcane,
-                level,
-                souls,
-                soulsmemory
+                souls
             }
         }
     }

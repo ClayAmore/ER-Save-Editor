@@ -8,20 +8,6 @@ pub mod general_view_model {
     // and no bit set means the plain Torrent.
     pub const STEED_ATTIRE_FLAG_BYTE: usize = 0x345;
 
-    #[allow(dead_code)]
-    #[derive(Default, Clone)]
-    pub struct MapID {
-        area_id: u8,
-        block_id: u8,
-        region_id: u8,
-        index_id: u8,
-    }
-    impl ToString for MapID {
-        fn to_string(&self) -> String {
-            format!("{:02}{:02}{:02}{:02}", self.area_id, self.block_id, self.region_id, self.index_id)
-        }
-    }
-
     #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
     pub enum SteedAttire {
         #[default] None,
@@ -89,10 +75,8 @@ pub mod general_view_model {
         }
     }
 
-    #[allow(dead_code)]
     #[derive(Default, Clone)]
     pub struct GeneralViewModel  {
-        pub steam_id: String,
         pub character_name: String,
         pub gender: Gender,
         pub weapon_level: u8,
@@ -101,10 +85,6 @@ pub mod general_view_model {
 
     impl GeneralViewModel {
         pub fn from_save(slot:& SaveSlot) -> Self {
-
-            // Steam Id
-            let steam_id = slot.steam_id.to_string();
-
             // Character Name
             let character_name = slot.player_game_data.character_name;
             let mut character_name_trimmed: [u16; 0x10] = [0;0x10];
@@ -124,7 +104,6 @@ pub mod general_view_model {
             let steed_attire = SteedAttire::from_flags(&slot.event_flags.flags);
 
             Self {
-                steam_id,
                 character_name,
                 gender,
                 weapon_level,

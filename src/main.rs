@@ -437,7 +437,8 @@ mod stat_edit {
         let mut vm = ViewModel::from_save(&save);
 
         let before = vm.slots[0].stats_vm.clone();
-        println!("before: vigor {} level {}", before.vigor, before.level);
+        let before_level = save.save_type.get_slot(0).player_game_data.level;
+        println!("before: vigor {} level {}", before.vigor, before_level);
 
         vm.slots[0].stats_vm.vigor = before.vigor + 1;
         vm.update_save(&mut save.save_type);
@@ -456,9 +457,10 @@ mod stat_edit {
         assert_eq!(vm2.active, Some(true), "validator rejected the edited save");
 
         let after = &vm2.slots[0].stats_vm;
-        println!("after:  vigor {} level {}", after.vigor, after.level);
+        let after_level = reloaded.save_type.get_slot(0).player_game_data.level;
+        println!("after:  vigor {} level {}", after.vigor, after_level);
         assert_eq!(after.vigor, before.vigor + 1, "vigor did not persist");
-        assert_eq!(after.level, before.level + 1, "level was not recalculated");
+        assert_eq!(after_level, before_level + 1, "level was not recalculated");
 
         // Only the edited character should have moved.
         assert_eq!(vm2.slots[1].stats_vm.vigor, vm.slots[1].stats_vm.vigor);

@@ -222,13 +222,10 @@ pub mod regulation_view_model {
         }
     }
     
-    #[allow(dead_code)]
     #[derive(Default, Clone)]
     pub struct RegulationItemViewModel {
         pub id: u32,
         pub name: String,
-        pub max_held: i16,
-        pub max_storage: i16,
         pub infusable: bool,
         pub is_key_item: bool,
         pub item_type: InventoryItemType,
@@ -389,8 +386,6 @@ pub mod regulation_view_model {
             .map(|(_, gem)| RegulationItemViewModel{
                 id: gem.id,
                 name: gem.name.to_string(),
-                max_held: 1,
-                max_storage: 1,
                 ..Default::default()
             }).filter(|gem|{
                 gem.id > 10000
@@ -452,8 +447,6 @@ pub mod regulation_view_model {
                     .map(|(_, good)| RegulationItemViewModel{
                         id: good.id,
                         name: good.name.to_string(),
-                        max_held: good.data.maxNum,
-                        max_storage: good.data.maxRepositoryNum,
                         wep_type: None,
                         quantity: Some(good.data.maxRepositoryNum),
                         is_key_item: GoodsType::from(good.data.goodsType) == GoodsType::KeyItem,
@@ -477,8 +470,6 @@ pub mod regulation_view_model {
                     .map(|(_,weapon)| RegulationItemViewModel{
                         id: weapon.id,
                         name: weapon.name.to_string(),
-                        max_held: 1,
-                        max_storage: 1,
                         infusable: weapon.data.gemMountType == 2,
                         item_type: InventoryItemType::WEAPON,
                         upgrade: Some(0),
@@ -504,8 +495,6 @@ pub mod regulation_view_model {
                     .map(|(_, protector)| RegulationItemViewModel{
                         id: protector.id,
                         name: protector.name.to_string(),
-                        max_held: 1,
-                        max_storage: 1,
                         item_type: InventoryItemType::ARMOR,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
@@ -522,8 +511,6 @@ pub mod regulation_view_model {
                     .map(|(_, gem)| RegulationItemViewModel{
                         id: gem.id,
                         name: gem.name.to_string(),
-                        max_held: 1,
-                        max_storage: 1,
                         item_type: InventoryItemType::AOW,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
@@ -540,8 +527,6 @@ pub mod regulation_view_model {
                     .map(|(_, accessory)| RegulationItemViewModel{
                         id: accessory.id,
                         name: accessory.name.to_string(),
-                        max_held: 1,
-                        max_storage: 1,
                         item_type: InventoryItemType::ACCESSORY,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
