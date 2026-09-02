@@ -22,7 +22,7 @@ use super::regulation::regulation_view_model::GoodsType;
 // extra character can only narrow the result set, never wipe it - unlike a
 // whole-string similarity score, which treats a one-character query as
 // having no bigrams in common with anything.
-fn matches_filter(name: &str, filter_text: &str) -> bool {
+pub(crate) fn matches_filter(name: &str, filter_text: &str) -> bool {
     let query = filter_text.trim().to_lowercase();
     query.is_empty() || name.to_lowercase().contains(&query)
 }

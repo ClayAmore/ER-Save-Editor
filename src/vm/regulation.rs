@@ -1,16 +1,5 @@
 pub mod regulation_view_model {
-    use crate::{util::regulation::Regulation, vm::inventory::{InventoryItemType, InventoryTypeRoute}};
-
-    // A "Filter:" box is a substring search, not a fuzzy-match ranking: the
-    // query, trimmed and lowercased, must either be empty (nothing typed
-    // yet) or appear anywhere in the lowercased name. This is monotonic -
-    // every extra character can only narrow the result set, never wipe it -
-    // unlike a whole-string similarity score, which treats a one-character
-    // query as having no bigrams in common with anything.
-    fn matches_filter(name: &str, filter_text: &str) -> bool {
-        let query = filter_text.trim().to_lowercase();
-        query.is_empty() || name.to_lowercase().contains(&query)
-    }
+    use crate::{util::regulation::Regulation, vm::inventory::{matches_filter, InventoryItemType, InventoryTypeRoute}};
 
 
     #[derive(Clone, PartialEq)]
@@ -565,52 +554,4 @@ pub mod regulation_view_model {
         }
     }
 
-    #[cfg(test)]
-    mod tests {
-        use super::matches_filter;
-
-        #[test]
-        fn empty_query_matches_everything() {
-            assert!(matches_filter("Dagger", ""));
-        }
-
-        #[test]
-        fn a_single_character_query_matches_a_known_item() {
-            // This is the bug: sorensen_dice has no bigrams for a
-            // one-character string, so it scored 0 against everything and
-            // the list went empty on the first keystroke.
-            assert!(matches_filter("Dagger", "d"));
-        }
-
-        #[test]
-        fn the_query_is_case_insensitive() {
-            assert!(matches_filter("Dagger", "DAG"));
-            assert!(matches_filter("dagger", "DAG"));
-        }
-
-        #[test]
-        fn a_query_not_contained_in_the_name_does_not_match() {
-            assert!(!matches_filter("Dagger", "sword"));
-        }
-
-        #[test]
-        fn a_longer_query_narrows_rather_than_wipes_the_matches() {
-            // Monotonic property the old similarity score broke: every
-            // extra character can only remove matches, never add ones a
-            // shorter query missed.
-            let names = ["Dagger", "Heavy Dagger", "Broadsword", "Bandit's Curved Sword"];
-
-            let one_char: Vec<&&str> = names.iter().filter(|n| matches_filter(n, "d")).collect();
-            let three_char: Vec<&&str> = names.iter().filter(|n| matches_filter(n, "dag")).collect();
-
-            assert!(!one_char.is_empty());
-            assert!(three_char.iter().all(|n| one_char.contains(n)));
-            assert!(three_char.len() <= one_char.len());
-        }
-
-        #[test]
-        fn leading_and_trailing_whitespace_in_the_query_is_ignored() {
-            assert!(matches_filter("Dagger", "  dag  "));
-        }
-    }
 }
