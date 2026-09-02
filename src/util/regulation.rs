@@ -139,16 +139,26 @@ impl Regulation {
         // PARAMS empty. That is a normal state, not an error, so item
         // detail lookups against it return "no data" rather than panicking.
         let params = PARAMS.read().unwrap();
+        if params.is_empty() {
+            return HashMap::new();
+        }
         let bytes = match params.get(param) {
             Some(bytes) => bytes,
-            None => return HashMap::new(),
+            None => {
+                println!("regulation param {param:?} missing");
+                return HashMap::new();
+            }
         };
         match PARAM::<T>::from_bytes(bytes) {
             Ok(parsed) => parsed
-                .rows.into_iter()
+                .rows
+                .into_iter()
                 .map(|row| (row.id, row))
                 .collect::<HashMap<u32, Row<T>>>(),
-            Err(_) => HashMap::new(),
+            Err(err) => {
+                println!("regulation param {param:?} failed to parse: {err}");
+                HashMap::new()
+            }
         }
     }
     
