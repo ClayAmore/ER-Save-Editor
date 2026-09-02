@@ -5,7 +5,7 @@
 // report a person reads, rather than on a user's machine.
 #[cfg(test)]
 mod generator {
-    use std::collections::HashMap;
+    use std::collections::{HashMap, BTreeMap};
 
     use crate::db::{
         accessory_name::accessory_name::ACCESSORY_NAME, aow_name::aow_name::AOW_NAME,
@@ -92,7 +92,7 @@ mod generator {
             ("ashes", MediaCategory::AshOfWar, AOW_NAME.lock().unwrap().iter().map(|(k, v)| (*k, v.to_string())).collect()),
         ];
 
-        let mut out: HashMap<String, serde_json::Value> = HashMap::new();
+        let mut out: BTreeMap<String, serde_json::Value> = BTreeMap::new();
         println!("\ncoverage");
         for (group, category, rows) in &tables {
             let lookup = &api[group];
