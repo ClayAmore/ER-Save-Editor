@@ -1,8 +1,10 @@
 // The API and our name tables disagree on case, punctuation and trailing
 // category words, so both sides are reduced to the same shape before
 // they are compared.
+#[cfg(test)]
 const TRAILING_WORDS: [&str; 4] = ["talisman", "cookbook", "bell bearing", "whetblade"];
 
+#[cfg(test)]
 pub fn normalise(name: &str) -> String {
     let mut text = name.to_lowercase();
 

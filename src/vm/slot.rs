@@ -2,6 +2,7 @@ pub mod slot_view_model {
     use crate::{save::common::save_slot::SaveSlot, vm::{equipment::equipment_view_model::EquipmentViewModel, events::events_view_model::EventsViewModel, general::general_view_model::GeneralViewModel, inventory::InventoryViewModel, regions::regions_view_model::RegionsViewModel, stats::stats_view_model::StatsViewModel}};
 
 
+    #[allow(dead_code)]
     #[derive(Default, Clone)]
     pub struct SlotViewModel {
         pub active: bool,

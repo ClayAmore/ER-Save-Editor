@@ -184,6 +184,7 @@ impl InventoryItemViewModel {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Default, Clone)]
 pub struct InventoryStorage {
     pub common_items: Vec<InventoryItemViewModel>,
@@ -203,6 +204,7 @@ pub struct InventoryStorage {
     pub next_equip_index: u32,
 }
 
+#[allow(dead_code)]
 #[derive(Default, Clone)]
 pub struct InventoryViewModel  {
     // Navigation

@@ -233,6 +233,7 @@ pub mod regulation_view_model {
         }
     }
     
+    #[allow(dead_code)]
     #[derive(Default, Clone)]
     pub struct RegulationItemViewModel {
         pub id: u32,
