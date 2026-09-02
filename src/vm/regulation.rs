@@ -1,8 +1,17 @@
 pub mod regulation_view_model {
-    use std::cmp::Ordering;
-    use strsim::sorensen_dice;
     use crate::{util::regulation::Regulation, vm::inventory::{InventoryItemType, InventoryTypeRoute}};
-    
+
+    // A "Filter:" box is a substring search, not a fuzzy-match ranking: the
+    // query, trimmed and lowercased, must either be empty (nothing typed
+    // yet) or appear anywhere in the lowercased name. This is monotonic -
+    // every extra character can only narrow the result set, never wipe it -
+    // unlike a whole-string similarity score, which treats a one-character
+    // query as having no bigrams in common with anything.
+    fn matches_filter(name: &str, filter_text: &str) -> bool {
+        let query = filter_text.trim().to_lowercase();
+        query.is_empty() || name.to_lowercase().contains(&query)
+    }
+
 
     #[derive(Clone, PartialEq)]
     pub enum ProtectorCategory {
@@ -461,27 +470,16 @@ pub mod regulation_view_model {
                         item_type: InventoryItemType::ITEM,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&reg_item_vm.name, filter_text)
                     }).filter(|reg_item_vm|{
                         !replacement_items.contains(&reg_item_vm.id)
                     })
                     .filter(|reg_item_vm|
                         reg_item_vm.id > 9100 || reg_item_vm.id < 9000
                     )
-                    .collect::<Vec<RegulationItemViewModel>>(); 
+                    .collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_goods.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_goods.sort_by(|a,b| a.name.cmp(&b.name));
                 },
                 InventoryTypeRoute::Weapons => {
                     self.filtered_weapons = Regulation::equip_weapon_params_map()
@@ -503,23 +501,12 @@ pub mod regulation_view_model {
                         } else {None},
                         ..Default::default()
                     }).filter(|i|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&i.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&i.name, filter_text)
                     }).filter(|i|{
                         i.id % 10_000 == 0
                     }).collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_weapons.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_weapons.sort_by(|a,b| a.name.cmp(&b.name));
                 },
                 InventoryTypeRoute::Armors => {
                     self.filtered_protectors = Regulation::equip_protectors_param_map()
@@ -532,23 +519,12 @@ pub mod regulation_view_model {
                         item_type: InventoryItemType::ARMOR,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&reg_item_vm.name, filter_text)
                     }).filter(|reg_item_vm|{
                         reg_item_vm.id > 40000
                     }).collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_protectors.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_protectors.sort_by(|a,b| a.name.cmp(&b.name));
                 },
                 InventoryTypeRoute::AshOfWar => {
                     self.filtered_gems = Regulation::equip_gem_param_map()
@@ -561,23 +537,12 @@ pub mod regulation_view_model {
                         item_type: InventoryItemType::AOW,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&reg_item_vm.name, filter_text)
                     }).filter(|reg_item_vm|{
                         reg_item_vm.id > 10000
                     }).collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_gems.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_gems.sort_by(|a,b| a.name.cmp(&b.name));
                 },
                 InventoryTypeRoute::Talismans => {
                     self.filtered_accessories = Regulation::equip_accessory_param_map()
@@ -590,23 +555,61 @@ pub mod regulation_view_model {
                         item_type: InventoryItemType::ACCESSORY,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&reg_item_vm.name, filter_text)
                     }).collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_accessories.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_accessories.sort_by(|a,b| a.name.cmp(&b.name));
                 },
             }
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::matches_filter;
+
+        #[test]
+        fn empty_query_matches_everything() {
+            assert!(matches_filter("Dagger", ""));
+        }
+
+        #[test]
+        fn a_single_character_query_matches_a_known_item() {
+            // This is the bug: sorensen_dice has no bigrams for a
+            // one-character string, so it scored 0 against everything and
+            // the list went empty on the first keystroke.
+            assert!(matches_filter("Dagger", "d"));
+        }
+
+        #[test]
+        fn the_query_is_case_insensitive() {
+            assert!(matches_filter("Dagger", "DAG"));
+            assert!(matches_filter("dagger", "DAG"));
+        }
+
+        #[test]
+        fn a_query_not_contained_in_the_name_does_not_match() {
+            assert!(!matches_filter("Dagger", "sword"));
+        }
+
+        #[test]
+        fn a_longer_query_narrows_rather_than_wipes_the_matches() {
+            // Monotonic property the old similarity score broke: every
+            // extra character can only remove matches, never add ones a
+            // shorter query missed.
+            let names = ["Dagger", "Heavy Dagger", "Broadsword", "Bandit's Curved Sword"];
+
+            let one_char: Vec<&&str> = names.iter().filter(|n| matches_filter(n, "d")).collect();
+            let three_char: Vec<&&str> = names.iter().filter(|n| matches_filter(n, "dag")).collect();
+
+            assert!(!one_char.is_empty());
+            assert!(three_char.iter().all(|n| one_char.contains(n)));
+            assert!(three_char.len() <= one_char.len());
+        }
+
+        #[test]
+        fn leading_and_trailing_whitespace_in_the_query_is_ignored() {
+            assert!(matches_filter("Dagger", "  dag  "));
         }
     }
 }

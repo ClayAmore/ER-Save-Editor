@@ -1,5 +1,4 @@
-use std::{cmp::Ordering, collections::HashMap};
-use strsim::sorensen_dice;
+use std::collections::HashMap;
 
 use crate::{
     db::{
@@ -16,6 +15,17 @@ use crate::{
 };
 
 use super::regulation::regulation_view_model::GoodsType;
+
+// A "Filter:" box is a substring search, not a fuzzy-match ranking: the
+// query, trimmed and lowercased, must either be empty (nothing typed yet)
+// or appear anywhere in the lowercased name. This is monotonic - every
+// extra character can only narrow the result set, never wipe it - unlike a
+// whole-string similarity score, which treats a one-character query as
+// having no bigrams in common with anything.
+fn matches_filter(name: &str, filter_text: &str) -> bool {
+    let query = filter_text.trim().to_lowercase();
+    query.is_empty() || name.to_lowercase().contains(&query)
+}
 
 #[derive(Default, Clone)]
 pub enum InventoryRoute {
@@ -350,94 +360,40 @@ impl InventoryViewModel {
             inventory_storage.filtered_weapons = inventory_storage.common_items.iter()
             .filter(|i | {
                 if i.r#type != InventoryGaitemType::WEAPON {return false;}
-                if self.filter_text.is_empty() { return true; }
-                let distance = sorensen_dice(&i.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                distance > 0.3    
+                matches_filter(&i.item_name, &self.filter_text)
             }).map(|i| i.clone()).collect();
             inventory_storage.filtered_armors = inventory_storage.common_items.iter()
             .filter(|i | {
                 if i.r#type != InventoryGaitemType::ARMOR {return false;}
-                if self.filter_text.is_empty() { return true; }
-                let distance = sorensen_dice(&i.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                distance > 0.3
+                matches_filter(&i.item_name, &self.filter_text)
             }).map(|i| i.clone()).collect();
             inventory_storage.filtered_accessories = inventory_storage.common_items.iter()
             .filter(|i | {
                 if i.r#type != InventoryGaitemType::ACCESSORY {return false;}
-                if self.filter_text.is_empty() { return true; }
-                let distance = sorensen_dice(&i.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                distance > 0.3
+                matches_filter(&i.item_name, &self.filter_text)
             }).map(|i| i.clone()).collect();
             inventory_storage.filtered_items = inventory_storage.common_items.iter()
             .filter(|i | {
                 if i.r#type != InventoryGaitemType::ITEM {return false;}
-                if self.filter_text.is_empty() { return true; }
-                let distance = sorensen_dice(&i.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                distance > 0.3
+                matches_filter(&i.item_name, &self.filter_text)
             }).map(|i| i.clone()).collect();
             inventory_storage.filtered_key_items = inventory_storage.key_items.iter()
             .filter(|i | {
                 if i.quantity == 0 { return false; }
-                if self.filter_text.is_empty() { return true; }
-                let distance = sorensen_dice(&i.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                distance > 0.3
+                matches_filter(&i.item_name, &self.filter_text)
             }).map(|i| i.clone()).collect();
             inventory_storage.filtered_aows = inventory_storage.common_items.iter()
             .filter(|i | {
                 if i.r#type != InventoryGaitemType::AOW {return false;}
-                if self.filter_text.is_empty() { return true; }
-                let distance = sorensen_dice(&i.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                distance > 0.3
+                matches_filter(&i.item_name, &self.filter_text)
             }).map(|i| i.clone()).collect();
 
-            inventory_storage.filtered_weapons.sort_by(|a, b| {
-                if self.filter_text.is_empty() {return a.item_name.cmp(&b.item_name);}
-                let distance_a = sorensen_dice(&a.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                let distance_b = sorensen_dice(&b.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                if distance_a < distance_b { return Ordering::Greater; }
-                else if distance_a > distance_b { return Ordering::Less; }
-                return Ordering::Equal;
-            });
-            inventory_storage.filtered_armors.sort_by(|a, b| {
-                if self.filter_text.is_empty() {return a.item_name.cmp(&b.item_name);}
-                let distance_a = sorensen_dice(&a.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                let distance_b = sorensen_dice(&b.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                if distance_a < distance_b { return Ordering::Greater; }
-                else if distance_a > distance_b { return Ordering::Less; }
-                return Ordering::Equal;
-            });
-            inventory_storage.filtered_accessories.sort_by(|a, b| {
-                if self.filter_text.is_empty() {return a.item_name.cmp(&b.item_name);}
-                let distance_a = sorensen_dice(&a.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                let distance_b = sorensen_dice(&b.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                if distance_a < distance_b { return Ordering::Greater; }
-                else if distance_a > distance_b { return Ordering::Less; }
-                return Ordering::Equal;
-            });
-            inventory_storage.filtered_items.sort_by(|a, b| {
-                if self.filter_text.is_empty() {return a.item_name.cmp(&b.item_name);}
-                let distance_a = sorensen_dice(&a.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                let distance_b = sorensen_dice(&b.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                if distance_a < distance_b { return Ordering::Greater; }
-                else if distance_a > distance_b { return Ordering::Less; }
-                return Ordering::Equal;
-            });
-            inventory_storage.filtered_key_items.sort_by(|a, b| {
-                if self.filter_text.is_empty() {return a.item_name.cmp(&b.item_name);}
-                let distance_a = sorensen_dice(&a.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                let distance_b = sorensen_dice(&b.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                if distance_a < distance_b { return Ordering::Greater; }
-                else if distance_a > distance_b { return Ordering::Less; }
-                return Ordering::Equal;
-            });
-            inventory_storage.filtered_aows.sort_by(|a, b| {
-                if self.filter_text.is_empty() {return a.item_name.cmp(&b.item_name);}
-                let distance_a = sorensen_dice(&a.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                let distance_b = sorensen_dice(&b.item_name.to_lowercase(), &self.filter_text.to_lowercase());
-                if distance_a < distance_b { return Ordering::Greater; }
-                else if distance_a > distance_b { return Ordering::Less; }
-                return Ordering::Equal;
-            });
+            inventory_storage.filtered_weapons.sort_by(|a, b| a.item_name.cmp(&b.item_name));
+            inventory_storage.filtered_armors.sort_by(|a, b| a.item_name.cmp(&b.item_name));
+            inventory_storage.filtered_accessories.sort_by(|a, b| a.item_name.cmp(&b.item_name));
+            inventory_storage.filtered_items.sort_by(|a, b| a.item_name.cmp(&b.item_name));
+            inventory_storage.filtered_key_items.sort_by(|a, b| a.item_name.cmp(&b.item_name));
+            inventory_storage.filtered_aows.sort_by(|a, b| a.item_name.cmp(&b.item_name));
         }
     }
 
@@ -549,6 +505,55 @@ impl InventoryViewModel {
                 .collect();
             },
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::matches_filter;
+
+    #[test]
+    fn empty_query_matches_everything() {
+        assert!(matches_filter("Dagger", ""));
+    }
+
+    #[test]
+    fn a_single_character_query_matches_a_known_item() {
+        // This is the bug: sorensen_dice has no bigrams for a one-character
+        // string, so it scored 0 against everything and the list went
+        // empty on the first keystroke.
+        assert!(matches_filter("Dagger", "d"));
+    }
+
+    #[test]
+    fn the_query_is_case_insensitive() {
+        assert!(matches_filter("Dagger", "DAG"));
+        assert!(matches_filter("dagger", "DAG"));
+    }
+
+    #[test]
+    fn a_query_not_contained_in_the_name_does_not_match() {
+        assert!(!matches_filter("Dagger", "sword"));
+    }
+
+    #[test]
+    fn a_longer_query_narrows_rather_than_wipes_the_matches() {
+        // Monotonic property the old similarity score broke: every extra
+        // character can only remove matches, never add ones a shorter
+        // query missed.
+        let names = ["Dagger", "Heavy Dagger", "Broadsword", "Bandit's Curved Sword"];
+
+        let one_char: Vec<&&str> = names.iter().filter(|n| matches_filter(n, "d")).collect();
+        let three_char: Vec<&&str> = names.iter().filter(|n| matches_filter(n, "dag")).collect();
+
+        assert!(!one_char.is_empty());
+        assert!(three_char.iter().all(|n| one_char.contains(n)));
+        assert!(three_char.len() <= one_char.len());
+    }
+
+    #[test]
+    fn leading_and_trailing_whitespace_in_the_query_is_ignored() {
+        assert!(matches_filter("Dagger", "  dag  "));
     }
 }
 
