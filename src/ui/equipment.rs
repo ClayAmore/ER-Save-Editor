@@ -14,7 +14,7 @@ pub mod equipment {
 
     pub fn equipment(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemTextures) {
         egui::SidePanel::right("equipment_list").show(ui.ctx(), |ui| {
-            side_panel(ui, vm);
+            side_panel(ui, vm, textures);
         });
 
         egui::CentralPanel::default().show(ui.ctx(), |ui| {
@@ -240,7 +240,7 @@ pub mod equipment {
         });
     } 
 
-    fn side_panel(ui: &mut Ui, vm: &mut ViewModel) {
+    fn side_panel(ui: &mut Ui, vm: &mut ViewModel, textures: &mut ItemTextures) {
         let inventory_vm = &mut vm.slots[vm.index].inventory_vm;
         let equipment_vm = &mut vm.slots[vm.index].equipment_vm;
         let empty = Vec::new();
@@ -337,6 +337,24 @@ pub mod equipment {
                     for i in row_range {
                         let item = &current_inventory_list[i];
                         if item.item_id == inventory_vm.unarmed.item_id {continue;} // Skip showing "unarmed" weapon which is the weapon used when weapon slot is empty.
+
+                        // Only rows the scroll area actually renders reach
+                        // this code, so only visible icons are ever
+                        // requested (same convention as browse.rs). The
+                        // route this list is showing under, not the item
+                        // itself, says which of the five equipment param
+                        // tables item_id came from.
+                        let icon_category = media_category(&inventory_vm.current_subtype_route);
+                        let texture = icon_category.and_then(|category| textures.texture(media_index::key(category, item.item_id)));
+                        match texture {
+                            Some(handle) => {
+                                ui.image((handle.id(), egui::vec2(24., 24.)));
+                            }
+                            None => {
+                                ui.allocate_exact_size(egui::vec2(24., 24.), egui::Sense::hover());
+                            }
+                        }
+
                         let item_name_ui = egui::RichText::new(item.item_name.to_string());
                         let is_current_item = item.equip_index == match &inventory_vm.current_subtype_route {
                             InventorySubTypeRoute::None => {0},
