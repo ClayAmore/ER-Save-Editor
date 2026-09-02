@@ -376,7 +376,7 @@ fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel,
             let (category, details) = match inventory_vm.current_type_route {
                 InventoryTypeRoute::CommonItems | InventoryTypeRoute::KeyItems => (
                     MediaCategory::Goods,
-                    item_details::simple_details(regulation_vm.selected_item.id),
+                    item_details::simple_details(MediaCategory::Goods, regulation_vm.selected_item.id),
                 ),
                 InventoryTypeRoute::Weapons => (
                     MediaCategory::Weapon,
@@ -388,7 +388,7 @@ fn single_item_customization(ui: &mut Ui, inventory_vm: &mut InventoryViewModel,
                 ),
                 InventoryTypeRoute::Talismans => (
                     MediaCategory::Accessory,
-                    item_details::simple_details(regulation_vm.selected_item.id),
+                    item_details::simple_details(MediaCategory::Accessory, regulation_vm.selected_item.id),
                 ),
                 InventoryTypeRoute::AshOfWar => (
                     MediaCategory::AshOfWar,

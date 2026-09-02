@@ -43,6 +43,7 @@ struct Job {
 pub struct ImageCache {
     jobs: Sender<Job>,
     results: Arc<Mutex<Receiver<(u32, Option<Vec<u8>>)>>>,
+    dir: Option<PathBuf>,
 }
 
 impl ImageCache {
@@ -100,6 +101,17 @@ impl ImageCache {
         ImageCache {
             jobs: job_tx,
             results: Arc::new(Mutex::new(result_rx)),
+            dir,
+        }
+    }
+
+    // Removes the cached file for `media_key`, if any. Used to heal a
+    // poisoned cache entry: a proxy or error page returned with HTTP 200
+    // decodes to nothing, and without this it would be re-served from disk
+    // forever. Never panics and does not care whether the file existed.
+    pub fn discard(&self, media_key: u32) {
+        if let Some(dir) = &self.dir {
+            let _ = std::fs::remove_file(dir.join(format!("{media_key}.png")));
         }
     }
 
@@ -196,6 +208,24 @@ mod tests {
         let cache = ImageCache::new(source, Some(dir), 1);
         cache.request(2009600, "https://example.test/missing.png");
         assert_eq!(drain(&cache, 1), vec![(2009600, None)]);
+    }
+
+    #[test]
+    fn discard_removes_a_cached_file_and_is_harmless_when_none_exists() {
+        let dir = temp_dir("discard");
+        std::fs::write(dir.join("1000000.png"), vec![1, 2, 3]).expect("seed icon");
+        let source = Arc::new(FakeSource {
+            calls: AtomicUsize::new(0),
+            payload: None,
+        });
+        let cache = ImageCache::new(source, Some(dir.clone()), 1);
+
+        assert!(dir.join("1000000.png").exists());
+        cache.discard(1000000);
+        assert!(!dir.join("1000000.png").exists(), "poisoned cache file was not removed");
+
+        // Discarding a key with no cached file must not panic.
+        cache.discard(999999);
     }
 
     #[test]

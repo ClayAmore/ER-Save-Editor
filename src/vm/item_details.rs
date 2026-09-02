@@ -87,20 +87,32 @@ pub fn ash_details(param_id: u32) -> ItemDetails {
     }
 }
 
-pub fn simple_details(param_id: u32) -> ItemDetails {
+// The category is passed in rather than inferred by probing both tables:
+// the goods and accessory param tables are independent id spaces (see
+// media::index) and 88 ids collide between them, so guessing from whichever
+// table answers first silently shows the wrong item's stats and description.
+pub fn simple_details(category: MediaCategory, param_id: u32) -> ItemDetails {
     let mut details = ItemDetails {
         description: None,
         attributes: Vec::new(),
     };
 
-    if let Some(row) = Regulation::equip_accessory_param_map().get(&param_id) {
-        details.description = description(MediaCategory::Accessory, param_id);
-        let weight = row.data.weight;
-        details.attributes.push(("Weight".into(), format!("{weight:.1}")));
-    } else if let Some(row) = Regulation::equip_goods_param_map().get(&param_id) {
-        details.description = description(MediaCategory::Goods, param_id);
-        let max = row.data.maxNum;
-        details.attributes.push(("Max held".into(), max.to_string()));
+    match category {
+        MediaCategory::Accessory => {
+            if let Some(row) = Regulation::equip_accessory_param_map().get(&param_id) {
+                details.description = description(MediaCategory::Accessory, param_id);
+                let weight = row.data.weight;
+                details.attributes.push(("Weight".into(), format!("{weight:.1}")));
+            }
+        }
+        MediaCategory::Goods => {
+            if let Some(row) = Regulation::equip_goods_param_map().get(&param_id) {
+                details.description = description(MediaCategory::Goods, param_id);
+                let max = row.data.maxNum;
+                details.attributes.push(("Max held".into(), max.to_string()));
+            }
+        }
+        _ => {}
     }
 
     details
@@ -121,7 +133,14 @@ mod tests {
     fn a_missing_description_does_not_hide_attributes() {
         // Attribute numbers come from the regulation, so an item absent from
         // the media index still shows its stats once params are loaded.
-        let details = simple_details(1);
+        let details = simple_details(MediaCategory::Goods, 1);
         assert!(details.description.is_none());
+    }
+
+    #[test]
+    fn an_unrecognized_category_yields_the_default_details_without_panicking() {
+        let details = simple_details(MediaCategory::Weapon, 1000);
+        assert!(details.description.is_none());
+        assert!(details.attributes.is_empty());
     }
 }

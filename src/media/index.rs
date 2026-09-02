@@ -148,4 +148,28 @@ mod tests {
             key(MediaCategory::Weapon, 1000000)
         );
     }
+
+    #[test]
+    fn goods_and_accessory_no_longer_collide_on_a_shared_raw_param_id() {
+        // Param id 1000 is "Flask of Crimson Tears" in the goods table and
+        // "Crimson Amber Medallion" in the accessory table (see
+        // src/db/item_name.rs and src/db/accessory_name.rs) - a real
+        // collision, not a contrived one, and both are present in the
+        // shipped index. If the namespacing in `key` is ever collapsed back
+        // to a bare param id, this must fail loudly rather than let the
+        // wrong item's description and stats show up under the right icon.
+        let goods_key = key(MediaCategory::Goods, 1000);
+        let accessory_key = key(MediaCategory::Accessory, 1000);
+        assert_ne!(goods_key, accessory_key);
+
+        let goods_entry = super::entry(goods_key);
+        let accessory_entry = super::entry(accessory_key);
+        assert!(goods_entry.is_some(), "expected a shipped goods entry for id 1000");
+        assert!(accessory_entry.is_some(), "expected a shipped accessory entry for id 1000");
+        assert_ne!(
+            goods_entry.unwrap().description,
+            accessory_entry.unwrap().description,
+            "goods and accessory entries for the same raw id must not resolve to the same content"
+        );
+    }
 }

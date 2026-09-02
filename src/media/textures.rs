@@ -42,7 +42,16 @@ impl ItemTextures {
                         egui::TextureOptions::LINEAR,
                     ))
                 }
-                None => State::Failed,
+                None => {
+                    // Bytes arrived but were not a decodable image: a
+                    // poisoned disk cache entry (e.g. a proxy error page
+                    // saved under HTTP 200). Discard it so a later run
+                    // re-fetches instead of re-serving the same bad bytes
+                    // forever. This session still shows the placeholder —
+                    // `Failed` is never retried.
+                    self.cache.discard(media_key);
+                    State::Failed
+                }
             };
             self.state.insert(media_key, next);
         }
