@@ -61,6 +61,7 @@ pub mod classes {
         }
     }
 
+    #[allow(dead_code)]
     pub struct Stats {
         pub level: u32,
         pub vigor: u32,

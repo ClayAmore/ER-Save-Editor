@@ -8,6 +8,7 @@ pub mod general_view_model {
     // and no bit set means the plain Torrent.
     pub const STEED_ATTIRE_FLAG_BYTE: usize = 0x345;
 
+    #[allow(dead_code)]
     #[derive(Default, Clone)]
     pub struct MapID {
         area_id: u8,
@@ -88,6 +89,7 @@ pub mod general_view_model {
         }
     }
 
+    #[allow(dead_code)]
     #[derive(Default, Clone)]
     pub struct GeneralViewModel  {
         pub steam_id: String,

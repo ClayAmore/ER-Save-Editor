@@ -69,6 +69,7 @@ pub mod bnd4 {
         }
     }
 
+    #[allow(dead_code)]
     #[derive(Default)]
     pub struct BinderFile {
         pub flags: FileFlags,

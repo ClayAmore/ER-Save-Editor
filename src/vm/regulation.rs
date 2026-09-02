@@ -1,8 +1,6 @@
 pub mod regulation_view_model {
-    use std::cmp::Ordering;
-    use strsim::sorensen_dice;
-    use crate::{util::regulation::Regulation, vm::inventory::{InventoryItemType, InventoryTypeRoute}};
-    
+    use crate::{util::regulation::Regulation, vm::inventory::{matches_filter, InventoryItemType, InventoryTypeRoute}};
+
 
     #[derive(Clone, PartialEq)]
     pub enum ProtectorCategory {
@@ -224,6 +222,7 @@ pub mod regulation_view_model {
         }
     }
     
+    #[allow(dead_code)]
     #[derive(Default, Clone)]
     pub struct RegulationItemViewModel {
         pub id: u32,
@@ -461,27 +460,16 @@ pub mod regulation_view_model {
                         item_type: InventoryItemType::ITEM,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&reg_item_vm.name, filter_text)
                     }).filter(|reg_item_vm|{
                         !replacement_items.contains(&reg_item_vm.id)
                     })
                     .filter(|reg_item_vm|
                         reg_item_vm.id > 9100 || reg_item_vm.id < 9000
                     )
-                    .collect::<Vec<RegulationItemViewModel>>(); 
+                    .collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_goods.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_goods.sort_by(|a,b| a.name.cmp(&b.name));
                 },
                 InventoryTypeRoute::Weapons => {
                     self.filtered_weapons = Regulation::equip_weapon_params_map()
@@ -503,23 +491,12 @@ pub mod regulation_view_model {
                         } else {None},
                         ..Default::default()
                     }).filter(|i|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&i.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&i.name, filter_text)
                     }).filter(|i|{
                         i.id % 10_000 == 0
                     }).collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_weapons.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_weapons.sort_by(|a,b| a.name.cmp(&b.name));
                 },
                 InventoryTypeRoute::Armors => {
                     self.filtered_protectors = Regulation::equip_protectors_param_map()
@@ -532,23 +509,12 @@ pub mod regulation_view_model {
                         item_type: InventoryItemType::ARMOR,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&reg_item_vm.name, filter_text)
                     }).filter(|reg_item_vm|{
                         reg_item_vm.id > 40000
                     }).collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_protectors.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_protectors.sort_by(|a,b| a.name.cmp(&b.name));
                 },
                 InventoryTypeRoute::AshOfWar => {
                     self.filtered_gems = Regulation::equip_gem_param_map()
@@ -561,23 +527,12 @@ pub mod regulation_view_model {
                         item_type: InventoryItemType::AOW,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&reg_item_vm.name, filter_text)
                     }).filter(|reg_item_vm|{
                         reg_item_vm.id > 10000
                     }).collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_gems.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_gems.sort_by(|a,b| a.name.cmp(&b.name));
                 },
                 InventoryTypeRoute::Talismans => {
                     self.filtered_accessories = Regulation::equip_accessory_param_map()
@@ -590,23 +545,13 @@ pub mod regulation_view_model {
                         item_type: InventoryItemType::ACCESSORY,
                         ..Default::default()
                     }).filter(|reg_item_vm|{
-                        if filter_text.is_empty() { return true; }
-                        let distance = sorensen_dice(&reg_item_vm.name.to_lowercase(), &filter_text.to_lowercase());
-                        distance > 0.3 
+                        matches_filter(&reg_item_vm.name, filter_text)
                     }).collect::<Vec<RegulationItemViewModel>>();
 
-                    self.filtered_accessories.sort_by(|a,b| {
-                        if filter_text.is_empty() {
-                            return a.name.cmp(&b.name);
-                        }
-                        let distance_a = sorensen_dice(&a.name.to_lowercase(), &filter_text.to_lowercase());
-                        let distance_b = sorensen_dice(&b.name.to_lowercase(), &filter_text.to_lowercase());
-                        if distance_a < distance_b { return Ordering::Greater; }
-                        else if distance_a > distance_b { return Ordering::Less; }
-                        return Ordering::Equal;
-                    })
+                    self.filtered_accessories.sort_by(|a,b| a.name.cmp(&b.name));
                 },
             }
         }
     }
+
 }

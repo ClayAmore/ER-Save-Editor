@@ -1,7 +1,7 @@
-# ER Save Editor
+# Elden Ring Save Editor
 
 <p align="center">
-  <a href="https://github.com/ClayAmore/ER-Save-Editor/blob/master/icon/readme.md"><img src="https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/e1d40274-066a-4b72-b010-de9170090b60" /></a>
+  <img src="./icon/icon.png">
 </p>
 
 Tool for editing Elden Ring save files. Compatible with PC and Playstation Save Wizard exported saves.
@@ -33,6 +33,3 @@ A: There's no guarantee that you won't be banned. None of these features have be
 
 ## Reporting Issues
 If you encounter any bugs or issues while using the save editor, please report them. When reporting bugs, try to provide reproducible steps so I can debug effectively.
-
-## Credits
-<a href="https://github.com/nordgaren/"><img src="https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/710c9ee6-c3df-4665-be6b-d96bce1ebf46"/></a>

@@ -6,6 +6,7 @@ mod read;
 mod write;
 mod ui;
 mod db;
+mod media;
 
 use std::{fs::File, io::Write, path::PathBuf};
 
@@ -63,18 +64,20 @@ pub struct App {
     importer_vm: ImporterViewModel,
     importer_open: bool,
     error: Option<String>,
+    textures: media::textures::ItemTextures,
 }
 
 impl App {
     pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         Self {
-            save: Save::default(), 
-            picked_path: Default::default(), 
+            save: Save::default(),
+            picked_path: Default::default(),
             current_route: Route::None,
             vm: ViewModel::default(),
             importer_vm: Default::default(),
             importer_open: Default::default(),
-            error: None
+            error: None,
+            textures: media::textures::ItemTextures::new(),
         }
     }
 
@@ -147,6 +150,7 @@ impl App {
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.textures.poll(ctx);
         ctx.set_zoom_factor(1.75);
         // TOP PANEL
         egui::TopBottomPanel::top("toolbar").default_height(35.).show(ctx, |ui| {
@@ -284,8 +288,8 @@ impl eframe::App for App {
                     Route::None => none(ui),
                     Route::General => general(ui, &mut self.vm),
                     Route::Stats => stats(ui, &mut self.vm),
-                    Route::Equipment => equipment(ui, &mut self.vm),
-                    Route::Inventory => inventory(ui, &mut self.vm),
+                    Route::Equipment => equipment(ui, &mut self.vm, &mut self.textures),
+                    Route::Inventory => inventory(ui, &mut self.vm, &mut self.textures),
                     Route::EventFlags => events(ui, &mut self.vm),
                     Route::Regions => regions(ui, &mut self.vm),
                 }
