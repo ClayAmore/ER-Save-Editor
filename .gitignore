@@ -1,4 +1,10 @@
 /target
 /.vscode
 /saves
+
+# Claude Code / agent files
 /.claude
+/.superpowers
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
