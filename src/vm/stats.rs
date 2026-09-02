@@ -1,6 +1,7 @@
 pub mod stats_view_model {
     use crate::{db::classes::classes::ArcheType, save::common::save_slot::SaveSlot};
 
+    #[allow(dead_code)]
     #[derive(Clone)]
     pub struct StatsViewModel  {
         pub arche_type: ArcheType,
