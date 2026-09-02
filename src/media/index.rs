@@ -42,11 +42,17 @@ impl MediaCategory {
     }
 }
 
-// Weapon param ids carry the upgrade level in their last two digits, so a
-// "+5" of an item resolves to the same artwork as the "+0".
+// Weapon param ids are `base + affinity*100`, with base weapons landing on
+// multiples of 10000 and the upgrade level in the last two digits (e.g.
+// 1000000 Dagger, 1000100 Heavy Dagger, 1000105 Heavy Dagger +5 all share
+// the Dagger's artwork; 1010000 Black Knife and 1020000 Parrying Dagger are
+// separate base weapons and stay distinct). Reducing only to `/100*100`
+// strips the upgrade level but leaves the affinity, so an affinity variant
+// would ask for artwork that does not exist under its own name - affinity
+// variants and upgrade levels both share the base weapon's artwork.
 pub fn key(category: MediaCategory, param_id: u32) -> u32 {
     let base = match category {
-        MediaCategory::Weapon => (param_id / 100) * 100,
+        MediaCategory::Weapon => (param_id / 10000) * 10000,
         _ => param_id,
     };
     category.offset() | base
@@ -116,10 +122,18 @@ mod tests {
 
     #[test]
     fn the_shipped_index_keeps_its_coverage() {
-        // Floor recorded from the first successful generation after the
-        // category-namespaced key fix (2362 entries), rounded down to the
-        // nearest fifty, not guessed. Rerun the generator and update this
-        // deliberately if the API changes.
+        // Floor recorded from a measured generation run, rounded down to
+        // the nearest fifty, not guessed. Reconfirmed at 2362 entries after
+        // reducing MediaCategory::Weapon's key to the base weapon
+        // (param_id/10000*10000): the API this generator pulls from only
+        // ever offered artwork under base weapon names, never per-affinity
+        // ("Heavy Dagger", "Keen Dagger", ...), so those affinity rows were
+        // already absent from `out` before this fix and collapsing their
+        // keys onto the base weapon does not remove any entries here - the
+        // fix's effect is at lookup time, where a save's affinity/upgrade
+        // variant id now reduces to the base key this index actually has,
+        // rather than to a key nothing was ever written under. Rerun the
+        // generator and update this deliberately if the API changes.
         assert!(super::count() >= 2350);
     }
 
@@ -145,6 +159,35 @@ mod tests {
     fn a_weapons_upgrade_level_resolves_to_the_same_key_as_its_base() {
         assert_eq!(
             key(MediaCategory::Weapon, 1000005),
+            key(MediaCategory::Weapon, 1000000)
+        );
+    }
+
+    #[test]
+    fn an_affinity_variant_resolves_to_the_same_key_as_its_base_weapon() {
+        // 1000100 is Heavy Dagger - an affinity of the 1000000 Dagger, not a
+        // different weapon. Both must resolve to the base weapon's artwork.
+        assert_eq!(
+            key(MediaCategory::Weapon, 1000100),
+            key(MediaCategory::Weapon, 1000000)
+        );
+    }
+
+    #[test]
+    fn an_affinity_variants_upgrade_level_still_resolves_to_the_base_weapon() {
+        // 1000105 is Heavy Dagger +5.
+        assert_eq!(
+            key(MediaCategory::Weapon, 1000105),
+            key(MediaCategory::Weapon, 1000000)
+        );
+    }
+
+    #[test]
+    fn distinct_base_weapons_stay_distinct() {
+        // 1020000 is Parrying Dagger, a different base weapon from 1000000
+        // Dagger, not an affinity of it.
+        assert_ne!(
+            key(MediaCategory::Weapon, 1020000),
             key(MediaCategory::Weapon, 1000000)
         );
     }
