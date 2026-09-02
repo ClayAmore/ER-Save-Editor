@@ -10,7 +10,13 @@ pub struct HttpSource;
 
 impl ImageSource for HttpSource {
     fn fetch(&self, url: &str) -> Result<Vec<u8>, String> {
-        let response = reqwest::blocking::get(url).map_err(|e| e.to_string())?;
+        let client = reqwest::blocking::Client::builder()
+            .timeout(std::time::Duration::from_secs(10))
+            .user_agent("er-save-editor")
+            .build()
+            .map_err(|e| e.to_string())?;
+
+        let response = client.get(url).send().map_err(|e| e.to_string())?;
         if !response.status().is_success() {
             return Err(format!("http {}", response.status()));
         }
