@@ -72,4 +72,4 @@ This project is a fork of [ER-Save-Editor](https://github.com/ClayAmore/ER-Save-
 
 ## License
 
-Dual licensed under [Apache-2.0](LICENSE-APACHE), at your option.
+Licensed under [Apache-2.0](LICENSE-APACHE), at your option.
