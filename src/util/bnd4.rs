@@ -50,34 +50,12 @@ pub mod bnd4 {
         }
     }
 
-    // I am only using this to read the regulation so I am setting this to (DCX_DFLT_11000_44_9_15 = 10)
-    bitflags::bitflags! {
-        #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Hash)]
-        pub struct CompressionType: u8 {
-            const Unkown = 0;
-            const None = 1;
-            const Zlib = 2;
-            const Dcp_edge = 3 ;
-            const Dcp_dflt = 4;
-            const Dcx_edge = 5;
-            const Dcx_dflt_10000_24_9 = 6 ;
-            const Dcx_dflt_10000_44_9 = 7 ;
-            const Dcx_dflt_11000_44_8 = 8;
-            const Dcx_dflt_11000_44_9 = 9 ;
-            const Dcx_dflt_11000_44_9_15 = 10;
-            const Dcx_krak = 11;
-        }
-    }
-
     #[derive(Default)]
     pub struct BinderFile {
         pub flags: FileFlags,
         pub id: i32,
         pub name: String,
         pub bytes: Vec<u8>,
-        pub compression_type: CompressionType,
-        pub uncompressed_size: i64,
-        pub data_offset: i64,
     }
     impl BinderFile {
         pub fn new(
@@ -95,14 +73,11 @@ pub mod bnd4 {
         }
     }
 
-    #[allow(unused)]
     #[derive(Default)]
     pub struct BinderHeader {
         file_flags: FileFlags,
         id: i32,
         name: String,
-        compression_type: CompressionType,
-        compressed_size: i64,
         uncompressed_size: i64,
         data_offset: i64,
     }
@@ -110,7 +85,6 @@ pub mod bnd4 {
     impl BinderHeader {
         pub fn read_file_data(&self, br: &mut BinaryReader) -> Result<BinderFile, Error> {
             let mut bytes: Vec<u8> = Vec::new();
-            let _compression_type = CompressionType::Zlib;
 
             if Binder::is_compressed(self.file_flags) {
                 todo!();
@@ -150,8 +124,7 @@ pub mod bnd4 {
             assert_eq!(br.read_u8()?, 0);
             assert_eq!(br.read_i32()?, -1);
 
-            let compressed_size = br.read_i64()?;
-            
+            br.read_i64()?;
             let uncompressed_size = if Binder::has_compression(format) { 
                 br.read_i64()?
             }
@@ -231,8 +204,6 @@ pub mod bnd4 {
                 file_flags: FileFlags::from_bits_truncate(file_flags as u8),
                 id,
                 name,
-                compression_type: CompressionType::Dcx_dflt_11000_44_9_15,
-                compressed_size,
                 uncompressed_size,
                 data_offset,
             })
@@ -245,10 +216,10 @@ pub mod bnd4 {
 
     impl Binder {
         fn get_bnd4_header_size(format: Format) -> i64 {
+            // 0x10 covers the flags, the -1 marker and the compressed size.
             let mut size = 0x10;
-            if Binder::has_long_offsets(format) {
-                size += 8;
-            }
+            // The data offset is always present, as an i64 or an i32.
+            size += if Binder::has_long_offsets(format) { 8 } else { 4 };
             if Binder::has_compression(format) {
                 size += 8;
             }
@@ -307,15 +278,6 @@ pub mod bnd4 {
             bnd4
         }
 
-        #[allow(unused)]
-        pub fn is(&self, br: &mut BinaryReader) -> bool {
-            if br.length < 4 {
-                return false;
-            }
-            let magic = br.read_bytes(4).unwrap();
-            magic == b"BND4"
-        }
-
         pub fn from_bytes(bytes: &[u8]) -> Result<BND4, Error>{
             let mut br = BinaryReader::from_u8(bytes);
             let mut bnd4 = BND4::new();
@@ -341,7 +303,8 @@ pub mod bnd4 {
 
             assert_eq!(br.read_u8()?, 0);
             self.big_endian = br.read_bool()?;
-            self.bit_big_endian = br.read_bool()?;
+            // Stored inverted: a 0 here means the format bits are in reverse order.
+            self.bit_big_endian = !br.read_bool()?;
             assert_eq!(br.read_u8()?, 0);
 
             br.set_endian(if self.big_endian {binary_reader::Endian::Big} else {Endian::Little});
@@ -382,6 +345,7 @@ pub mod bnd4 {
                 ((raw_format & 0b01000000) >> 5) |
                 ((raw_format & 0b10000000) >> 7)) as u8)
             };
+            self.format = format;
 
             let b = br.read_u8()?;
             self.extended = -1;
@@ -415,7 +379,7 @@ pub mod bnd4 {
                 assert_eq!(br.read_i64()?, 0);
             }
 
-            if file_header_size != Binder::get_bnd4_header_size(format) {
+            if file_header_size != Binder::get_bnd4_header_size(self.format) {
                 panic!("File header size for format {} is expected to be {:#X}, but was {:#X}", self.format.as_i32(), Binder::get_bnd4_header_size(self.format), file_header_size);
             }
 

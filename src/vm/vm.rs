@@ -1,6 +1,8 @@
 pub mod vm {
     use std::collections::HashMap;
 
+    use crate::vm::general::general_view_model::{SteedAttire, STEED_ATTIRE_FLAG_BYTE};
+
     use crate::{
         db::{
             bosses::bosses::BOSSES, 
@@ -76,7 +78,7 @@ pub mod vm {
             // Get active characters
             for (index, active) in save.save_type.active_slots().iter().enumerate() {
                 if *active {
-                    vm.profile_summary[index] = ProfileSummaryViewModel::from_save(&save.save_type.get_profile_summary(index));
+                    vm.profile_summary[index] = ProfileSummaryViewModel { active: true };
                     vm.slots[index] = SlotViewModel::from_save(&save.save_type.get_slot(index));
                 }
             }
@@ -103,6 +105,9 @@ pub mod vm {
 
                     // Update Character Weapon Match Making Level
                     self.update_weapon_match_making_level(save_type, i);
+
+                    // Update Torrent appearance
+                    self.update_steed_attire(save_type, i);
 
                     // Update Inventory (Held + Storage Box)
                     self.update_inventory(save_type, i);
@@ -156,6 +161,22 @@ pub mod vm {
             save_type.set_character_arcane(index, stats_vm.arcane);
 
             save_type.set_character_souls(index, stats_vm.souls);
+        }
+
+        // The three attire flags are mutually exclusive, so the selected one is
+        // set and the other two cleared. Bits outside them are left untouched.
+        fn update_steed_attire(&self, save_type: &mut SaveType, index: usize) {
+            let selected = self.slots[index].general_vm.steed_attire;
+            for attire in SteedAttire::ALL {
+                if let Some(bit) = attire.bit() {
+                    save_type.set_character_event_flag(
+                        index,
+                        STEED_ATTIRE_FLAG_BYTE,
+                        bit,
+                        attire == selected,
+                    );
+                }
+            }
         }
 
         fn update_weapon_match_making_level(&self, save_type: &mut SaveType, index: usize) {

@@ -1,38 +1,75 @@
-# ER Save Editor
+# Elden Ring Save Manager
 
 <p align="center">
-  <a href="https://github.com/ClayAmore/ER-Save-Editor/blob/master/icon/readme.md"><img src="https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/e1d40274-066a-4b72-b010-de9170090b60" /></a>
+  <img src="./icon/icon.png">
 </p>
 
-Tool for editing Elden Ring save files. Compatible with PC and Playstation Save Wizard exported saves.
+Tool for managing and editing Elden Ring save files. Compatible with PC and PlayStation Save Wizard exported saves. 
+
+Supports game version 1.17.
 
 **Use with caution:** This tool should be used responsibly. Always backup your save file before making any edits. This is a hobby project developed during spare time and is intended for easier character build making. I do not endorse or condone cheating online.
 
+The application works entirely offline and makes no network connections of any kind.
+
 ## Features
+
+### Character
 - Import characters from other save files
-- Change pc save file SteamID
+- Change the SteamID of a PC save file
 - Modify player name
 - Change player gender
-- Edit player stats
-- Modify soul count
-- Add items, weapons, armors, ashes of war, and talismans to inventory
-- Add items in bulk to speed up build making process.
-- Browse inventory
-- Change player equipment
-- Activate/deactivate Sites of Grace, summoning pools, colosseums, etc.
-- Revive or kill bosses
-- Activate/deactivate invasion regions
-- More features will be added in future updates
+- Edit player stats and attributes
+- Modify rune count
 
-## Permissions
-Feel free to use this save editor for learning or development purposes. However, I do not authorize its use for creating tools or modifications that enable actions online outside the bounds of what the game allows.
+### Inventory & equipment
+- Add items, weapons, armors, ashes of war and talismans to your inventory
+- Bulk add items to speed up build making, with search, multi-select and select-all
+- Filter the catalog to show only the items you are still missing
+- Full equipment editor: armaments, armor, talismans, ammunition, memorized spells, quick items and pouch
+- Build your Wondrous Physick and change Torrent's appearance
+- Weapon detail panel with a dedicated scaling card, affinity and upgrade level
+
+### Interactive map
+- Complete in-game map with smooth pan and zoom
+- All four layers: Overland, Underground, Ashen Capital and Realm of Shadow (DLC)
+- Thousands of markers: sites of grace, bosses, weapons, armor, talismans, spells, ashes of war and spirits, flask upgrades, key items, NPCs and locations
+- Filter markers by category, with presets to show everything, nothing, or just the essentials
+- Reads your save and shows your real completion: graces discovered, bosses defeated and overall progress
+
+### Built-in wiki
+- Bosses, Side Quests, NPCs & Lore, Merchants and Bestiary, with images, locations and descriptions
+- Bosses are marked as defeated or alive based on your save
+- Search and filter every list by region, type and status
+
+### World progression
+- Activate/deactivate Sites of Grace, summoning pools and colosseums
+- Unlock whetblade affinities, cookbooks and map fragments
+- Revive or kill bosses
+- Activate/deactivate invadable regions
+- Progress counters and bulk lock/unlock for every group
+
+More features will be added in future updates.
+
+## Download
+
+Releases are published on [GitHub Releases](../../releases) and on Nexus Mods.
+
+The release archive contains the executable and an `assets/` folder holding the item icons and map tiles. Keep `assets/` next to the executable — the application reads them from disk and never downloads anything. The images are not stored in this repository because of their size.
 
 ## FAQ
+
 Q: Will this ban me?<br/>
 A: There's no guarantee that you won't be banned. None of these features have been tested online.
 
-## Reporting Issues
-If you encounter any bugs or issues while using the save editor, please report them. When reporting bugs, try to provide reproducible steps so I can debug effectively.
+## Reporting issues
+
+If you encounter any bugs or issues while using the save manager, please report them. When reporting bugs, try to provide reproducible steps so I can debug effectively.
 
 ## Credits
-<a href="https://github.com/nordgaren/"><img src="https://github.com/ClayAmore/ER-Save-Editor/assets/131625063/710c9ee6-c3df-4665-be6b-d96bce1ebf46"/></a>
+
+This project is a fork of [ER-Save-Editor](https://github.com/ClayAmore/ER-Save-Editor) by ClayAmore, which does the hard work of parsing the save format.
+
+## License
+
+Licensed under [Apache-2.0](LICENSE-APACHE), at your option.

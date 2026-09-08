@@ -9,3 +9,4 @@ pub mod importer;
 pub mod vm;
 pub mod regulation;
 pub mod equipment;
+pub mod item_details;
