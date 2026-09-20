@@ -96,9 +96,9 @@ impl Read for PlayerCoords {
         let mut player_coords = PlayerCoords::default();
         player_coords.player_coords = (br.read_f32()?, br.read_f32()?, br.read_f32()?);
         player_coords.map_id.copy_from_slice(br.read_bytes(4)?);
-        let _0x11 = br.read_bytes(0x11)?;
+        player_coords._0x11.copy_from_slice(br.read_bytes(0x11)?);
         player_coords.player_coords2 = (br.read_f32()?, br.read_f32()?, br.read_f32()?);
-        let _0x10: &[u8] = br.read_bytes(0x10)?;
+        player_coords._0x10.copy_from_slice(br.read_bytes(0x10)?);
         Ok(player_coords)
     }
 }
@@ -1802,8 +1802,13 @@ impl Write for SaveSlot {
 
         bytes.extend(self._0x80);
 
-        // Empty calories
-        bytes.extend(vec![0;0x280000-bytes.len()]);
+        // Everything past the structures mapped above, kept verbatim
+        bytes.extend_from_slice(&self._rest);
+
+        // Only pads a default constructed slot, which carries no tail
+        if bytes.len() < 0x280000 {
+            bytes.extend(vec![0; 0x280000 - bytes.len()]);
+        }
 
         Ok(bytes)
     }

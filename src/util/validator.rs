@@ -1,6 +1,6 @@
 pub mod validator {
     use std::collections::{HashMap, HashSet};
-    use crate::{save::{common::save_slot::{EquipInventoryItem, GaItem}, save::save::Save}, util::{param_structs::EQUIP_PARAM_GEM_ST, params::params::Row, regulation::Regulation}, vm::{inventory::{InventoryGaitemType, InventoryItemType}, regulation::regulation_view_model::{GoodsType, ProtectorCategory, WepType}}};
+    use crate::{save::{common::save_slot::{EquipInventoryItem, EquipItem, GaItem}, save::save::Save}, util::{param_structs::EQUIP_PARAM_GEM_ST, params::params::Row, regulation::Regulation}, vm::{inventory::{InventoryGaitemType, InventoryItemType}, regulation::regulation_view_model::{GoodsType, ProtectorCategory, WepType}}};
 
     pub struct Validator;
 
@@ -134,35 +134,34 @@ pub mod validator {
             let quick_slot_items = &save.save_type.get_slot(index).equip_item_data.quick_slot_items;
             let pouch_items = &save.save_type.get_slot(index).equip_item_data.pouch_items;
 
-            // Check for invalid or duplicate quickslot items
-            let mut item_ids = HashSet::new();
-            for item in quick_slot_items.iter() {
-                if item.item_id == 0 { continue; }
-                if Regulation::equip_goods_param_map().get(&(item.item_id ^ InventoryGaitemType::ITEM as u32)).is_none() { println!("Item {} not found", item.item_id); return false; }
-                if let Some(_existing_id) = item_ids.get(&item.item_id) {
-                    println!("Duplicate item found: {}", _existing_id);
-                    return false;
-                } else {
-                    item_ids.insert(item.item_id);
-                }
-            }
-            
-            // Check for invalid or duplicate pouch items
-            let mut item_ids = HashSet::new();
-            for item in pouch_items.iter() {
-                if item.item_id == 0 { continue; }
-                if Regulation::equip_goods_param_map().get(&(item.item_id ^ InventoryGaitemType::ITEM as u32)).is_none() { println!("Item {} not found", item.item_id); return false; }
-                if let Some(_existing_id) = item_ids.get(&item.item_id) {
-                    println!("Duplicate item found: {}", _existing_id);
-                    return false;
-                } else {
-                    item_ids.insert(item.item_id);
-                }
-            }
+            // Check for duplicate quickslot items
+            if !Self::has_unique_ids(quick_slot_items) { return false; }
+
+            // Check for duplicate pouch items
+            if !Self::has_unique_ids(pouch_items) { return false; }
+
             true
         }
 
         // region: utils
+
+        // An id the regulation does not list is unknown, not invalid. Mods such
+        // as Seamless Co-op put their own items in these slots, and the editor
+        // writes them back untouched, so refusing the whole save over one would
+        // block editing a save it can handle perfectly well. Duplicates are a
+        // different matter: those are a real sign the data is broken.
+        fn has_unique_ids(items: &Vec<EquipItem>) -> bool {
+            let mut item_ids = HashSet::new();
+            for item in items.iter() {
+                if item.item_id == 0 { continue; }
+                if item_ids.contains(&item.item_id) {
+                    println!("Duplicate item found: {}", item.item_id);
+                    return false;
+                }
+                item_ids.insert(item.item_id);
+            }
+            true
+        }
 
         fn validate_armor_piece(id: u32, protector_category: ProtectorCategory) -> bool {
             let res_armor_piece = Regulation::equip_protectors_param_map().get(&id);

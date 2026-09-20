@@ -75,8 +75,6 @@ impl InventoryViewModel {
                                 quantity: quantity,
                                 is_key_item: goods_type == GoodsType::KeyItem,
                                 item_type: InventoryItemType::ITEM,
-                                max_held: item_param.data.maxNum,
-                                max_storage: item_param.data.maxRepositoryNum,
                                 name: item_param.name.to_string(),
                                 ..Default::default()
                             });

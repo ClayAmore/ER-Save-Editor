@@ -15,6 +15,9 @@ pub mod classes {
         Prisoner = 8,
         Confessor = 6,
         Wretch = 9,
+        // Added by patch 1.17 (Tarnished Pack), CharaInitParam rows 3010/3011.
+        IdusKnight = 10,
+        HeavyKnight = 11,
     }
 
     impl TryFrom<u8> for ArcheType {
@@ -31,6 +34,8 @@ pub mod classes {
                 x if x == ArcheType::Prisoner as u8 => Ok(ArcheType::Prisoner),
                 x if x == ArcheType::Confessor as u8 => Ok(ArcheType::Confessor),
                 x if x == ArcheType::Wretch as u8 => Ok(ArcheType::Wretch),
+                x if x == ArcheType::IdusKnight as u8 => Ok(ArcheType::IdusKnight),
+                x if x == ArcheType::HeavyKnight as u8 => Ok(ArcheType::HeavyKnight),
                 _ => Err(()),
             }
         }
@@ -50,12 +55,13 @@ pub mod classes {
                 ArcheType::Prisoner => "Prisoner".to_string(),
                 ArcheType::Confessor => "Confessor".to_string(),
                 ArcheType::Wretch => "Wretch".to_string(),
+                ArcheType::IdusKnight => "Idus Knight".to_string(),
+                ArcheType::HeavyKnight => "Heavy Knight".to_string(),
             }
         }
     }
 
     pub struct Stats {
-        pub level: u32,
         pub vigor: u32,
         pub mind: u32,
         pub endurance: u32,
@@ -71,7 +77,6 @@ pub mod classes {
     pub static STARTER_CLASSES: Lazy<Mutex<HashMap<ArcheType,Stats>>> = Lazy::new(|| {
         Mutex::new(HashMap::from([
             (ArcheType::Vagabond, Stats{
-                level: 9,
                 vigor: 15,
                 mind: 10,
                 endurance: 11,
@@ -83,7 +88,6 @@ pub mod classes {
             }),
             
             (ArcheType::Warrior, Stats{
-                level: 8,
                 vigor: 11,
                 mind: 12,
                 endurance: 11,
@@ -103,11 +107,9 @@ pub mod classes {
                 intelligence: 7,
                 faith: 8,
                 arcane: 11,
-                level: 7,
             }),
             
             (ArcheType::Bandit, Stats{
-                level: 5,
                 vigor: 10,
                 mind: 11,
                 endurance: 10,
@@ -119,7 +121,6 @@ pub mod classes {
             }),
             
             (ArcheType::Astrologer, Stats{
-                level: 6,
                 vigor: 9,
                 mind: 15,
                 endurance: 9,
@@ -131,7 +132,6 @@ pub mod classes {
             }),
             
             (ArcheType::Prophet, Stats{
-                level: 7,
                 vigor: 10,
                 mind: 14,
                 endurance: 8,
@@ -143,7 +143,6 @@ pub mod classes {
             }),
             
             (ArcheType::Samurai, Stats{
-                level: 9,
                 vigor: 12,
                 mind: 11,
                 endurance: 13,
@@ -155,7 +154,6 @@ pub mod classes {
             }),
             
             (ArcheType::Prisoner, Stats{
-                level: 9,
                 vigor: 11,
                 mind: 12,
                 endurance: 11,
@@ -167,7 +165,6 @@ pub mod classes {
             }),
             
             (ArcheType::Confessor, Stats{
-                level: 10,
                 vigor: 10,
                 mind: 13,
                 endurance: 10,
@@ -179,7 +176,42 @@ pub mod classes {
             }),
             
             (ArcheType::Wretch, Stats{
-                level: 1,
+                vigor: 10,
+                mind: 10,
+                endurance: 10,
+                strength: 10,
+                dexterity: 10,
+                intelligence: 10,
+                faith: 10,
+                arcane: 10,
+            }),
+
+            (ArcheType::IdusKnight, Stats{
+                vigor: 10,
+                mind: 12,
+                endurance: 11,
+                strength: 13,
+                dexterity: 15,
+                intelligence: 8,
+                faith: 11,
+                arcane: 6,
+            }),
+
+            (ArcheType::HeavyKnight, Stats{
+                vigor: 14,
+                mind: 8,
+                endurance: 17,
+                strength: 15,
+                dexterity: 11,
+                intelligence: 7,
+                faith: 8,
+                arcane: 9,
+            }),
+
+            // Stands in for a class this build does not know yet, so a save
+            // from a future patch still opens. Wretch minimums are the floor
+            // the game allows for every class.
+            (ArcheType::Unknown, Stats{
                 vigor: 10,
                 mind: 10,
                 endurance: 10,

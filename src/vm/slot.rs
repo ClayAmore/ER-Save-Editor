@@ -4,7 +4,6 @@ pub mod slot_view_model {
 
     #[derive(Default, Clone)]
     pub struct SlotViewModel {
-        pub active: bool,
         pub general_vm : GeneralViewModel,
         pub stats_vm: StatsViewModel,
         pub equipment_vm: EquipmentViewModel,
@@ -15,8 +14,6 @@ pub mod slot_view_model {
     
     impl SlotViewModel {
         pub fn from_save(slot:&SaveSlot) -> Self {
-            let active = true;
-            
             let general_vm = GeneralViewModel::from_save(slot);
             let stats_vm = StatsViewModel::from_save(slot);
             let equipment_vm = EquipmentViewModel::from_save(slot);
@@ -25,7 +22,6 @@ pub mod slot_view_model {
             let regions_vm = RegionsViewModel::from_save(slot);
              
             Self {
-                active,
                 general_vm,
                 stats_vm,
                 equipment_vm,

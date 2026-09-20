@@ -12,9 +12,7 @@ pub mod stats_view_model {
         pub intelligence: u32,
         pub faith: u32,
         pub arcane: u32,
-        pub level: u32,
-        pub souls: u32,
-        pub soulsmemory: u32
+        pub souls: u32
     }
 
     impl Default for StatsViewModel {
@@ -29,16 +27,18 @@ pub mod stats_view_model {
                 intelligence: Default::default(), 
                 faith: Default::default(), 
                 arcane: Default::default(),
-                level: Default::default(), 
-                souls: Default::default(), 
-                soulsmemory: Default::default(), 
+                souls: Default::default(),
             }
         }
     }
 
     impl StatsViewModel {
         pub fn from_save(slot:& SaveSlot) -> Self {
-            let arche_type = ArcheType::try_from(slot.player_game_data.arche_type).expect("");
+            // A class this build does not know (a later patch adding one) must
+            // not take the save down with it. The raw byte is written back
+            // untouched, so falling back here changes nothing on disk.
+            let arche_type = ArcheType::try_from(slot.player_game_data.arche_type)
+                .unwrap_or(ArcheType::Unknown);
             let vigor = slot.player_game_data.vigor;
             let mind = slot.player_game_data.mind;
             let endurance = slot.player_game_data.endurance;
@@ -47,9 +47,7 @@ pub mod stats_view_model {
             let intelligence = slot.player_game_data.intelligence;
             let faith = slot.player_game_data.faith;
             let arcane = slot.player_game_data.arcane;
-            let level = slot.player_game_data.level;
             let souls = slot.player_game_data.souls;
-            let soulsmemory = slot.player_game_data.soulsmemory;
 
             Self {
                 arche_type,
@@ -61,9 +59,7 @@ pub mod stats_view_model {
                 intelligence,
                 faith,
                 arcane,
-                level,
-                souls,
-                soulsmemory
+                souls
             }
         }
     }
